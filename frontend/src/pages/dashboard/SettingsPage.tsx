@@ -34,6 +34,11 @@ export default function SettingsPage() {
     lastName: '',
     language: 'en',
   })
+  const [originalFormData, setOriginalFormData] = useState({
+    firstName: '',
+    lastName: '',
+    language: 'en',
+  })
 
   useEffect(() => {
     setFormData((prev) => ({ ...prev, language: i18n.language }))
@@ -56,6 +61,11 @@ export default function SettingsPage() {
             firstName: data.firstName || '',
             lastName: data.lastName || '',
           }))
+          setOriginalFormData({
+            firstName: data.firstName || '',
+            lastName: data.lastName || '',
+            language: data.language || i18n.language,
+          })
 
           if (data.language && data.language !== i18n.language) {
             i18n.changeLanguage(data.language)
@@ -91,6 +101,12 @@ export default function SettingsPage() {
       if (response.ok) {
         const updatedUser = await response.json()
         setUser(updatedUser)
+        const saved = {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          language: formData.language,
+        }
+        setOriginalFormData(saved)
         if (formData.language !== i18n.language) {
           i18n.changeLanguage(formData.language)
         }
@@ -185,7 +201,15 @@ export default function SettingsPage() {
             </div>
           </CardContent>
           <CardFooter>
-            <Button onClick={handleSaveProfile} disabled={profileLoading}>
+            <Button
+              onClick={handleSaveProfile}
+              disabled={
+                profileLoading ||
+                (formData.firstName === originalFormData.firstName &&
+                  formData.lastName === originalFormData.lastName &&
+                  formData.language === originalFormData.language)
+              }
+            >
               {profileLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {t('common.save')}
             </Button>
