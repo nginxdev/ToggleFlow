@@ -10,6 +10,7 @@ interface FlagState {
   fetchFlags: (projectId: string) => Promise<void>
   fetchFlag: (id: string) => Promise<void>
   createFlag: (projectId: string, data: any) => Promise<void>
+  updateFlag: (id: string, data: any) => Promise<void>
   deleteFlag: (id: string) => Promise<void>
   toggleFlag: (id: string, environmentId: string, currentState: boolean) => Promise<void>
 }
@@ -48,6 +49,15 @@ export const useFlagStore = create<FlagState>((set, get) => ({
   createFlag: async (projectId, data) => {
     await flagsApi.create(projectId, data)
     await get().fetchFlags(projectId)
+  },
+
+  updateFlag: async (id, data) => {
+    const updated = await flagsApi.update(id, data)
+    set((state) => ({
+      flags: state.flags.map((f) => (f.id === id ? { ...f, ...updated } : f)),
+      selectedFlag:
+        state.selectedFlag?.id === id ? { ...state.selectedFlag, ...updated } : state.selectedFlag,
+    }))
   },
 
   deleteFlag: async (id) => {

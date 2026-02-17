@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
-import { useParams, Link } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
+import { useParams, Link, useNavigate } from 'react-router-dom'
+import { useTranslation, Trans } from 'react-i18next'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Switch } from '@/components/ui/switch'
 import { Separator } from '@/components/ui/separator'
@@ -14,6 +16,16 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import {
   ChevronRight,
   Settings as SettingsIcon,
   Users,
@@ -22,8 +34,10 @@ import {
   Activity,
   Plus,
   Copy,
+  Check,
   Terminal,
   Loader2,
+  Trash2,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useFlagStore } from '@/store/flagStore'
@@ -31,10 +45,20 @@ import { useFlagStore } from '@/store/flagStore'
 export default function FlagDetailsPage() {
   const { t } = useTranslation()
   const { id } = useParams()
-  const { selectedFlag: flag, loading, fetchFlag, toggleFlag } = useFlagStore()
+  const navigate = useNavigate()
+  const { selectedFlag: flag, loading, fetchFlag, toggleFlag, updateFlag, deleteFlag } =
+    useFlagStore()
   const [activeTab, setActiveTab] = useState('targeting')
   const [selectedEnvId, setSelectedEnvId] = useState<string>('')
   const [isToggling, setIsToggling] = useState(false)
+  const [copied, setCopied] = useState(false)
+
+  const [editForm, setEditForm] = useState({ name: '', description: '' })
+  const [originalForm, setOriginalForm] = useState({ name: '', description: '' })
+  const [isSaving, setIsSaving] = useState(false)
+
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const [deleteConfirmation, setDeleteConfirmation] = useState('')
 
   useEffect(() => {
     if (id) {
@@ -51,6 +75,14 @@ export default function FlagDetailsPage() {
     }
   }, [flag, selectedEnvId])
 
+  useEffect(() => {
+    if (flag) {
+      const formData = { name: flag.name, description: flag.description || '' }
+      setEditForm(formData)
+      setOriginalForm(formData)
+    }
+  }, [flag])
+
   const handleToggleStatus = async (checked: boolean) => {
     if (!selectedEnvId || !id) return
 
@@ -63,6 +95,42 @@ export default function FlagDetailsPage() {
       setIsToggling(false)
     }
   }
+
+  const handleCopyKey = async () => {
+    if (!flag) return
+    await navigator.clipboard.writeText(flag.key)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  const handleSaveSettings = async () => {
+    if (!id) return
+    setIsSaving(true)
+    try {
+      await updateFlag(id, {
+        name: editForm.name,
+        description: editForm.description || undefined,
+      })
+      setOriginalForm({ ...editForm })
+    } catch (error) {
+      console.error('Failed to update flag:', error)
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  const handleDeleteFlag = async () => {
+    if (!flag) return
+    try {
+      await deleteFlag(flag.id)
+      navigate('/dashboard/flags')
+    } catch (error) {
+      console.error('Failed to delete flag:', error)
+    }
+  }
+
+  const hasChanges =
+    editForm.name !== originalForm.name || editForm.description !== originalForm.description
 
   if (loading) {
     return (
@@ -78,7 +146,7 @@ export default function FlagDetailsPage() {
     return (
       <DashboardLayout>
         <div className="flex h-96 items-center justify-center">
-          <p className="text-muted-foreground">Flag not found</p>
+          <p className="text-muted-foreground">{t('flagDetails.notFound')}</p>
         </div>
       </DashboardLayout>
     )
@@ -110,7 +178,6 @@ export default function FlagDetailsPage() {
   return (
     <DashboardLayout>
       <div className="flex flex-col gap-6">
-        {/* Breadcrumbs */}
         <nav className="text-muted-foreground flex items-center gap-2 text-sm">
           <Link to="/dashboard/flags" className="hover:text-foreground transition-colors">
             {t('nav.featureFlags')}
@@ -119,7 +186,6 @@ export default function FlagDetailsPage() {
           <span className="text-foreground font-medium">{flag.name}</span>
         </nav>
 
-        {/* Header */}
         <div className="border-border flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
             <div className="bg-primary/10 text-primary hidden h-12 w-12 items-center justify-center sm:flex">
@@ -131,8 +197,17 @@ export default function FlagDetailsPage() {
                 <code className="text-muted-foreground bg-muted px-1.5 py-0.5 font-mono text-sm">
                   {flag.key}
                 </code>
-                <Button variant="ghost" size="icon" className="h-6 w-6">
-                  <Copy className="h-3 w-3" />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6"
+                  onClick={handleCopyKey}
+                >
+                  {copied ? (
+                    <Check className="h-3 w-3 text-green-500" />
+                  ) : (
+                    <Copy className="h-3 w-3" />
+                  )}
                 </Button>
                 <Separator orientation="vertical" className="mx-1 h-4" />
                 <Badge
@@ -147,7 +222,7 @@ export default function FlagDetailsPage() {
           <div className="flex items-center gap-3">
             <Select value={selectedEnvId} onValueChange={setSelectedEnvId}>
               <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Select Environment" />
+                <SelectValue placeholder={t('flagDetails.selectEnvironment')} />
               </SelectTrigger>
               <SelectContent>
                 {flag.project?.environments?.map((env: any) => (
@@ -178,7 +253,6 @@ export default function FlagDetailsPage() {
           </div>
         </div>
 
-        {/* Tabs */}
         <div className="border-border no-scrollbar flex items-center gap-1 overflow-x-auto border-b">
           {tabs.map((tab) => (
             <button
@@ -197,7 +271,6 @@ export default function FlagDetailsPage() {
           ))}
         </div>
 
-        {/* Tab Content */}
         <div className="py-2">
           {activeTab === 'targeting' && (
             <div className="grid gap-6">
@@ -291,15 +364,132 @@ export default function FlagDetailsPage() {
                   ))}
                   {(!flag.variations || flag.variations.length === 0) && (
                     <div className="text-muted-foreground p-4 text-center text-sm">
-                      No variations defined for boolean flag (Implicit true/false)
+                      {t('flagDetails.variations.noVariations')}
                     </div>
                   )}
                 </div>
               </div>
             </section>
           )}
+
+          {activeTab === 'settings' && (
+            <div className="grid gap-6">
+              <section className="border-border bg-card border">
+                <div className="border-border flex items-center justify-between border-b p-4">
+                  <div className="flex items-center gap-3">
+                    <SettingsIcon className="text-primary h-5 w-5" />
+                    <h3 className="font-bold">{t('flagDetails.settings.general')}</h3>
+                  </div>
+                </div>
+                <div className="space-y-4 p-6">
+                  <div className="grid gap-2">
+                    <Label htmlFor="edit-flag-name">{t('flags.flagName')}</Label>
+                    <Input
+                      id="edit-flag-name"
+                      value={editForm.name}
+                      onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="edit-flag-key">{t('flags.flagKey')}</Label>
+                    <Input id="edit-flag-key" value={flag.key} disabled />
+                    <p className="text-muted-foreground text-xs">
+                      {t('flagDetails.settings.keyReadOnly')}
+                    </p>
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="edit-flag-desc">{t('flags.description')}</Label>
+                    <Input
+                      id="edit-flag-desc"
+                      value={editForm.description}
+                      placeholder={t('flags.descriptionPlaceholder')}
+                      onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                    />
+                  </div>
+                  <div className="flex justify-end">
+                    <Button onClick={handleSaveSettings} disabled={!hasChanges || isSaving}>
+                      {isSaving ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          {t('common.saving')}
+                        </>
+                      ) : (
+                        t('common.save')
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              </section>
+
+              <section className="border-destructive/20 bg-card border">
+                <div className="border-destructive/20 flex items-center justify-between border-b p-4">
+                  <div className="flex items-center gap-3">
+                    <Trash2 className="text-destructive h-5 w-5" />
+                    <h3 className="text-destructive font-bold">
+                      {t('flagDetails.settings.dangerZone')}
+                    </h3>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between p-6">
+                  <div>
+                    <p className="font-medium">{t('flagDetails.settings.deleteFlag')}</p>
+                    <p className="text-muted-foreground text-sm">
+                      {t('flagDetails.settings.deleteDesc')}
+                    </p>
+                  </div>
+                  <Button variant="destructive" onClick={() => setShowDeleteDialog(true)}>
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    {t('common.delete')}
+                  </Button>
+                </div>
+              </section>
+            </div>
+          )}
         </div>
       </div>
+
+      <AlertDialog
+        open={showDeleteDialog}
+        onOpenChange={(open) => {
+          if (!open) {
+            setShowDeleteDialog(false)
+            setDeleteConfirmation('')
+          }
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('flags.deleteTitle')}</AlertDialogTitle>
+            <AlertDialogDescription>{t('flags.deleteWarning')}</AlertDialogDescription>
+            <div className="mt-4 w-full">
+              <Label htmlFor="confirm-detail-delete" className="mb-2 block">
+                <Trans
+                  i18nKey="flags.deleteInstruction"
+                  values={{ name: flag.name }}
+                  components={{ strong: <span className="font-mono font-bold" /> }}
+                />
+              </Label>
+              <Input
+                id="confirm-detail-delete"
+                value={deleteConfirmation}
+                onChange={(e) => setDeleteConfirmation(e.target.value)}
+                placeholder={flag.name}
+                className="w-full"
+              />
+            </div>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              onClick={handleDeleteFlag}
+              disabled={deleteConfirmation !== flag.name}
+            >
+              {t('flags.deleteAction')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </DashboardLayout>
   )
 }
