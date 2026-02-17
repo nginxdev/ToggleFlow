@@ -137,27 +137,27 @@ export default function ProjectsPage() {
               </Button>
             </DialogTrigger>
             <DialogContent>
-              <DialogHeader>
-                <DialogTitle>{t('projects.createProject')}</DialogTitle>
+                <DialogHeader>
+                <DialogTitle>{t('projects.createNew')}</DialogTitle>
                 <DialogDescription>
                   {t('projects.createDesc')}
                 </DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="name">{t('projects.name')}</Label>
+                  <Label htmlFor="name">{t('projects.projectName')}</Label>
                   <Input
                     id="name"
-                    placeholder="My Awesome Project"
+                    placeholder={t('projects.namePlaceholder')}
                     value={newProject.name}
                     onChange={(e) => handleNameChange(e.target.value)}
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="key">{t('projects.key')}</Label>
+                  <Label htmlFor="key">{t('projects.projectKey')}</Label>
                   <Input
                     id="key"
-                    placeholder="my-awesome-project"
+                    placeholder={t('projects.keyPlaceholder')}
                     value={newProject.key}
                     onChange={(e) => setNewProject({ ...newProject, key: e.target.value })}
                   />
@@ -169,7 +169,7 @@ export default function ProjectsPage() {
                   <Label htmlFor="description">{t('projects.description')}</Label>
                   <Textarea
                     id="description"
-                    placeholder="Describe your project..."
+                    placeholder={t('projects.descPlaceholder')}
                     value={newProject.description}
                     onChange={(e) => setNewProject({ ...newProject, description: e.target.value })}
                   />
@@ -189,7 +189,7 @@ export default function ProjectsPage() {
                       {t('common.creating')}
                     </>
                   ) : (
-                    t('projects.createProject')
+                    t('projects.createNew')
                   )}
                 </Button>
               </DialogFooter>
@@ -215,11 +215,11 @@ export default function ProjectsPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{t('projects.name')}</TableHead>
-                  <TableHead>{t('projects.key')}</TableHead>
+                  <TableHead>{t('projects.projectName')}</TableHead>
+                  <TableHead>{t('projects.projectKey')}</TableHead>
                   <TableHead>{t('projects.description')}</TableHead>
-                  <TableHead>{t('projects.environments')}</TableHead>
-                  <TableHead>{t('projects.flags')}</TableHead>
+                  <TableHead>{t('projects.environmentCount')}</TableHead>
+                  <TableHead>{t('projects.flagCount')}</TableHead>
                   <TableHead className="text-right">{t('common.actions')}</TableHead>
                 </TableRow>
               </TableHeader>

@@ -123,19 +123,19 @@ export default function EnvironmentsPage() {
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="name">{t('environments.name')}</Label>
+                  <Label htmlFor="name">{t('environments.environmentName')}</Label>
                   <Input
                     id="name"
-                    placeholder="e.g., Development, Testing, Staging, Production"
+                    placeholder={t('environments.namePlaceholder')}
                     value={newEnvironment.name}
                     onChange={(e) => handleNameChange(e.target.value)}
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="key">{t('environments.key')}</Label>
+                  <Label htmlFor="key">{t('environments.environmentKey')}</Label>
                   <Input
                     id="key"
-                    placeholder="environment-key"
+                    placeholder={t('environments.keyPlaceholder')}
                     value={newEnvironment.key}
                     onChange={(e) =>
                       setNewEnvironment({ ...newEnvironment, key: e.target.value })
