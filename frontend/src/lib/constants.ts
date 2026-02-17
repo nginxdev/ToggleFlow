@@ -4,6 +4,7 @@ export const SUPPORTED_LANGUAGES = [
   { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
   { code: 'it', name: 'Italiano', flag: '🇮🇹' },
   { code: 'te', name: 'తెలుగు', flag: '🇮🇳' },
+  { code: 'debug', name: 'Language Keys', flag: '🐛' },
 ] as const
 
 export type LanguageCode = (typeof SUPPORTED_LANGUAGES)[number]['code']

@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "preview": "vite preview",
-    "prepare": "husky"
+    "prepare": "husky",
+    "gen:debug": "node ../tools/generate_debug_locale.js"
   },
   "dependencies": {
     "@base-ui/react": "^1.2.0",

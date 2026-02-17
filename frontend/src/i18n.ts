@@ -7,6 +7,7 @@ import de from './locales/de.json'
 import it from './locales/it.json'
 import fr from './locales/fr.json'
 import te from './locales/te.json'
+import debug from './locales/debug.json'
 
 i18n
   .use(LanguageDetector)
@@ -18,6 +19,7 @@ i18n
       it: { translation: it },
       fr: { translation: fr },
       te: { translation: te },
+      debug: { translation: debug },
     },
     fallbackLng: 'en',
     interpolation: {
