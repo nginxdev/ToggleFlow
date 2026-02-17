@@ -76,7 +76,7 @@
     "deleteInstruction": "Tapez <strong>{{key}}</strong> pour confirmer",
     "deleteAction": "Supprimer le Projet",
     "infoTitle": "À Propos des Projets",
-    "infoDesc": "Les projets vous aident à organiser les indicateurs de fonctionnalité entre différentes applications ou équipes. Chaque projet reçoit automatiquement 3 environnements (Développement, Préproduction, Production) lors de la création. Vous pouvez gérer des environnements supplémentaires depuis la page Environnements."
+    "infoDesc": "Les projets vous aident à organiser les indicateurs de fonctionnalité entre différentes applications ou équipes. Chaque projet reçoit automatiquement 3 environnements (Développement, Test, Production) lors de la création. Vous pouvez gérer des environnements supplémentaires depuis la page Environnements."
   },
   "environments": {
     "title": "Environnements",
@@ -98,7 +98,13 @@
     "live": "En Direct",
     "active": "Actif",
     "infoTitle": "À Propos des Environnements",
-    "infoDesc": "Les environnements vous permettent de gérer les indicateurs de fonctionnalité à travers différentes étapes de déploiement. Chaque environnement peut avoir des états d'indicateurs différents, vous permettant de tester les fonctionnalités avant de les publier en production. Entrez n'importe quel nom - des exemples courants incluent Développement, Test, Préproduction et Production."
+    "infoDesc": "Les environnements vous permettent de gérer les indicateurs de fonctionnalité à travers différentes étapes de déploiement. Chaque environnement peut avoir des états d'indicateurs différents, vous permettant de tester les fonctionnalités avant de les publier en production. Entrez n'importe quel nom - des exemples courants incluent Développement, Test, Préproduction et Production.",
+    "default": "Par défaut",
+    "deleteTitle": "Supprimer l'Environnement",
+    "deleteWarning": "Cela supprimera définitivement cet environnement et tous les états d'indicateurs associés. Cette action est irréversible.",
+    "deleteProtected": "Ceci est un environnement par défaut et ne peut pas être supprimé. Les environnements par défaut (Développement, Test, Production) sont protégés.",
+    "deleteInstruction": "Tapez <strong>{{name}}</strong> pour confirmer la suppression",
+    "deleteAction": "Supprimer l'Environnement"
   },
   "segments": {
     "title": "Segments d'Utilisateurs",

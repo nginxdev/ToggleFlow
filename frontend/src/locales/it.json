@@ -76,7 +76,7 @@
     "deleteInstruction": "Digita <strong>{{key}}</strong> per confermare",
     "deleteAction": "Elimina Progetto",
     "infoTitle": "Informazioni sui Progetti",
-    "infoDesc": "I progetti ti aiutano a organizzare i flag di funzionalità tra diverse applicazioni o team. Ogni progetto ottiene automaticamente 3 ambienti (Sviluppo, Staging, Produzione) alla creazione. Puoi gestire ambienti aggiuntivi dalla pagina Ambienti."
+    "infoDesc": "I progetti ti aiutano a organizzare i flag di funzionalità tra diverse applicazioni o team. Ogni progetto ottiene automaticamente 3 ambienti (Sviluppo, Test, Produzione) alla creazione. Puoi gestire ambienti aggiuntivi dalla pagina Ambienti."
   },
   "environments": {
     "title": "Ambienti",
@@ -98,7 +98,13 @@
     "live": "Live",
     "active": "Attivo",
     "infoTitle": "Informazioni sugli Ambienti",
-    "infoDesc": "Gli ambienti ti permettono di gestire i flag di funzionalità attraverso diverse fasi di distribuzione. Ogni ambiente può avere stati di flag diversi, permettendoti di testare le funzionalità prima di rilasciarle in produzione. Inserisci qualsiasi nome desideri - esempi comuni includono Sviluppo, Test, Staging e Produzione."
+    "infoDesc": "Gli ambienti ti permettono di gestire i flag di funzionalità attraverso diverse fasi di distribuzione. Ogni ambiente può avere stati di flag diversi, permettendoti di testare le funzionalità prima di rilasciarle in produzione. Inserisci qualsiasi nome desideri - esempi comuni includono Sviluppo, Test e Produzione.",
+    "default": "Predefinito",
+    "deleteTitle": "Elimina Ambiente",
+    "deleteWarning": "Questo eliminerà permanentemente questo ambiente e tutti gli stati dei flag associati. Questa azione non può essere annullata.",
+    "deleteProtected": "Questo è un ambiente predefinito e non può essere eliminato. Gli ambienti predefiniti (Development, Test, Production) sono protetti.",
+    "deleteInstruction": "Digita <strong>{{name}}</strong> per confermare l'eliminazione",
+    "deleteAction": "Elimina Ambiente"
   },
   "segments": {
     "title": "Segmenti Utente",

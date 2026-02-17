@@ -76,7 +76,7 @@
     "deleteInstruction": "Type <strong>{{key}}</strong> to confirm",
     "deleteAction": "Delete Project",
     "infoTitle": "About Projects",
-    "infoDesc": "Projects help you organize feature flags across different applications or teams. Each project automatically gets 3 environments (Development, Staging, Production) when created. You can manage additional environments from the Environments page."
+    "infoDesc": "Projects help you organize feature flags across different applications or teams. Each project automatically gets 3 environments (Development, Test, Production) when created. You can manage additional environments from the Environments page."
   },
   "environments": {
     "title": "Environments",
@@ -98,7 +98,13 @@
     "live": "Live",
     "active": "Active",
     "infoTitle": "About Environments",
-    "infoDesc": "Environments allow you to manage feature flags across different deployment stages. Each environment can have different flag states, enabling you to test features before releasing them to production. Enter any name you want - common examples include Development, Testing, Staging, and Production."
+    "infoDesc": "Environments allow you to manage feature flags across different deployment stages. Each environment can have different flag states, enabling you to test features before releasing them to production. Enter any name you want - common examples include Development, Testing, Staging, and Production.",
+    "default": "Default",
+    "deleteTitle": "Delete Environment",
+    "deleteWarning": "This will permanently delete this environment and all associated flag states. This action cannot be undone.",
+    "deleteProtected": "This is a default environment and cannot be deleted. Default environments (Development, Test, Production) are protected.",
+    "deleteInstruction": "Type <strong>{{name}}</strong> to confirm deletion",
+    "deleteAction": "Delete Environment"
   },
   "segments": {
     "title": "User Segments",

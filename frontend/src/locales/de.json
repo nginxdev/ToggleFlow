@@ -76,7 +76,7 @@
     "deleteInstruction": "Geben Sie <strong>{{key}}</strong> ein, um zu bestätigen",
     "deleteAction": "Projekt Löschen",
     "infoTitle": "Über Projekte",
-    "infoDesc": "Projekte helfen Ihnen, Feature-Flags über verschiedene Anwendungen oder Teams hinweg zu organisieren. Jedes Projekt erhält automatisch 3 Umgebungen (Entwicklung, Staging, Produktion) bei der Erstellung. Sie können zusätzliche Umgebungen über die Umgebungsseite verwalten."
+    "infoDesc": "Projekte helfen Ihnen, Feature-Flags über verschiedene Anwendungen oder Teams hinweg zu organisieren. Jedes Projekt erhält automatisch 3 Umgebungen (Entwicklung, Test, Produktion) bei der Erstellung. Sie können zusätzliche Umgebungen über die Umgebungsseite verwalten."
   },
   "environments": {
     "title": "Umgebungen",
@@ -98,7 +98,13 @@
     "live": "Live",
     "active": "Aktiv",
     "infoTitle": "Über Umgebungen",
-    "infoDesc": "Umgebungen ermöglichen es Ihnen, Feature-Flags über verschiedene Bereitstellungsstufen hinweg zu verwalten. Jede Umgebung kann unterschiedliche Flag-Zustände haben, sodass Sie Funktionen testen können, bevor Sie sie in der Produktion freigeben. Geben Sie einen beliebigen Namen ein - übliche Beispiele sind Entwicklung, Test, Staging und Produktion."
+    "infoDesc": "Umgebungen ermöglichen es Ihnen, Feature-Flags über verschiedene Bereitstellungsstufen hinweg zu verwalten. Jede Umgebung kann unterschiedliche Flag-Zustände haben, sodass Sie Funktionen testen können, bevor Sie sie in der Produktion freigeben. Geben Sie einen beliebigen Namen ein - übliche Beispiele sind Entwicklung, Test und Produktion.",
+    "default": "Standard",
+    "deleteTitle": "Umgebung löschen",
+    "deleteWarning": "Diese Umgebung und alle zugehörigen Flag-Zustände werden dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.",
+    "deleteProtected": "Dies ist eine Standardumgebung und kann nicht gelöscht werden. Standardumgebungen (Development, Test, Production) sind geschützt.",
+    "deleteInstruction": "Geben Sie <strong>{{name}}</strong> ein, um das Löschen zu bestätigen",
+    "deleteAction": "Umgebung löschen"
   },
   "segments": {
     "title": "Benutzersegmente",

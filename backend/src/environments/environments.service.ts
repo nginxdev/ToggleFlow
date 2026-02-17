@@ -2,10 +2,12 @@ import {
   Injectable,
   NotFoundException,
   ConflictException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateEnvironmentDto } from './dto/create-environment.dto';
 import { UpdateEnvironmentDto } from './dto/update-environment.dto';
+import { DEFAULT_ENVIRONMENT_KEYS } from '../types/consts/environments';
 
 @Injectable()
 export class EnvironmentsService {
@@ -83,6 +85,16 @@ export class EnvironmentsService {
 
     if (!environment) {
       throw new NotFoundException(`Environment with ID ${id} not found`);
+    }
+
+    if (
+      DEFAULT_ENVIRONMENT_KEYS.includes(
+        environment.key as (typeof DEFAULT_ENVIRONMENT_KEYS)[number],
+      )
+    ) {
+      throw new ForbiddenException(
+        'Default environments (development, test, production) cannot be deleted',
+      );
     }
 
     await this.prisma.environment.delete({

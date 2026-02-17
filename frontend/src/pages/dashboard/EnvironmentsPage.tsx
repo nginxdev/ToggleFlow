@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
+import { useTranslation, Trans } from 'react-i18next'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import { Button } from '@/components/ui/button'
-import { Plus, Layers, Trash2, Edit, Loader2 } from 'lucide-react'
+import { Plus, Layers, Trash2, Edit, Loader2, ShieldAlert } from 'lucide-react'
 import {
   Table,
   TableBody,
@@ -14,6 +14,8 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { useProjectStore } from '@/store/projectStore'
 import { toCamelCase } from '@/lib/string-utils'
+import { DEFAULT_ENVIRONMENT_KEYS } from '@/types'
+import type { Environment } from '@/types'
 import {
   Dialog,
   DialogContent,
@@ -23,8 +25,21 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+
+const isDefaultEnvironment = (key: string) =>
+  DEFAULT_ENVIRONMENT_KEYS.includes(key as (typeof DEFAULT_ENVIRONMENT_KEYS)[number])
 
 export default function EnvironmentsPage() {
   const { t } = useTranslation()
@@ -41,6 +56,8 @@ export default function EnvironmentsPage() {
     name: '',
     key: '',
   })
+  const [envToDelete, setEnvToDelete] = useState<Environment | null>(null)
+  const [deleteConfirmation, setDeleteConfirmation] = useState('')
 
   const handleCreateEnvironment = async () => {
     if (!newEnvironment.name || !newEnvironment.key || !selectedProject) return
@@ -62,6 +79,19 @@ export default function EnvironmentsPage() {
     }
   }
 
+  const confirmDeleteEnvironment = async () => {
+    if (!envToDelete || isDefaultEnvironment(envToDelete.key)) return
+
+    try {
+      await deleteEnvironment(envToDelete.id)
+      setEnvToDelete(null)
+      setDeleteConfirmation('')
+    } catch (error) {
+      console.error('Failed to delete environment:', error)
+      alert('Failed to delete environment.')
+    }
+  }
+
   const handleNameChange = (name: string) => {
     setNewEnvironment({
       name,
@@ -72,7 +102,6 @@ export default function EnvironmentsPage() {
   return (
     <DashboardLayout>
       <div className="flex flex-col gap-6 p-6">
-        {/* Header */}
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">{t('environments.title')}</h1>
@@ -133,7 +162,6 @@ export default function EnvironmentsPage() {
           </Dialog>
         </div>
 
-        {/* Environments Table */}
         {loading ? (
           <div className="text-muted-foreground py-12 text-center">{t('common.loading')}</div>
         ) : environments.length === 0 ? (
@@ -162,7 +190,16 @@ export default function EnvironmentsPage() {
               <TableBody>
                 {environments.map((env) => (
                   <TableRow key={env.id}>
-                    <TableCell className="font-medium">{env.name}</TableCell>
+                    <TableCell className="font-medium">
+                      <span className="flex items-center gap-2">
+                        {env.name}
+                        {isDefaultEnvironment(env.key) && (
+                          <Badge variant="outline" className="text-xs">
+                            {t('environments.default')}
+                          </Badge>
+                        )}
+                      </span>
+                    </TableCell>
                     <TableCell className="text-muted-foreground font-mono text-sm">
                       {env.key}
                     </TableCell>
@@ -184,11 +221,8 @@ export default function EnvironmentsPage() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => {
-                            if (confirm(t('environments.deleteConfirm'))) {
-                              deleteEnvironment(env.id)
-                            }
-                          }}
+                          disabled={isDefaultEnvironment(env.key)}
+                          onClick={() => setEnvToDelete(env)}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -201,12 +235,67 @@ export default function EnvironmentsPage() {
           </div>
         )}
 
-        {/* Info Card */}
         <div className="bg-muted/50 rounded-lg border p-4">
           <h3 className="mb-2 font-semibold">{t('environments.infoTitle')}</h3>
           <p className="text-muted-foreground text-sm">{t('environments.infoDesc')}</p>
         </div>
       </div>
+
+      <AlertDialog
+        open={!!envToDelete}
+        onOpenChange={(open) => {
+          if (!open) {
+            setEnvToDelete(null)
+            setDeleteConfirmation('')
+          }
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('environments.deleteTitle')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {envToDelete && isDefaultEnvironment(envToDelete.key) ? (
+                <span className="flex items-center gap-2 text-amber-500">
+                  <ShieldAlert className="h-4 w-4" />
+                  {t('environments.deleteProtected')}
+                </span>
+              ) : (
+                t('environments.deleteWarning')
+              )}
+            </AlertDialogDescription>
+            {envToDelete && !isDefaultEnvironment(envToDelete.key) && (
+              <div className="mt-4 w-full">
+                <Label htmlFor="confirm-env-delete" className="mb-2 block">
+                  <Trans
+                    i18nKey="environments.deleteInstruction"
+                    values={{ name: envToDelete.name }}
+                    components={{ strong: <span className="font-mono font-bold" /> }}
+                  />
+                </Label>
+                <Input
+                  id="confirm-env-delete"
+                  value={deleteConfirmation}
+                  onChange={(e) => setDeleteConfirmation(e.target.value)}
+                  placeholder={envToDelete.name}
+                  className="w-full"
+                />
+              </div>
+            )}
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+            {envToDelete && !isDefaultEnvironment(envToDelete.key) && (
+              <AlertDialogAction
+                variant="destructive"
+                onClick={confirmDeleteEnvironment}
+                disabled={deleteConfirmation !== envToDelete.name}
+              >
+                {t('environments.deleteAction')}
+              </AlertDialogAction>
+            )}
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </DashboardLayout>
   )
 }
