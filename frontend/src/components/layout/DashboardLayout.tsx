@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import {
   Zap,
@@ -27,6 +27,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { projectsApi, environmentsApi } from '@/lib/api'
 
 interface SidebarItemProps {
   icon: React.ReactNode
@@ -62,6 +63,49 @@ function SidebarItem({ icon, label, href, active }: SidebarItemProps) {
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const location = useLocation()
   const navigate = useNavigate()
+  
+  const [projects, setProjects] = useState<any[]>([])
+  const [selectedProject, setSelectedProject] = useState<any>(null)
+  const [environments, setEnvironments] = useState<any[]>([])
+  const [selectedEnvironment, setSelectedEnvironment] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const data = await projectsApi.getAll()
+        setProjects(data)
+        if (data.length > 0) {
+          setSelectedProject(data[0])
+          // Fetch environments for first project
+          const envs = await environmentsApi.getByProject(data[0].id)
+          setEnvironments(envs)
+          if (envs.length > 0) {
+            setSelectedEnvironment(envs[0])
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch projects:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchProjects()
+  }, [])
+
+  const handleProjectChange = async (project: any) => {
+    setSelectedProject(project)
+    try {
+      const envs = await environmentsApi.getByProject(project.id)
+      setEnvironments(envs)
+      if (envs.length > 0) {
+        setSelectedEnvironment(envs[0])
+      }
+    } catch (error) {
+      console.error('Failed to fetch environments:', error)
+    }
+  }
 
   const handleLogout = () => {
     localStorage.removeItem('token')

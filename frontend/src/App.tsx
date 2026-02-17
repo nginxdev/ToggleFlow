@@ -5,6 +5,11 @@ import SignUpPage from '@/pages/auth/SignUpPage'
 import ForgotPasswordPage from '@/pages/auth/ForgotPasswordPage'
 import FlagsPage from '@/pages/dashboard/FlagsPage'
 import FlagDetailsPage from '@/pages/dashboard/FlagDetailsPage'
+import SegmentsPage from '@/pages/dashboard/SegmentsPage'
+import EnvironmentsPage from '@/pages/dashboard/EnvironmentsPage'
+import AuditLogPage from '@/pages/dashboard/AuditLogPage'
+import SettingsPage from '@/pages/dashboard/SettingsPage'
+import ProtectedRoute from '@/components/ProtectedRoute'
 
 export function App() {
   return (
@@ -14,14 +19,14 @@ export function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-        {/* Dashboard Routes */}
-        <Route path="/dashboard" element={<Navigate to="/dashboard/flags" replace />} />
-        <Route path="/dashboard/flags" element={<FlagsPage />} />
-        <Route path="/dashboard/flags/:id" element={<FlagDetailsPage />} />
-        <Route path="/dashboard/segments" element={<FlagsPage />} /> {/* Placeholder */}
-        <Route path="/dashboard/environments" element={<FlagsPage />} /> {/* Placeholder */}
-        <Route path="/dashboard/audit-log" element={<FlagsPage />} /> {/* Placeholder */}
-        <Route path="/dashboard/settings" element={<FlagsPage />} /> {/* Placeholder */}
+        {/* Dashboard Routes - Protected */}
+        <Route path="/dashboard" element={<ProtectedRoute><Navigate to="/dashboard/flags" replace /></ProtectedRoute>} />
+        <Route path="/dashboard/flags" element={<ProtectedRoute><FlagsPage /></ProtectedRoute>} />
+        <Route path="/dashboard/flags/:id" element={<ProtectedRoute><FlagDetailsPage /></ProtectedRoute>} />
+        <Route path="/dashboard/segments" element={<ProtectedRoute><SegmentsPage /></ProtectedRoute>} />
+        <Route path="/dashboard/environments" element={<ProtectedRoute><EnvironmentsPage /></ProtectedRoute>} />
+        <Route path="/dashboard/audit-log" element={<ProtectedRoute><AuditLogPage /></ProtectedRoute>} />
+        <Route path="/dashboard/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
       </Routes>
     </BrowserRouter>
   )
