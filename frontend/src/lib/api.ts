@@ -117,6 +117,15 @@ export const environmentsApi = {
 export const flagsApi = {
   getByProject: async (projectId: string) => {
     const response = await apiFetch(`${API_URL}/projects/${projectId}/flags`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    })
+    return response.json()
+  },
+
+  getArchived: async (projectId: string) => {
+    const response = await apiFetch(`${API_URL}/projects/${projectId}/flags/archived`, {
+      method: 'GET',
       headers: getAuthHeaders(),
     })
     return response.json()
@@ -171,7 +180,30 @@ export const flagsApi = {
     const response = await apiFetch(`${API_URL}/flags/${id}`, {
       method: 'DELETE',
       headers: getAuthHeaders(),
-      body: JSON.stringify({}),
+    })
+    return response.json()
+  },
+
+  archive: async (id: string) => {
+    const response = await apiFetch(`${API_URL}/flags/${id}/archive`, {
+      method: 'PATCH',
+      headers: getAuthHeaders(),
+    })
+    return response.json()
+  },
+
+  unarchive: async (id: string) => {
+    const response = await apiFetch(`${API_URL}/flags/${id}/unarchive`, {
+      method: 'PATCH',
+      headers: getAuthHeaders(),
+    })
+    return response.json()
+  },
+
+  getAudits: async (id: string) => {
+    const response = await apiFetch(`${API_URL}/flags/${id}/audits`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
     })
     return response.json()
   },

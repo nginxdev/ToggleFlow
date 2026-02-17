@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { useTranslation, Trans } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import {
   Table,
@@ -15,7 +15,7 @@ import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { MoreVertical, Plus, Loader2, Flag } from 'lucide-react'
+import { MoreVertical, Plus, Loader2, Flag, Archive } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -49,15 +49,14 @@ import type { FeatureFlag } from '@/types'
 export default function FlagsPage() {
   const { t } = useTranslation()
   const { selectedProject } = useProjectStore()
-  const { flags, loading, fetchFlags, createFlag, toggleFlag, deleteFlag } = useFlagStore()
+  const { flags, loading, fetchFlags, createFlag, toggleFlag, archiveFlag } = useFlagStore()
 
   const [togglingFlags, setTogglingFlags] = useState<Set<string>>(new Set())
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [isCreating, setIsCreating] = useState(false)
   const [newFlag, setNewFlag] = useState({ name: '', key: '', description: '' })
 
-  const [flagToDelete, setFlagToDelete] = useState<FeatureFlag | null>(null)
-  const [deleteConfirmation, setDeleteConfirmation] = useState('')
+  const [flagToArchive, setFlagToArchive] = useState<FeatureFlag | null>(null)
 
   useEffect(() => {
     if (selectedProject) {
@@ -106,15 +105,13 @@ export default function FlagsPage() {
     }
   }
 
-  const confirmDeleteFlag = async () => {
-    if (!flagToDelete) return
-
+  const confirmArchiveFlag = async () => {
+    if (!flagToArchive) return
     try {
-      await deleteFlag(flagToDelete.id)
-      setFlagToDelete(null)
-      setDeleteConfirmation('')
+      await archiveFlag(flagToArchive.id)
+      setFlagToArchive(null)
     } catch (error) {
-      console.error('Failed to delete flag:', error)
+      console.error('Failed to archive flag:', error)
     }
   }
 
@@ -137,6 +134,12 @@ export default function FlagsPage() {
             <p className="text-muted-foreground mt-1">{t('flags.subtitle')}</p>
           </div>
           <div className="flex gap-2">
+            <Link to="/dashboard/flags/archived">
+              <Button variant="outline" size="sm">
+                <Archive className="mr-2 h-4 w-4" />
+                {t('flags.viewArchived')}
+              </Button>
+            </Link>
             <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
               <DialogTrigger asChild>
                 <Button size="sm">
@@ -275,9 +278,9 @@ export default function FlagsPage() {
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               className="text-destructive"
-                              onClick={() => setFlagToDelete(flag)}
+                              onClick={() => setFlagToArchive(flag)}
                             >
-                              {t('common.delete')}
+                              {t('flags.archive')}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -297,48 +300,28 @@ export default function FlagsPage() {
       </div>
 
       <AlertDialog
-        open={!!flagToDelete}
+        open={!!flagToArchive}
         onOpenChange={(open) => {
           if (!open) {
-            setFlagToDelete(null)
-            setDeleteConfirmation('')
+            setFlagToArchive(null)
           }
         }}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t('flags.deleteTitle')}</AlertDialogTitle>
-            <AlertDialogDescription>{t('flags.deleteWarning')}</AlertDialogDescription>
-            {flagToDelete && (
-              <div className="mt-4 w-full">
-                <Label htmlFor="confirm-flag-delete" className="mb-2 block">
-                  <Trans
-                    i18nKey="flags.deleteInstruction"
-                    values={{ name: flagToDelete.name }}
-                    components={{ strong: <span className="font-mono font-bold" /> }}
-                  />
-                </Label>
-                <Input
-                  id="confirm-flag-delete"
-                  value={deleteConfirmation}
-                  onChange={(e) => setDeleteConfirmation(e.target.value)}
-                  placeholder={flagToDelete.name}
-                  className="w-full"
-                />
-              </div>
-            )}
+            <AlertDialogTitle>{t('flags.archiveConfirm')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('flags.archiveWarning')}
+            </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
-            {flagToDelete && (
-              <AlertDialogAction
-                variant="destructive"
-                onClick={confirmDeleteFlag}
-                disabled={deleteConfirmation !== flagToDelete.name}
-              >
-                {t('flags.deleteAction')}
-              </AlertDialogAction>
-            )}
+            <AlertDialogAction
+              variant="destructive"
+              onClick={confirmArchiveFlag}
+            >
+              {t('flags.archiveAction')}
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

@@ -7,7 +7,9 @@ import {
   Param,
   Delete,
   UseGuards,
+  Request as NestRequest,
 } from '@nestjs/common';
+import { Request } from 'express';
 import { FlagsService } from './flags.service';
 import { CreateFlagDto } from './dto/create-flag.dto';
 import { UpdateFlagDto } from './dto/update-flag.dto';
@@ -24,6 +26,11 @@ export class FlagsController {
     return this.flagsService.findByProject(projectId);
   }
 
+  @Get('projects/:projectId/flags/archived')
+  findArchivedByProject(@Param('projectId') projectId: string) {
+    return this.flagsService.findArchivedByProject(projectId);
+  }
+
   @Get('flags/:id')
   findOne(@Param('id') id: string) {
     return this.flagsService.findOne(id);
@@ -33,18 +40,38 @@ export class FlagsController {
   create(
     @Param('projectId') projectId: string,
     @Body() createFlagDto: CreateFlagDto,
+    @NestRequest() req: Request,
   ) {
-    return this.flagsService.create(createFlagDto, projectId);
+    const userId = (req.user as { userId: string }).userId;
+    return this.flagsService.create(createFlagDto, projectId, userId);
   }
 
   @Patch('flags/:id')
-  update(@Param('id') id: string, @Body() updateFlagDto: UpdateFlagDto) {
-    return this.flagsService.update(id, updateFlagDto);
+  update(
+    @Param('id') id: string,
+    @Body() updateFlagDto: UpdateFlagDto,
+    @NestRequest() req: Request,
+  ) {
+    const userId = (req.user as { userId: string }).userId;
+    return this.flagsService.update(id, updateFlagDto, userId);
   }
 
   @Delete('flags/:id')
-  delete(@Param('id') id: string) {
-    return this.flagsService.delete(id);
+  delete(@Param('id') id: string, @NestRequest() req: Request) {
+    const userId = (req.user as { userId: string }).userId;
+    return this.flagsService.delete(id, userId);
+  }
+
+  @Patch('flags/:id/archive')
+  archive(@Param('id') id: string, @NestRequest() req: Request) {
+    const userId = (req.user as { userId: string }).userId;
+    return this.flagsService.archive(id, userId);
+  }
+
+  @Patch('flags/:id/unarchive')
+  unarchive(@Param('id') id: string, @NestRequest() req: Request) {
+    const userId = (req.user as { userId: string }).userId;
+    return this.flagsService.unarchive(id, userId);
   }
 
   @Patch('flags/:flagId/environments/:environmentId')
@@ -52,11 +79,19 @@ export class FlagsController {
     @Param('flagId') flagId: string,
     @Param('environmentId') environmentId: string,
     @Body() updateFlagStateDto: UpdateFlagStateDto,
+    @NestRequest() req: Request,
   ) {
+    const userId = (req.user as { userId: string }).userId;
     return this.flagsService.updateFlagState(
       flagId,
       environmentId,
-      updateFlagStateDto,
+      updateFlagStateDto.isEnabled ?? false,
+      userId,
     );
+  }
+
+  @Get('flags/:id/audits')
+  getAudits(@Param('id') id: string) {
+    return this.flagsService.getAudits(id);
   }
 }

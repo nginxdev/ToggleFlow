@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,16 +7,17 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(uuid())
-  email     String    @unique
-  username  String
-  firstName String?
-  lastName  String?
-  language  String    @default("en")
-  password  String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  projects  Project[]
+  id          String    @id @default(uuid())
+  email       String    @unique
+  username    String
+  firstName   String?
+  lastName    String?
+  language    String    @default("en")
+  password    String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  isSuperUser Boolean   @default(false)
+  projects    Project[] @relation("ProjectToUser")
 }
 
 model Project {
@@ -32,9 +27,9 @@ model Project {
   description  String?
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
-  users        User[]
   environments Environment[]
   flags        FeatureFlag[]
+  users        User[]        @relation("ProjectToUser")
 }
 
 model Environment {
@@ -43,10 +38,10 @@ model Environment {
   key        String
   apiKey     String      @unique @default(uuid())
   projectId  String
-  project    Project     @relation(fields: [projectId], references: [id])
-  flagStates FlagState[]
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
+  project    Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  flagStates FlagState[]
 
   @@unique([projectId, key])
 }
@@ -56,25 +51,36 @@ model FeatureFlag {
   name         String
   key          String      @unique
   description  String?
-  type         String      @default("boolean") // boolean, string, number, json
-  variations   Json?       // List of possible variations
+  type         String      @default("boolean")
+  variations   Json?
   defaultValue String
   projectId    String
-  project      Project     @relation(fields: [projectId], references: [id])
-  flagStates   FlagState[]
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
+  isArchived   Boolean     @default(false)
+  project      Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  flagStates   FlagState[]
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  action    String
+  entity    String
+  entityId  String
+  payload   Json?
+  userId    String
+  createdAt DateTime @default(now())
 }
 
 model FlagState {
   id            String      @id @default(uuid())
   isEnabled     Boolean     @default(false)
-  rules         Json?       // Targeting rules for this environment
+  rules         Json?
   flagId        String
-  flag          FeatureFlag @relation(fields: [flagId], references: [id])
   environmentId String
-  environment   Environment @relation(fields: [environmentId], references: [id])
   updatedAt     DateTime    @updatedAt
+  environment   Environment @relation(fields: [environmentId], references: [id], onDelete: Cascade)
+  flag          FeatureFlag @relation(fields: [flagId], references: [id], onDelete: Cascade)
 
   @@unique([flagId, environmentId])
 }

@@ -7,14 +7,18 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateFlagDto } from './dto/create-flag.dto';
 import { UpdateFlagDto } from './dto/update-flag.dto';
 import { UpdateFlagStateDto } from './dto/update-flag-state.dto';
+import { AuditService } from '../audit/audit.service';
 
 @Injectable()
 export class FlagsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private auditService: AuditService,
+  ) {}
 
   async findByProject(projectId: string) {
     return this.prisma.featureFlag.findMany({
-      where: { projectId },
+      where: { projectId, isArchived: false },
       include: {
         flagStates: {
           include: {
@@ -24,6 +28,22 @@ export class FlagsService {
       },
       orderBy: {
         createdAt: 'desc',
+      },
+    });
+  }
+
+  async findArchivedByProject(projectId: string) {
+    return this.prisma.featureFlag.findMany({
+      where: { projectId, isArchived: true },
+      include: {
+        flagStates: {
+          include: {
+            environment: true,
+          },
+        },
+      },
+      orderBy: {
+        updatedAt: 'desc',
       },
     });
   }
@@ -52,7 +72,7 @@ export class FlagsService {
     return flag;
   }
 
-  async create(createFlagDto: CreateFlagDto, projectId: string) {
+  async create(createFlagDto: CreateFlagDto, projectId: string, userId: string) {
     // Check if key already exists
     const existing = await this.prisma.featureFlag.findFirst({
       where: {
@@ -72,9 +92,17 @@ export class FlagsService {
         description: createFlagDto.description,
         type: createFlagDto.type || 'boolean',
         defaultValue: createFlagDto.defaultValue,
-        variations: createFlagDto.variations,
+        variations: createFlagDto.variations || [],
         projectId,
       },
+    });
+
+    await this.auditService.log({
+      action: 'FLAG_CREATED',
+      entity: 'FeatureFlag',
+      entityId: flag.id,
+      userId,
+      payload: { name: flag.name, key: flag.key },
     });
 
     // Get all environments for this project
@@ -83,22 +111,20 @@ export class FlagsService {
     });
 
     // Create flag states for all environments (default: disabled)
-    await Promise.all(
-      environments.map((env) =>
-        this.prisma.flagState.create({
-          data: {
-            flagId: flag.id,
-            environmentId: env.id,
-            isEnabled: false,
-          },
-        }),
-      ),
-    );
+    for (const env of environments) {
+      await this.prisma.flagState.create({
+        data: {
+          flagId: flag.id,
+          environmentId: env.id,
+          isEnabled: false,
+        },
+      });
+    }
 
     return this.findOne(flag.id);
   }
 
-  async update(id: string, updateFlagDto: UpdateFlagDto) {
+  async update(id: string, updateFlagDto: UpdateFlagDto, userId: string) {
     const flag = await this.prisma.featureFlag.findUnique({
       where: { id },
     });
@@ -121,7 +147,7 @@ export class FlagsService {
       }
     }
 
-    return this.prisma.featureFlag.update({
+    const updated = await this.prisma.featureFlag.update({
       where: { id },
       data: updateFlagDto,
       include: {
@@ -132,9 +158,27 @@ export class FlagsService {
         },
       },
     });
+
+    await this.auditService.log({
+      action: 'FLAG_UPDATED',
+      entity: 'FeatureFlag',
+      entityId: id,
+      userId,
+      payload: updateFlagDto,
+    });
+
+    return updated;
   }
 
-  async delete(id: string) {
+  async delete(id: string, userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user || !user.isSuperUser) {
+      throw new ConflictException('Only superusers can delete flags');
+    }
+
     const flag = await this.prisma.featureFlag.findUnique({
       where: { id },
     });
@@ -143,17 +187,78 @@ export class FlagsService {
       throw new NotFoundException(`Feature flag with ID ${id} not found`);
     }
 
+    if (!(flag as any).isArchived) {
+      throw new ConflictException('Flag must be archived before deletion');
+    }
+
     await this.prisma.featureFlag.delete({
       where: { id },
+    });
+
+    await this.auditService.log({
+      action: 'FLAG_DELETED',
+      entity: 'FeatureFlag',
+      entityId: id,
+      userId,
+      payload: { name: flag.name, key: flag.key },
     });
 
     return { message: 'Feature flag deleted successfully' };
   }
 
+  async archive(id: string, userId: string) {
+    const flag = await this.prisma.featureFlag.findUnique({
+      where: { id },
+    });
+
+    if (!flag) {
+      throw new NotFoundException(`Feature flag with ID ${id} not found`);
+    }
+
+    const updated = await this.prisma.featureFlag.update({
+      where: { id },
+      data: { isArchived: true },
+    });
+
+    await this.auditService.log({
+      action: 'FLAG_ARCHIVED',
+      entity: 'FeatureFlag',
+      entityId: id,
+      userId,
+    });
+
+    return updated;
+  }
+
+  async unarchive(id: string, userId: string) {
+    const flag = await this.prisma.featureFlag.findUnique({
+      where: { id },
+    });
+
+    if (!flag) {
+      throw new NotFoundException(`Feature flag with ID ${id} not found`);
+    }
+
+    const updated = await this.prisma.featureFlag.update({
+      where: { id },
+      data: { isArchived: false },
+    });
+
+    await this.auditService.log({
+      action: 'FLAG_UNARCHIVED',
+      entity: 'FeatureFlag',
+      entityId: id,
+      userId,
+    });
+
+    return updated;
+  }
+
   async updateFlagState(
     flagId: string,
     environmentId: string,
-    updateFlagStateDto: UpdateFlagStateDto,
+    isEnabled: boolean,
+    userId: string,
   ) {
     // Check if flag state exists
     const flagState = await this.prisma.flagState.findUnique({
@@ -163,27 +268,36 @@ export class FlagsService {
           environmentId,
         },
       },
+      include: { environment: true },
     });
 
     if (!flagState) {
       throw new NotFoundException('Flag state not found');
     }
 
-    return this.prisma.flagState.update({
+    const updated = await this.prisma.flagState.update({
       where: {
         flagId_environmentId: {
           flagId,
           environmentId,
         },
       },
-      data: {
-        isEnabled: updateFlagStateDto.isEnabled,
-        rules: updateFlagStateDto.rules,
-      },
-      include: {
-        environment: true,
-        flag: true,
-      },
+      data: { isEnabled },
+      include: { environment: true, flag: true },
     });
+
+    await this.auditService.log({
+      action: 'FLAG_TOGGLED',
+      entity: 'FeatureFlag',
+      entityId: flagId,
+      userId,
+      payload: { environment: updated.environment.key, isEnabled },
+    });
+
+    return updated;
+  }
+
+  async getAudits(id: string) {
+    return this.auditService.findByEntity('FeatureFlag', id);
   }
 }

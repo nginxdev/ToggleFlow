@@ -5,6 +5,8 @@ export interface FeatureFlag {
   description?: string
   isEnabled: boolean
   type?: string
+  isArchived: boolean
+  defaultValue: string
   flagStates?: Array<{
     id: string
     isEnabled: boolean

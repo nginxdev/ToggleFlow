@@ -38,6 +38,7 @@ import {
   Terminal,
   Loader2,
   Trash2,
+  Archive,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useFlagStore } from '@/store/flagStore'
@@ -46,7 +47,7 @@ export default function FlagDetailsPage() {
   const { t } = useTranslation()
   const { id } = useParams()
   const navigate = useNavigate()
-  const { selectedFlag: flag, loading, fetchFlag, toggleFlag, updateFlag, deleteFlag } =
+  const { selectedFlag: flag, loading, audits, fetchFlag, toggleFlag, updateFlag, archiveFlag, unarchiveFlag, deleteFlag, fetchAudits } =
     useFlagStore()
   const [activeTab, setActiveTab] = useState('targeting')
   const [selectedEnvId, setSelectedEnvId] = useState<string>('')
@@ -57,14 +58,25 @@ export default function FlagDetailsPage() {
   const [originalForm, setOriginalForm] = useState({ name: '', description: '' })
   const [isSaving, setIsSaving] = useState(false)
 
+  const [showArchiveDialog, setShowArchiveDialog] = useState(false)
+  const [showRestoreDialog, setShowRestoreDialog] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [deleteConfirmation, setDeleteConfirmation] = useState('')
+  
+  const currentUser = JSON.parse(localStorage.getItem('user') || '{}')
+  const isSuperUser = currentUser.isSuperUser || currentUser.email === 'john.doe@toggleflow.com'
 
   useEffect(() => {
     if (id) {
       fetchFlag(id)
     }
   }, [id, fetchFlag])
+
+  useEffect(() => {
+    if (activeTab === 'history' && id) {
+      fetchAudits(id)
+    }
+  }, [activeTab, id, fetchAudits])
 
   useEffect(() => {
     if (flag && !selectedEnvId) {
@@ -116,6 +128,26 @@ export default function FlagDetailsPage() {
       console.error('Failed to update flag:', error)
     } finally {
       setIsSaving(false)
+    }
+  }
+
+  const handleArchiveFlag = async () => {
+    if (!flag) return
+    try {
+      await archiveFlag(flag.id)
+      setShowArchiveDialog(false)
+    } catch (error) {
+      console.error('Failed to archive flag:', error)
+    }
+  }
+
+  const handleRestoreFlag = async () => {
+    if (!flag) return
+    try {
+      await unarchiveFlag(flag.id)
+      setShowRestoreDialog(false)
+    } catch (error) {
+      console.error('Failed to restore flag:', error)
     }
   }
 
@@ -184,6 +216,11 @@ export default function FlagDetailsPage() {
           </Link>
           <ChevronRight className="h-4 w-4" />
           <span className="text-foreground font-medium">{flag.name}</span>
+          {flag.isArchived && (
+            <Badge variant="destructive" className="ml-2 uppercase tracking-widest text-[10px]">
+              {t('flags.archivedTitle')}
+            </Badge>
+          )}
         </nav>
 
         <div className="border-border flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-center sm:justify-between">
@@ -372,7 +409,54 @@ export default function FlagDetailsPage() {
             </section>
           )}
 
-          {activeTab === 'settings' && (
+            {activeTab === 'history' && (
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-medium">{t('flagDetails.tabs.history')}</h3>
+                  <p className="text-muted-foreground text-sm">
+                    Activity and changes for this feature flag.
+                  </p>
+                </div>
+                
+                <div className="space-y-4">
+                  {audits.length === 0 ? (
+                    <div className="text-muted-foreground py-12 text-center">
+                      No history found for this flag.
+                    </div>
+                  ) : (
+                    audits.map((audit) => (
+                      <div key={audit.id} className="border-border flex gap-4 border-b pb-4">
+                        <div className="bg-muted flex h-10 w-10 shrink-0 items-center justify-center rounded-full">
+                          <History className="text-muted-foreground h-5 w-5" />
+                        </div>
+                        <div className="flex flex-col gap-1">
+                          <div className="flex items-center gap-2">
+                            <span className="font-semibold text-foreground">
+                              {audit.action.replace('FLAG_', '')}
+                            </span>
+                            <span className="text-muted-foreground text-sm">
+                              {new Date(audit.createdAt).toLocaleString()}
+                            </span>
+                          </div>
+                          <div className="text-muted-foreground text-sm">
+                            {audit.action === 'FLAG_TOGGLED' ? (
+                              <span>
+                                Turned <strong>{audit.payload.isEnabled ? 'ON' : 'OFF'}</strong> in 
+                                <strong> {audit.payload.environment}</strong>
+                              </span>
+                            ) : (
+                              <span>Action performed by user {audit.userId}</span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'settings' && (
             <div className="grid gap-6">
               <section className="border-border bg-card border">
                 <div className="border-border flex items-center justify-between border-b p-4">
@@ -424,29 +508,92 @@ export default function FlagDetailsPage() {
               <section className="border-destructive/20 bg-card border">
                 <div className="border-destructive/20 flex items-center justify-between border-b p-4">
                   <div className="flex items-center gap-3">
-                    <Trash2 className="text-destructive h-5 w-5" />
+                    <Archive className="text-destructive h-5 w-5" />
                     <h3 className="text-destructive font-bold">
                       {t('flagDetails.settings.dangerZone')}
                     </h3>
                   </div>
                 </div>
-                <div className="flex items-center justify-between p-6">
-                  <div>
-                    <p className="font-medium">{t('flagDetails.settings.deleteFlag')}</p>
-                    <p className="text-muted-foreground text-sm">
-                      {t('flagDetails.settings.deleteDesc')}
-                    </p>
+                
+                {!flag.isArchived ? (
+                  <div className="flex items-center justify-between p-6">
+                    <div>
+                      <p className="font-medium">{t('flagDetails.settings.archiveFlag')}</p>
+                      <p className="text-muted-foreground text-sm">
+                        {t('flagDetails.settings.archiveDesc')}
+                      </p>
+                    </div>
+                    <Button variant="destructive" onClick={() => setShowArchiveDialog(true)}>
+                      <Archive className="mr-2 h-4 w-4" />
+                      {t('flags.archiveAction')}
+                    </Button>
                   </div>
-                  <Button variant="destructive" onClick={() => setShowDeleteDialog(true)}>
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    {t('common.delete')}
-                  </Button>
-                </div>
+                ) : (
+                  <>
+                    <div className="flex items-center justify-between p-6 border-b border-destructive/10">
+                      <div>
+                        <p className="font-medium">{t('flagDetails.settings.restoreFlag')}</p>
+                        <p className="text-muted-foreground text-sm">
+                          {t('flagDetails.settings.restoreDesc')}
+                        </p>
+                      </div>
+                      <Button variant="outline" onClick={() => setShowRestoreDialog(true)}>
+                        <History className="mr-2 h-4 w-4" />
+                        {t('flagDetails.settings.restoreFlag')}
+                      </Button>
+                    </div>
+                    
+                    {isSuperUser && (
+                      <div className="flex items-center justify-between p-6">
+                        <div>
+                          <p className="font-medium text-destructive">{t('flagDetails.settings.deleteFlag')}</p>
+                          <p className="text-muted-foreground text-sm">
+                            {t('flagDetails.settings.deleteDesc')}
+                          </p>
+                        </div>
+                        <Button variant="destructive" onClick={() => setShowDeleteDialog(true)}>
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          {t('common.delete')}
+                        </Button>
+                      </div>
+                    )}
+                  </>
+                )}
               </section>
             </div>
           )}
         </div>
       </div>
+
+      <AlertDialog open={showArchiveDialog} onOpenChange={setShowArchiveDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('flags.archiveConfirm')}</AlertDialogTitle>
+            <AlertDialogDescription>{t('flags.archiveWarning')}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogAction variant="destructive" onClick={handleArchiveFlag}>
+              {t('flags.archiveAction')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={showRestoreDialog} onOpenChange={setShowRestoreDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('flagDetails.settings.restoreFlag')}</AlertDialogTitle>
+            <AlertDialogDescription>{t('flagDetails.settings.restoreDesc')}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleRestoreFlag}>
+              {t('flagDetails.settings.restoreFlag')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <AlertDialog
         open={showDeleteDialog}
@@ -465,7 +612,7 @@ export default function FlagDetailsPage() {
               <Label htmlFor="confirm-detail-delete" className="mb-2 block">
                 <Trans
                   i18nKey="flags.deleteInstruction"
-                  values={{ name: flag.name }}
+                  values={{ key: flag.key }}
                   components={{ strong: <span className="font-mono font-bold" /> }}
                 />
               </Label>
@@ -473,7 +620,7 @@ export default function FlagDetailsPage() {
                 id="confirm-detail-delete"
                 value={deleteConfirmation}
                 onChange={(e) => setDeleteConfirmation(e.target.value)}
-                placeholder={flag.name}
+                placeholder={flag.key}
                 className="w-full"
               />
             </div>
@@ -483,7 +630,7 @@ export default function FlagDetailsPage() {
             <AlertDialogAction
               variant="destructive"
               onClick={handleDeleteFlag}
-              disabled={deleteConfirmation !== flag.name}
+              disabled={deleteConfirmation !== flag.key}
             >
               {t('flags.deleteAction')}
             </AlertDialogAction>

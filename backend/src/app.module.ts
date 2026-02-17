@@ -8,6 +8,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ProjectsModule } from './projects/projects.module';
 import { EnvironmentsModule } from './environments/environments.module';
 import { FlagsModule } from './flags/flags.module';
+import { AuditModule } from './audit/audit.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { FlagsModule } from './flags/flags.module';
     ProjectsModule,
     EnvironmentsModule,
     FlagsModule,
+    AuditModule,
   ],
   controllers: [AppController],
   providers: [AppService],

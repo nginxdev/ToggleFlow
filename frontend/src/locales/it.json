@@ -63,7 +63,7 @@
     "createError": "Impossibile creare la flag. La chiave potrebbe già esistere.",
     "deleteTitle": "Elimina Flag Funzionalità",
     "deleteWarning": "Questo eliminerà permanentemente questa flag di funzionalità e tutti i suoi stati in tutti gli ambienti. Questa azione non può essere annullata.",
-    "deleteInstruction": "Digita <strong>{{name}}</strong> per confermare l'eliminazione",
+    "deleteInstruction": "Digita <strong>{{key}}</strong> per confermare l'eliminazione",
     "deleteAction": "Elimina Flag"
   },
   "projects": {

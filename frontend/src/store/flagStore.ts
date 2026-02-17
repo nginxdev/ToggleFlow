@@ -4,31 +4,48 @@ import type { FeatureFlag } from '@/types'
 
 interface FlagState {
   flags: FeatureFlag[]
+  archivedFlags: FeatureFlag[]
   selectedFlag: FeatureFlag | null
+  audits: any[]
   loading: boolean
 
   fetchFlags: (projectId: string) => Promise<void>
+  fetchArchivedFlags: (projectId: string) => Promise<void>
   fetchFlag: (id: string) => Promise<void>
-  createFlag: (projectId: string, data: any) => Promise<void>
-  updateFlag: (id: string, data: any) => Promise<void>
+  fetchAudits: (id: string) => Promise<void>
+  createFlag: (projectId: string, data: Partial<FeatureFlag>) => Promise<FeatureFlag>
+  updateFlag: (id: string, data: Partial<FeatureFlag>) => Promise<void>
+  archiveFlag: (id: string) => Promise<void>
+  unarchiveFlag: (id: string) => Promise<void>
   deleteFlag: (id: string) => Promise<void>
-  toggleFlag: (id: string, environmentId: string, currentState: boolean) => Promise<void>
+  toggleFlag: (flagId: string, environmentId: string, currentState: boolean) => Promise<void>
 }
 
 export const useFlagStore = create<FlagState>((set, get) => ({
   flags: [],
+  archivedFlags: [],
   selectedFlag: null,
+  audits: [],
   loading: false,
 
   fetchFlags: async (projectId) => {
     set({ loading: true })
     try {
       const flags = await flagsApi.getByProject(projectId)
-      set({ flags })
+      set({ flags, loading: false })
     } catch (error) {
-      console.error('Failed to fetch flags:', error)
-      set({ flags: [] })
-    } finally {
+      console.error('Error fetching flags:', error)
+      set({ loading: false })
+    }
+  },
+
+  fetchArchivedFlags: async (projectId) => {
+    set({ loading: true })
+    try {
+      const archivedFlags = await flagsApi.getArchived(projectId)
+      set({ archivedFlags, loading: false })
+    } catch (error) {
+      console.error('Error fetching archived flags:', error)
       set({ loading: false })
     }
   },
@@ -37,38 +54,90 @@ export const useFlagStore = create<FlagState>((set, get) => ({
     set({ loading: true })
     try {
       const flag = await flagsApi.getOne(id)
-      set({ selectedFlag: flag })
+      set({ selectedFlag: flag, loading: false })
     } catch (error) {
       console.error('Failed to fetch flag:', error)
-      set({ selectedFlag: null })
-    } finally {
-      set({ loading: false })
+      set({ selectedFlag: null, loading: false })
+    }
+  },
+
+  fetchAudits: async (id) => {
+    try {
+      const audits = await flagsApi.getAudits(id)
+      set({ audits })
+    } catch (error) {
+      console.error('Failed to fetch audits:', error)
     }
   },
 
   createFlag: async (projectId, data) => {
-    await flagsApi.create(projectId, data)
-    await get().fetchFlags(projectId)
+    const newFlag = await flagsApi.create(projectId, data as any)
+    await get().fetchFlags(projectId) // Refresh the list of active flags
+    return newFlag
   },
 
   updateFlag: async (id, data) => {
     const updated = await flagsApi.update(id, data)
     set((state) => ({
       flags: state.flags.map((f) => (f.id === id ? { ...f, ...updated } : f)),
+      archivedFlags: state.archivedFlags.map((f) => (f.id === id ? { ...f, ...updated } : f)),
       selectedFlag:
         state.selectedFlag?.id === id ? { ...state.selectedFlag, ...updated } : state.selectedFlag,
     }))
   },
 
-  deleteFlag: async (id) => {
-    set((state) => ({
-      flags: state.flags.filter((f) => f.id !== id),
-    }))
+  archiveFlag: async (id) => {
+    try {
+      await flagsApi.archive(id)
+      const { flags, archivedFlags, selectedFlag } = get()
+      const flagToArchive = flags.find((f) => f.id === id)
 
+      if (flagToArchive) {
+        set({
+          flags: flags.filter((f) => f.id !== id),
+          archivedFlags: [...archivedFlags, { ...flagToArchive, isArchived: true }],
+          selectedFlag:
+            selectedFlag?.id === id ? { ...selectedFlag, isArchived: true } : selectedFlag,
+        })
+      }
+    } catch (error) {
+      console.error('Error archiving flag:', error)
+      throw error
+    }
+  },
+
+  unarchiveFlag: async (id) => {
+    try {
+      await flagsApi.unarchive(id)
+      const { flags, archivedFlags, selectedFlag } = get()
+      const flagToRestore = archivedFlags.find((f) => f.id === id)
+
+      if (flagToRestore) {
+        set({
+          archivedFlags: archivedFlags.filter((f) => f.id !== id),
+          flags: [...flags, { ...flagToRestore, isArchived: false }],
+          selectedFlag:
+            selectedFlag?.id === id ? { ...selectedFlag, isArchived: false } : selectedFlag,
+        })
+      }
+    } catch (error) {
+      console.error('Error unarchiving flag:', error)
+      throw error
+    }
+  },
+
+  deleteFlag: async (id) => {
     try {
       await flagsApi.delete(id)
+      const { flags, archivedFlags, selectedFlag } = get()
+      set({
+        flags: flags.filter((f) => f.id !== id),
+        archivedFlags: archivedFlags.filter((f) => f.id !== id),
+        selectedFlag: selectedFlag?.id === id ? null : selectedFlag,
+      })
     } catch (error) {
-      console.error('Delete failed', error)
+      console.error('Error deleting flag:', error)
+      throw error
     }
   },
 

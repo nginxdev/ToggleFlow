@@ -61,7 +61,16 @@
     "description": "Description (Optionnelle)",
     "descriptionPlaceholder": "Décrivez ce que cet indicateur contrôle...",
     "createError": "Échec de la création de l'indicateur. La clé existe peut-être déjà.",
+    "archive": "Archiver",
+    "unarchive": "Restaurer",
+    "archivedTitle": "Indicateurs Archivés",
+    "viewArchived": "Voir les Indicateurs Archivés",
+    "archiveConfirm": "Êtes-vous sûr de vouloir archiver cet indicateur ?",
+    "archiveWarning": "Cela retirera l'indicateur de votre liste active, mais il pourra être restauré plus tard.",
+    "archiveAction": "Archiver l'Indicateur",
     "deleteTitle": "Supprimer l'Indicateur de Fonctionnalité",
+    "deletePermanent": "Supprimer Définitivement",
+    "deletePermanentWarning": "Cette action est irréversible et supprimera définitivement l'indicateur.",
     "deleteWarning": "Cela supprimera définitivement cet indicateur de fonctionnalité et tous ses états dans tous les environnements. Cette action est irréversible.",
     "deleteInstruction": "Tapez <strong>{{name}}</strong> pour confirmer la suppression",
     "deleteAction": "Supprimer l'Indicateur"
@@ -214,11 +223,14 @@
     "servingOn": "Sert ACTIVER",
     "servingOff": "Sert DÉSACTIVER",
     "settings": {
-      "general": "Paramètres Généraux",
-      "keyReadOnly": "La clé de l'indicateur ne peut pas être modifiée après la création",
+      "title": "Paramètres de l'Indicateur",
       "dangerZone": "Zone de Danger",
-      "deleteFlag": "Supprimer cet indicateur",
-      "deleteDesc": "Une fois que vous supprimez un indicateur, il n'y a pas de retour en arrière. Soyez certain."
+      "archiveFlag": "Archiver l'Indicateur",
+      "archiveDesc": "Retirer cet indicateur de la liste active.",
+      "restoreFlag": "Restaurer l'Indicateur",
+      "restoreDesc": "Replacer cet indicateur dans la liste active.",
+      "deleteFlag": "Supprimer l'Indicateur",
+      "deleteDesc": "Supprimer définitivement cet indicateur. Seuls les super-utilisateurs peuvent supprimer des indicateurs archivés."
     }
   },
   "settings": {

@@ -61,10 +61,19 @@
     "description": "Description (Optional)",
     "descriptionPlaceholder": "Describe what this flag controls...",
     "createError": "Failed to create flag. The key might already exist.",
+    "archive": "Archive",
+    "unarchive": "Restore",
+    "archivedTitle": "Archived Flags",
+    "viewArchived": "View Archived Flags",
+    "archiveConfirm": "Are you sure you want to archive this flag?",
+    "archiveWarning": "This will remove the flag from your active list, but it can be restored later.",
+    "archiveAction": "Archive Flag",
     "deleteTitle": "Delete Feature Flag",
     "deleteWarning": "This will permanently delete this feature flag and all its states across all environments. This action cannot be undone.",
-    "deleteInstruction": "Type <strong>{{name}}</strong> to confirm deletion",
-    "deleteAction": "Delete Flag"
+    "deletePermanent": "Permanently Delete",
+    "deletePermanentWarning": "This will PERMANENTLY delete the flag. Only superusers can perform this action on archived flags.",
+    "deleteInstruction": "Type <strong>{{key}}</strong> to confirm deletion",
+    "deleteAction": "Delete Permanently"
   },
   "projects": {
     "title": "Projects",
@@ -217,8 +226,12 @@
       "general": "General Settings",
       "keyReadOnly": "Flag key cannot be changed after creation",
       "dangerZone": "Danger Zone",
+      "archiveFlag": "Archive this flag",
+      "archiveDesc": "Archived flags are disabled across all environments but can be restored later.",
       "deleteFlag": "Delete this flag",
-      "deleteDesc": "Once you delete a flag, there is no going back. Please be certain."
+      "deleteDesc": "Permanently delete this flag. Only available for archived flags and superusers.",
+      "restoreFlag": "Restore flag",
+      "restoreDesc": "Bring this flag back to your active list."
     }
   },
   "settings": {
