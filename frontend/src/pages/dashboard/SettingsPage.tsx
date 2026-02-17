@@ -22,7 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { SUPPORTED_LANGUAGES } from '@/lib/constants'
+import { SUPPORTED_LANGUAGES } from '@/types'
 
 export default function SettingsPage() {
   const { t, i18n } = useTranslation()
@@ -37,7 +37,7 @@ export default function SettingsPage() {
 
   useEffect(() => {
     setFormData((prev) => ({ ...prev, language: i18n.language }))
-  }, [i18n.language])
+  }, [i18n, i18n.language])
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -61,15 +61,15 @@ export default function SettingsPage() {
             i18n.changeLanguage(data.language)
           }
         }
-      } catch (error) {
-        // quiet failure
+      } catch (e) {
+        console.error('Failed to fetch profile', e)
       } finally {
         setLoading(false)
       }
     }
 
     fetchUserProfile()
-  }, [])
+  }, [i18n])
 
   const handleSaveProfile = async () => {
     setProfileLoading(true)
@@ -94,12 +94,11 @@ export default function SettingsPage() {
         if (formData.language !== i18n.language) {
           i18n.changeLanguage(formData.language)
         }
-        // Ideally show success toast here
       } else {
         console.error('Failed to update profile')
       }
     } catch (error) {
-      // enhanced error handling could go here
+      console.error('Failed to update profile', error)
     } finally {
       setProfileLoading(false)
     }

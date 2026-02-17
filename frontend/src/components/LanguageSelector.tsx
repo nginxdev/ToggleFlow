@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
 
-import { SUPPORTED_LANGUAGES } from '@/lib/constants'
+import { SUPPORTED_LANGUAGES } from '@/types'
 import { usersApi } from '@/lib/api'
 
 export function LanguageSelector() {

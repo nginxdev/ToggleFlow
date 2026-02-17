@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
@@ -28,7 +28,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { projectsApi, environmentsApi } from '@/lib/api'
+import { useProjectStore } from '@/store/projectStore'
 import { LanguageSelector } from '@/components/LanguageSelector'
 
 interface SidebarItemProps {
@@ -67,47 +67,23 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const navigate = useNavigate()
   const { t } = useTranslation()
 
-  const [projects, setProjects] = useState<any[]>([])
-  const [selectedProject, setSelectedProject] = useState<any>(null)
-  const [environments, setEnvironments] = useState<any[]>([])
-  const [selectedEnvironment, setSelectedEnvironment] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
+  const {
+    projects,
+    selectedProject,
+    selectProject,
+    environments,
+    selectedEnvironment,
+    selectEnvironment,
+    loading,
+    fetchProjects,
+  } = useProjectStore()
 
   useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        const data = await projectsApi.getAll()
-        setProjects(data)
-        if (data.length > 0) {
-          setSelectedProject(data[0])
-          // Fetch environments for first project
-          const envs = await environmentsApi.getByProject(data[0].id)
-          setEnvironments(envs)
-          if (envs.length > 0) {
-            setSelectedEnvironment(envs[0])
-          }
-        }
-      } catch (error) {
-        console.error('Failed to fetch projects:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
-
     fetchProjects()
-  }, [])
+  }, [fetchProjects])
 
-  const handleProjectChange = async (project: any) => {
-    setSelectedProject(project)
-    try {
-      const envs = await environmentsApi.getByProject(project.id)
-      setEnvironments(envs)
-      if (envs.length > 0) {
-        setSelectedEnvironment(envs[0])
-      }
-    } catch (error) {
-      console.error('Failed to fetch environments:', error)
-    }
+  const handleProjectChange = (project: any) => {
+    selectProject(project)
   }
 
   const handleLogout = () => {
@@ -233,7 +209,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 {environments.map((env) => (
                   <DropdownMenuItem
                     key={env.id}
-                    onClick={() => setSelectedEnvironment(env)}
+                    onClick={() => selectEnvironment(env)}
                     className={selectedEnvironment?.id === env.id ? 'bg-accent' : ''}
                   >
                     <span className={env.key === 'production' ? 'flex items-center gap-2' : ''}>

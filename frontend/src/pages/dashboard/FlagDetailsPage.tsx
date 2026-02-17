@@ -26,58 +26,37 @@ import {
   Loader2,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { flagsApi } from '@/lib/api'
+import { useFlagStore } from '@/store/flagStore'
 
 export default function FlagDetailsPage() {
   const { t } = useTranslation()
   const { id } = useParams()
-  const [flag, setFlag] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
+  const { selectedFlag: flag, loading, fetchFlag, toggleFlag } = useFlagStore()
   const [activeTab, setActiveTab] = useState('targeting')
   const [selectedEnvId, setSelectedEnvId] = useState<string>('')
   const [isToggling, setIsToggling] = useState(false)
 
   useEffect(() => {
     if (id) {
-      fetchFlagDetails()
+      fetchFlag(id)
     }
-  }, [id])
+  }, [id, fetchFlag])
 
-  const fetchFlagDetails = async () => {
-    try {
-      if (!id) return
-      const data = await flagsApi.getOne(id)
-      setFlag(data)
-
-      // Select first environment by default if not set
-      if (!selectedEnvId && data.project?.environments?.length > 0) {
-        setSelectedEnvId(data.project.environments[0].id)
+  useEffect(() => {
+    if (flag && !selectedEnvId) {
+      const project = flag.project
+      if (project && project.environments && project.environments.length > 0) {
+        setSelectedEnvId(project.environments[0].id)
       }
-    } catch (error) {
-      console.error('Failed to fetch flag details:', error)
-    } finally {
-      setLoading(false)
     }
-  }
+  }, [flag, selectedEnvId])
 
   const handleToggleStatus = async (checked: boolean) => {
     if (!selectedEnvId || !id) return
 
     setIsToggling(true)
     try {
-      await flagsApi.updateFlagState(id, selectedEnvId, { isEnabled: checked })
-
-      // Update local state
-      const updatedFlag = { ...flag }
-      const stateIndex = updatedFlag.flagStates?.findIndex(
-        (s: any) => s.environmentId === selectedEnvId,
-      )
-
-      if (stateIndex >= 0) {
-        updatedFlag.flagStates[stateIndex].isEnabled = checked
-      }
-
-      setFlag(updatedFlag)
+      await toggleFlag(id, selectedEnvId, !checked)
     } catch (error) {
       console.error('Failed to update flag status:', error)
     } finally {
@@ -298,7 +277,7 @@ export default function FlagDetailsPage() {
                   <div className="col-span-7">{t('flagDetails.variations.descriptionColumn')}</div>
                 </div>
                 <div className="divide-border divide-y">
-                  {(flag.variations as any[])?.map((variation: any, index: number) => (
+                  {(flag.variations || []).map((variation: any, index: number) => (
                     <div key={index} className="grid grid-cols-12 items-center gap-4 p-4">
                       <div className="col-span-3">
                         <code className="text-primary font-mono text-[13px] font-bold">
@@ -310,7 +289,7 @@ export default function FlagDetailsPage() {
                       </div>
                     </div>
                   ))}
-                  {(!flag.variations || (flag.variations as any[]).length === 0) && (
+                  {(!flag.variations || flag.variations.length === 0) && (
                     <div className="text-muted-foreground p-4 text-center text-sm">
                       No variations defined for boolean flag (Implicit true/false)
                     </div>

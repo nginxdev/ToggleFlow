@@ -12,7 +12,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
-import { environmentsApi, projectsApi } from '@/lib/api'
+import { useProjectStore } from '@/store/projectStore'
 import { toCamelCase } from '@/lib/string-utils'
 import {
   Dialog,
@@ -26,18 +26,16 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
-interface Environment {
-  id: string
-  name: string
-  key: string
-  createdAt: string
-}
-
 export default function EnvironmentsPage() {
   const { t } = useTranslation()
-  const [environments, setEnvironments] = useState<Environment[]>([])
-  const [loading, setLoading] = useState(true)
-  const [projectId, setProjectId] = useState<string | null>(null)
+  const {
+    environments,
+    loading,
+    selectedProject,
+    createEnvironment,
+    deleteEnvironment,
+    fetchEnvironments,
+  } = useProjectStore()
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [isCreating, setIsCreating] = useState(false)
   const [newEnvironment, setNewEnvironment] = useState({
@@ -46,41 +44,23 @@ export default function EnvironmentsPage() {
   })
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const projects = await projectsApi.getAll()
-        if (projects.length > 0) {
-          const firstProjectId = projects[0].id
-          setProjectId(firstProjectId)
-          const envs = await environmentsApi.getByProject(firstProjectId)
-          setEnvironments(envs)
-        }
-      } catch (error) {
-        console.error('Failed to fetch environments:', error)
-      } finally {
-        setLoading(false)
-      }
+    if (selectedProject) {
+      fetchEnvironments(selectedProject.id)
     }
-
-    fetchData()
-  }, [])
+  }, [selectedProject, fetchEnvironments])
 
   const handleCreateEnvironment = async () => {
-    if (!newEnvironment.name || !newEnvironment.key || !projectId) return
+    if (!newEnvironment.name || !newEnvironment.key || !selectedProject) return
 
     setIsCreating(true)
     try {
-      await environmentsApi.create(projectId, {
+      await createEnvironment(selectedProject.id, {
         name: newEnvironment.name,
         key: newEnvironment.key,
       })
 
       setIsCreateDialogOpen(false)
       setNewEnvironment({ name: '', key: '' })
-
-      // Refresh environments
-      const envs = await environmentsApi.getByProject(projectId)
-      setEnvironments(envs)
     } catch (error) {
       console.error('Failed to create environment:', error)
       alert('Failed to create environment. Key might already exist.')
@@ -208,7 +188,15 @@ export default function EnvironmentsPage() {
                         <Button variant="ghost" size="icon">
                           <Edit className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => {
+                            if (confirm(t('environments.deleteConfirm'))) {
+                              deleteEnvironment(env.id)
+                            }
+                          }}
+                        >
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>

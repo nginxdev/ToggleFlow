@@ -12,7 +12,8 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
-import { projectsApi } from '@/lib/api'
+import { useProjectStore } from '@/store/projectStore'
+import type { Project } from '@/types'
 import { toCamelCase } from '@/lib/string-utils'
 import {
   Dialog,
@@ -37,26 +38,9 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 
-interface Project {
-  id: string
-  name: string
-  key: string
-  description?: string
-  environments: Array<{
-    id: string
-    name: string
-    key: string
-  }>
-  _count?: {
-    flags: number
-    environments: number
-  }
-}
-
 export default function ProjectsPage() {
   const { t } = useTranslation()
-  const [projects, setProjects] = useState<Project[]>([])
-  const [loading, setLoading] = useState(true)
+  const { projects, loading, fetchProjects, createProject, deleteProject } = useProjectStore()
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [isCreating, setIsCreating] = useState(false)
   const [newProject, setNewProject] = useState({
@@ -70,25 +54,14 @@ export default function ProjectsPage() {
 
   useEffect(() => {
     fetchProjects()
-  }, [])
-
-  const fetchProjects = async () => {
-    try {
-      const data = await projectsApi.getAll()
-      setProjects(data)
-    } catch (error) {
-      console.error('Failed to fetch projects:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+  }, [fetchProjects])
 
   const handleCreateProject = async () => {
     if (!newProject.name || !newProject.key) return
 
     setIsCreating(true)
     try {
-      await projectsApi.create({
+      await createProject({
         name: newProject.name,
         key: newProject.key,
         description: newProject.description || undefined,
@@ -96,7 +69,6 @@ export default function ProjectsPage() {
 
       setIsCreateDialogOpen(false)
       setNewProject({ name: '', key: '', description: '' })
-      fetchProjects()
     } catch (error) {
       console.error('Failed to create project:', error)
       alert('Failed to create project. Key might already exist.')
@@ -109,9 +81,8 @@ export default function ProjectsPage() {
     if (!projectToDelete) return
 
     try {
-      await projectsApi.delete(projectToDelete.id)
+      await deleteProject(projectToDelete.id)
       setProjectToDelete(null)
-      fetchProjects()
     } catch (error) {
       console.error('Failed to delete project:', error)
       alert('Failed to delete project.')

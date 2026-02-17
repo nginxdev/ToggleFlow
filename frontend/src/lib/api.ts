@@ -1,10 +1,7 @@
-// API base URL
 const API_URL = 'http://localhost:3000/api'
 
-// Flag to prevent multiple logout toasts
 let isLoggingOut = false
 
-// Get auth token from localStorage
 const getAuthHeaders = () => {
   const token = localStorage.getItem('token')
   return {
@@ -13,27 +10,20 @@ const getAuthHeaders = () => {
   }
 }
 
-// Enhanced fetch wrapper with 401 handling
 const apiFetch = async (url: string, options: RequestInit = {}) => {
   const response = await fetch(url, options)
 
-  // Handle 401 Unauthorized
   if (response.status === 401 && !isLoggingOut) {
     isLoggingOut = true
 
-    // Show timeout message
     const event = new CustomEvent('session-timeout', {
       detail: { message: 'Session timed out. Signing out...' },
     })
     window.dispatchEvent(event)
 
-    // Wait 2 seconds
     await new Promise((resolve) => setTimeout(resolve, 2000))
 
-    // Clear token
     localStorage.removeItem('token')
-
-    // Redirect to login
     window.location.href = '/login'
 
     throw new Error('Session expired')
@@ -46,7 +36,6 @@ const apiFetch = async (url: string, options: RequestInit = {}) => {
   return response
 }
 
-// Projects API
 export const projectsApi = {
   getAll: async () => {
     const response = await apiFetch(`${API_URL}/projects`, {
@@ -89,7 +78,6 @@ export const projectsApi = {
   },
 }
 
-// Environments API
 export const environmentsApi = {
   getByProject: async (projectId: string) => {
     const response = await apiFetch(`${API_URL}/projects/${projectId}/environments`, {
@@ -126,7 +114,6 @@ export const environmentsApi = {
   },
 }
 
-// Flags API
 export const flagsApi = {
   getByProject: async (projectId: string) => {
     const response = await apiFetch(`${API_URL}/projects/${projectId}/flags`, {
@@ -212,7 +199,6 @@ export const flagsApi = {
   },
 }
 
-// Users API
 export const usersApi = {
   getProfile: async () => {
     const response = await apiFetch(`${API_URL}/auth/profile`, {

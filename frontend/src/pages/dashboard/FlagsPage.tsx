@@ -20,79 +20,28 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { flagsApi, projectsApi } from '@/lib/api'
-
-interface FeatureFlag {
-  id: string
-  name: string
-  key: string
-  description?: string
-  type: string
-  defaultValue: string
-  flagStates?: Array<{
-    id: string
-    isEnabled: boolean
-    environmentId: string
-    environment: {
-      id: string
-      name: string
-      key: string
-    }
-  }>
-}
+import { useFlagStore } from '@/store/flagStore'
+import { useProjectStore } from '@/store/projectStore'
 
 export default function FlagsPage() {
   const { t } = useTranslation()
-  const [flags, setFlags] = useState<FeatureFlag[]>([])
-  const [loading, setLoading] = useState(true)
+  const { selectedProject } = useProjectStore()
+  const { flags, loading, fetchFlags, toggleFlag, deleteFlag } = useFlagStore()
+
   const [togglingFlags, setTogglingFlags] = useState<Set<string>>(new Set())
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Fetch projects first
-        const projects = await projectsApi.getAll()
-        if (projects.length > 0) {
-          const projectId = projects[0].id
-
-          // Fetch flags for the first project
-          const flagsData = await flagsApi.getByProject(projectId)
-          setFlags(flagsData)
-        }
-      } catch (error) {
-        console.error('Failed to fetch flags:', error)
-      } finally {
-        setLoading(false)
-      }
+    if (selectedProject) {
+      fetchFlags(selectedProject.id)
     }
-
-    fetchData()
-  }, [])
+  }, [selectedProject, fetchFlags])
 
   const handleToggleFlag = async (flagId: string, environmentId: string, currentState: boolean) => {
     const toggleKey = `${flagId}-${environmentId}`
     setTogglingFlags((prev) => new Set(prev).add(toggleKey))
 
     try {
-      await flagsApi.toggleFlagState(flagId, environmentId, !currentState)
-
-      // Update local state
-      setFlags((prevFlags) =>
-        prevFlags.map((flag) =>
-          flag.id === flagId
-            ? {
-                ...flag,
-                flagStates: flag.flagStates?.map((state) =>
-                  state.environmentId === environmentId
-                    ? { ...state, isEnabled: !currentState }
-                    : state,
-                ),
-              }
-            : flag,
-        ),
-      )
-    } catch (error) {
-      console.error('Failed to toggle flag:', error)
+      await toggleFlag(flagId, environmentId, currentState)
     } finally {
       setTogglingFlags((prev) => {
         const newSet = new Set(prev)
@@ -106,8 +55,7 @@ export default function FlagsPage() {
     if (!confirm(t('flags.deleteConfirm'))) return
 
     try {
-      await flagsApi.delete(flagId)
-      setFlags((prevFlags) => prevFlags.filter((flag) => flag.id !== flagId))
+      await deleteFlag(flagId)
     } catch (error) {
       console.error('Failed to delete flag:', error)
     }
