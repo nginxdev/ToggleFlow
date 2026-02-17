@@ -11,10 +11,12 @@ import EnvironmentsPage from '@/pages/dashboard/EnvironmentsPage'
 import AuditLogPage from '@/pages/dashboard/AuditLogPage'
 import SettingsPage from '@/pages/dashboard/SettingsPage'
 import ProtectedRoute from '@/components/ProtectedRoute'
+import { SessionTimeoutHandler } from '@/components/SessionTimeoutHandler'
 
 export function App() {
   return (
     <BrowserRouter>
+      <SessionTimeoutHandler />
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
