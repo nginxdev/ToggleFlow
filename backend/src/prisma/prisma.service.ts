@@ -10,6 +10,7 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
   private pool: Pool;
 
   constructor(private configService: ConfigService) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
     this.pool = new Pool({
       connectionString: this.configService.get<string>('DATABASE_URL'),
     });

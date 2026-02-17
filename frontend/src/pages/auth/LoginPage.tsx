@@ -128,7 +128,7 @@ export default function LoginPage() {
                   to="/signup"
                   className="text-primary font-medium underline-offset-4 hover:underline"
                 >
-                  Sign up
+                  Create account
                 </Link>
               </div>
             </CardFooter>

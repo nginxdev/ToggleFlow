@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import {
   Zap,
   Flag,
@@ -12,6 +12,7 @@ import {
   Bell,
   User,
   Plus,
+  LogOut,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -60,6 +61,12 @@ function SidebarItem({ icon, label, href, active }: SidebarItemProps) {
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const location = useLocation()
+  const navigate = useNavigate()
+
+  const handleLogout = () => {
+    localStorage.removeItem('token')
+    navigate('/login')
+  }
 
   const navItems = [
     { icon: <Flag className="h-4 w-4" />, label: 'Feature Flags', href: '/dashboard/flags' },
@@ -187,7 +194,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <DropdownMenuItem>API Keys</DropdownMenuItem>
                 <DropdownMenuItem>Teams</DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-destructive">Log out</DropdownMenuItem>
+                <DropdownMenuItem onClick={handleLogout} className="text-destructive">
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Log out
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
