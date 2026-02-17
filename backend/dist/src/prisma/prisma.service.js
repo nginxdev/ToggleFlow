@@ -12,10 +12,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PrismaService = void 0;
 const common_1 = require("@nestjs/common");
 const client_1 = require("@prisma/client");
+const adapter_pg_1 = require("@prisma/adapter-pg");
+const pg_1 = require("pg");
+const config_1 = require("@nestjs/config");
 let PrismaService = class PrismaService {
+    configService;
     prisma;
-    constructor() {
-        this.prisma = new client_1.PrismaClient();
+    pool;
+    constructor(configService) {
+        this.configService = configService;
+        this.pool = new pg_1.Pool({
+            connectionString: this.configService.get('DATABASE_URL'),
+        });
+        const adapter = new adapter_pg_1.PrismaPg(this.pool);
+        this.prisma = new client_1.PrismaClient({ adapter });
     }
     async onModuleInit() {
         await this.prisma.$connect();
@@ -42,6 +52,6 @@ let PrismaService = class PrismaService {
 exports.PrismaService = PrismaService;
 exports.PrismaService = PrismaService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [])
+    __metadata("design:paramtypes", [config_1.ConfigService])
 ], PrismaService);
 //# sourceMappingURL=prisma.service.js.map
