@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   Dialog,
   DialogContent,
@@ -9,6 +10,7 @@ import {
 import { Loader2 } from 'lucide-react'
 
 export function SessionTimeoutHandler() {
+  const { t } = useTranslation()
   const [isOpen, setIsOpen] = useState(false)
 
   useEffect(() => {
@@ -27,9 +29,9 @@ export function SessionTimeoutHandler() {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="sm:max-w-md" showCloseButton={false}>
         <DialogHeader>
-          <DialogTitle>Session Timed Out</DialogTitle>
+          <DialogTitle>{t('auth.sessionTimeout')}</DialogTitle>
           <DialogDescription>
-            Your session has expired. Signing you out...
+            {t('auth.sessionExpired')}
           </DialogDescription>
         </DialogHeader>
         <div className="flex items-center justify-center py-4">

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -20,16 +21,17 @@ import {
 import { cn } from '@/lib/utils'
 
 export default function FlagDetailsPage() {
+  const { t } = useTranslation()
   useParams()
   const [activeTab, setActiveTab] = useState('targeting')
   const [flagStatus, setFlagStatus] = useState(true)
 
   const tabs = [
-    { id: 'targeting', label: 'Targeting', icon: <Users className="h-4 w-4" /> },
-    { id: 'variations', label: 'Variations', icon: <GitBranch className="h-4 w-4" /> },
-    { id: 'rules', label: 'Rules', icon: <Terminal className="h-4 w-4" /> },
-    { id: 'history', label: 'History', icon: <History className="h-4 w-4" /> },
-    { id: 'settings', label: 'Settings', icon: <SettingsIcon className="h-4 w-4" /> },
+    { id: 'targeting', label: t('flagDetails.tabs.targeting'), icon: <Users className="h-4 w-4" /> },
+    { id: 'variations', label: t('flagDetails.tabs.variations'), icon: <GitBranch className="h-4 w-4" /> },
+    { id: 'rules', label: t('flagDetails.tabs.rules'), icon: <Terminal className="h-4 w-4" /> },
+    { id: 'history', label: t('flagDetails.tabs.history'), icon: <History className="h-4 w-4" /> },
+    { id: 'settings', label: t('flagDetails.tabs.settings'), icon: <SettingsIcon className="h-4 w-4" /> },
   ]
 
   return (
@@ -38,7 +40,7 @@ export default function FlagDetailsPage() {
         {/* Breadcrumbs */}
         <nav className="text-muted-foreground flex items-center gap-2 text-sm">
           <Link to="/dashboard/flags" className="hover:text-foreground transition-colors">
-            Feature Flags
+            {t('nav.featureFlags')}
           </Link>
           <ChevronRight className="h-4 w-4" />
           <span className="text-foreground font-medium">new-pricing-page</span>
@@ -72,7 +74,7 @@ export default function FlagDetailsPage() {
           <div className="flex items-center gap-3">
             <div className="bg-muted/50 border-border mr-4 flex items-center gap-2 border px-3 py-1.5">
               <span className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
-                Status
+                {t('flagDetails.status')}
               </span>
               <Switch checked={flagStatus} onCheckedChange={setFlagStatus} />
               <span
@@ -81,14 +83,14 @@ export default function FlagDetailsPage() {
                   flagStatus ? 'text-primary' : 'text-muted-foreground',
                 )}
               >
-                {flagStatus ? 'Serving ON' : 'Serving OFF'}
+                {flagStatus ? t('flagDetails.servingOn') : t('flagDetails.servingOff')}
               </span>
             </div>
             <Button variant="outline" size="sm">
-              Discard changes
+              {t('flagDetails.discardChanges')}
             </Button>
             <Button size="sm" className="font-semibold">
-              Save changes
+              {t('flagDetails.saveChanges')}
             </Button>
           </div>
         </div>
@@ -120,16 +122,16 @@ export default function FlagDetailsPage() {
                 <div className="border-border flex items-center justify-between border-b p-4">
                   <div className="flex items-center gap-3">
                     <Users className="text-primary h-5 w-5" />
-                    <h3 className="font-bold">Individual User Targeting</h3>
+                    <h3 className="font-bold">{t('flagDetails.targeting.title')}</h3>
                   </div>
                   <Button variant="outline" size="sm" className="gap-2">
                     <Plus className="h-4 w-4" />
-                    Add users
+                    {t('flagDetails.targeting.addUsers')}
                   </Button>
                 </div>
                 <div className="bg-muted/20 p-8 text-center">
                   <p className="text-muted-foreground text-sm">
-                    No users specifically targeted for this flag.
+                    {t('flagDetails.targeting.noUsers')}
                   </p>
                 </div>
               </section>
@@ -138,18 +140,18 @@ export default function FlagDetailsPage() {
                 <div className="border-border flex items-center justify-between border-b p-4">
                   <div className="flex items-center gap-3">
                     <Activity className="text-primary h-5 w-5" />
-                    <h3 className="font-bold">Default Rule</h3>
+                    <h3 className="font-bold">{t('flagDetails.targeting.defaultRule')}</h3>
                   </div>
                 </div>
                 <div className="space-y-4 p-6">
                   <div className="flex items-center gap-4">
-                    <span className="w-32 text-sm font-medium">When flag is ON</span>
+                    <span className="w-32 text-sm font-medium">{t('flagDetails.targeting.whenOn')}</span>
                     <div className="flex flex-1 gap-2">
                       <Button
                         variant="secondary"
                         className="bg-primary/10 text-primary border-primary"
                       >
-                        Serve
+                        {t('flagDetails.targeting.serve')}
                       </Button>
                       <Button variant="ghost" className="flex-1 items-center justify-between px-4">
                         <span>true</span>
@@ -158,10 +160,10 @@ export default function FlagDetailsPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
-                    <span className="w-32 text-sm font-medium">When flag is OFF</span>
+                    <span className="w-32 text-sm font-medium">{t('flagDetails.targeting.whenOff')}</span>
                     <div className="flex flex-1 gap-2">
                       <Button variant="secondary" disabled>
-                        Serve
+                        {t('flagDetails.targeting.serve')}
                       </Button>
                       <Button variant="ghost" className="flex-1 items-center justify-between px-4">
                         <span>false</span>
@@ -179,18 +181,18 @@ export default function FlagDetailsPage() {
               <div className="border-border flex items-center justify-between border-b p-4">
                 <div className="flex items-center gap-3">
                   <GitBranch className="text-primary h-5 w-5" />
-                  <h3 className="font-bold">Flag Variations</h3>
+                  <h3 className="font-bold">{t('flagDetails.variations.title')}</h3>
                 </div>
                 <Button variant="outline" size="sm" className="gap-2">
                   <Plus className="h-4 w-4" />
-                  Add variation
+                  {t('flagDetails.variations.addVariation')}
                 </Button>
               </div>
               <div className="p-0">
                 <div className="text-muted-foreground border-border bg-muted/30 grid grid-cols-12 gap-4 border-b p-4 text-xs font-semibold tracking-widest uppercase">
-                  <div className="col-span-3">Variation</div>
-                  <div className="col-span-7">Description</div>
-                  <div className="col-span-2 text-right">Actions</div>
+                  <div className="col-span-3">{t('flagDetails.variations.variationColumn')}</div>
+                  <div className="col-span-7">{t('flagDetails.variations.descriptionColumn')}</div>
+                  <div className="col-span-2 text-right">{t('common.actions')}</div>
                 </div>
                 <div className="divide-border divide-y">
                   <div className="grid grid-cols-12 items-center gap-4 p-4">

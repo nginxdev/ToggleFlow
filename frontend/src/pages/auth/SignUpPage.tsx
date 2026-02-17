@@ -13,8 +13,10 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Zap, Loader2 } from 'lucide-react'
 import { ModeToggle } from '@/components/mode-toggle'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 export default function SignUpPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [formData, setFormData] = useState({
     firstName: '',
@@ -31,7 +33,7 @@ export default function SignUpPage() {
     setError(null)
 
     if (formData.password.length < 8) {
-      setError('Password must be at least 8 characters')
+      setError(t('auth.signup.passwordLengthError'))
       setIsLoading(false)
       return
     }
@@ -84,8 +86,8 @@ export default function SignUpPage() {
         <div className="w-full max-w-md">
           <Card className="border-border/40 shadow-primary/5 shadow-xl">
             <CardHeader className="space-y-1">
-              <CardTitle className="text-2xl font-bold tracking-tight">Create an account</CardTitle>
-              <CardDescription>Get started with your free developer account today</CardDescription>
+              <CardTitle className="text-2xl font-bold tracking-tight">{t('auth.signup.title')}</CardTitle>
+              <CardDescription>{t('auth.signup.subtitle')}</CardDescription>
             </CardHeader>
             <form onSubmit={handleSubmit}>
               <CardContent className="grid gap-4">
@@ -97,7 +99,7 @@ export default function SignUpPage() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
-                    <Label htmlFor="first-name">First name</Label>
+                    <Label htmlFor="first-name">{t('auth.signup.firstName')}</Label>
                     <Input
                       id="first-name"
                       placeholder="John"
@@ -107,7 +109,7 @@ export default function SignUpPage() {
                     />
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="last-name">Last name</Label>
+                    <Label htmlFor="last-name">{t('auth.signup.lastName')}</Label>
                     <Input
                       id="last-name"
                       placeholder="Doe"
@@ -118,7 +120,7 @@ export default function SignUpPage() {
                   </div>
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email">{t('auth.login.emailLabel')}</Label>
                   <Input
                     id="email"
                     type="email"
@@ -129,11 +131,11 @@ export default function SignUpPage() {
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="password">Password</Label>
+                  <Label htmlFor="password">{t('auth.login.passwordLabel')}</Label>
                   <Input
                     id="password"
                     type="password"
-                    placeholder="Min. 8 characters"
+                    placeholder={t('auth.signup.passwordPlaceholder')}
                     required
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
@@ -143,15 +145,15 @@ export default function SignUpPage() {
               <CardFooter className="flex flex-col gap-4 mt-6">
                 <Button type="submit" className="w-full" disabled={isLoading}>
                   {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Create Account
+                  {t('auth.signup.submitButton')}
                 </Button>
                 <div className="text-muted-foreground text-center text-sm">
-                  Already have an account?{' '}
+                  {t('auth.signup.hasAccount')}{' '}
                   <Link
                     to="/login"
                     className="text-primary font-medium underline-offset-4 hover:underline"
                   >
-                    Log in
+                    {t('auth.signup.login')}
                   </Link>
                 </div>
               </CardFooter>

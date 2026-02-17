@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import {
   Table,
@@ -41,6 +42,7 @@ interface FeatureFlag {
 }
 
 export default function FlagsPage() {
+  const { t } = useTranslation()
   const [flags, setFlags] = useState<FeatureFlag[]>([])
   const [loading, setLoading] = useState(true)
   const [togglingFlags, setTogglingFlags] = useState<Set<string>>(new Set())
@@ -101,7 +103,7 @@ export default function FlagsPage() {
   }
 
   const handleDeleteFlag = async (flagId: number) => {
-    if (!confirm('Are you sure you want to delete this flag?')) return
+    if (!confirm(t('flags.deleteConfirm'))) return
 
     try {
       await flagsApi.delete(flagId)
@@ -127,19 +129,19 @@ export default function FlagsPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Feature Flags</h1>
+            <h1 className="text-3xl font-bold tracking-tight">{t('flags.title')}</h1>
             <p className="text-muted-foreground mt-1">
-              Manage and control your application features
+              {t('flags.subtitle')}
             </p>
           </div>
           <div className="flex gap-2">
             <Button variant="outline" size="sm">
               <Filter className="mr-2 h-4 w-4" />
-              Filter
+              {t('common.filter')}
             </Button>
             <Button size="sm">
               <Plus className="mr-2 h-4 w-4" />
-              New Flag
+              {t('flags.newFlag')}
             </Button>
           </div>
         </div>
@@ -148,13 +150,13 @@ export default function FlagsPage() {
         {flags.length === 0 ? (
           <div className="border rounded-lg p-12 text-center">
             <Flag className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-            <h3 className="text-lg font-semibold mb-2">No Feature Flags Yet</h3>
+            <h3 className="text-lg font-semibold mb-2">{t('flags.noFlags')}</h3>
             <p className="text-muted-foreground max-w-md mx-auto mb-4">
-              Create your first feature flag to start controlling features across your environments.
+              {t('flags.noFlagsDesc')}
             </p>
             <Button>
               <Plus className="mr-2 h-4 w-4" />
-              Create Your First Flag
+              {t('flags.createFirst')}
             </Button>
           </div>
         ) : (
@@ -162,11 +164,11 @@ export default function FlagsPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Key</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Status (Production)</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead>{t('flags.name')}</TableHead>
+                  <TableHead>{t('flags.key')}</TableHead>
+                  <TableHead>{t('flags.type')}</TableHead>
+                  <TableHead>{t('flags.status')}</TableHead>
+                  <TableHead className="text-right">{t('flags.actions')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -204,7 +206,7 @@ export default function FlagsPage() {
                             }
                           />
                           <span className="text-sm text-muted-foreground">
-                            {isEnabled ? 'Enabled' : 'Disabled'}
+                            {isEnabled ? t('flags.enabled') : t('flags.disabled')}
                           </span>
                           {togglingFlags.has(toggleKey) && (
                             <Loader2 className="h-4 w-4 animate-spin" />
@@ -220,14 +222,14 @@ export default function FlagsPage() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem asChild>
-                              <Link to={`/dashboard/flags/${flag.id}`}>View Details</Link>
+                              <Link to={`/dashboard/flags/${flag.id}`}>{t('common.viewDetails')}</Link>
                             </DropdownMenuItem>
-                            <DropdownMenuItem>Duplicate</DropdownMenuItem>
+                            <DropdownMenuItem>{t('common.duplicate')}</DropdownMenuItem>
                             <DropdownMenuItem
                               className="text-destructive"
                               onClick={() => handleDeleteFlag(flag.id)}
                             >
-                              Delete
+                              {t('common.delete')}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -242,11 +244,9 @@ export default function FlagsPage() {
 
         {/* Info Card */}
         <div className="bg-muted/50 border rounded-lg p-4">
-          <h3 className="font-semibold mb-2">About Feature Flags</h3>
+          <h3 className="font-semibold mb-2">{t('flags.infoTitle')}</h3>
           <p className="text-sm text-muted-foreground">
-            Feature flags allow you to control which features are enabled in your application
-            without deploying new code. Toggle flags on or off per environment to gradually
-            roll out new features, perform A/B testing, or quickly disable problematic features.
+            {t('flags.infoDesc')}
           </p>
         </div>
       </div>

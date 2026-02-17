@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import { Button } from '@/components/ui/button'
 import { Plus, Folder, Trash2, Edit, Loader2 } from 'lucide-react'
@@ -39,6 +40,7 @@ interface Project {
 }
 
 export default function ProjectsPage() {
+  const { t } = useTranslation()
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
@@ -122,28 +124,28 @@ export default function ProjectsPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Projects</h1>
+            <h1 className="text-3xl font-bold tracking-tight">{t('projects.title')}</h1>
             <p className="text-muted-foreground mt-1">
-              Manage your feature flag projects
+              {t('projects.subtitle')}
             </p>
           </div>
           <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
             <DialogTrigger asChild>
               <Button size="sm">
                 <Plus className="mr-2 h-4 w-4" />
-                New Project
+                {t('projects.newProject')}
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Create New Project</DialogTitle>
+                <DialogTitle>{t('projects.createProject')}</DialogTitle>
                 <DialogDescription>
-                  Add a new project to organize your feature flags
+                  {t('projects.createDesc')}
                 </DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="name">Project Name</Label>
+                  <Label htmlFor="name">{t('projects.name')}</Label>
                   <Input
                     id="name"
                     placeholder="My Awesome Project"
@@ -152,7 +154,7 @@ export default function ProjectsPage() {
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="key">Project Key</Label>
+                  <Label htmlFor="key">{t('projects.key')}</Label>
                   <Input
                     id="key"
                     placeholder="my-awesome-project"
@@ -160,11 +162,11 @@ export default function ProjectsPage() {
                     onChange={(e) => setNewProject({ ...newProject, key: e.target.value })}
                   />
                   <p className="text-xs text-muted-foreground">
-                    Auto-generated from name, but you can customize it
+                    {t('projects.keyHint')}
                   </p>
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="description">Description (Optional)</Label>
+                  <Label htmlFor="description">{t('projects.description')}</Label>
                   <Textarea
                     id="description"
                     placeholder="Describe your project..."
@@ -175,7 +177,7 @@ export default function ProjectsPage() {
               </div>
               <DialogFooter>
                 <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
-                  Cancel
+                  {t('common.cancel')}
                 </Button>
                 <Button
                   onClick={handleCreateProject}
@@ -184,10 +186,10 @@ export default function ProjectsPage() {
                   {isCreating ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Creating...
+                      {t('common.creating')}
                     </>
                   ) : (
-                    'Create Project'
+                    t('projects.createProject')
                   )}
                 </Button>
               </DialogFooter>
@@ -199,14 +201,13 @@ export default function ProjectsPage() {
         {projects.length === 0 ? (
           <div className="border rounded-lg p-12 text-center">
             <Folder className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-            <h3 className="text-lg font-semibold mb-2">No Projects Yet</h3>
+            <h3 className="text-lg font-semibold mb-2">{t('projects.noProjects')}</h3>
             <p className="text-muted-foreground max-w-md mx-auto mb-4">
-              Create your first project to start managing feature flags.
-              Each project comes with 3 default environments.
+              {t('projects.noProjectsDesc')}
             </p>
             <Button onClick={() => setIsCreateDialogOpen(true)}>
               <Plus className="mr-2 h-4 w-4" />
-              Create Your First Project
+              {t('projects.createFirst')}
             </Button>
           </div>
         ) : (
@@ -214,12 +215,12 @@ export default function ProjectsPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Project Name</TableHead>
-                  <TableHead>Key</TableHead>
-                  <TableHead>Description</TableHead>
-                  <TableHead>Environments</TableHead>
-                  <TableHead>Flags</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead>{t('projects.name')}</TableHead>
+                  <TableHead>{t('projects.key')}</TableHead>
+                  <TableHead>{t('projects.description')}</TableHead>
+                  <TableHead>{t('projects.environments')}</TableHead>
+                  <TableHead>{t('projects.flags')}</TableHead>
+                  <TableHead className="text-right">{t('common.actions')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -265,11 +266,9 @@ export default function ProjectsPage() {
 
         {/* Info Card */}
         <div className="bg-muted/50 border rounded-lg p-4">
-          <h3 className="font-semibold mb-2">About Projects</h3>
+          <h3 className="font-semibold mb-2">{t('projects.infoTitle')}</h3>
           <p className="text-sm text-muted-foreground">
-            Projects help you organize feature flags across different applications or teams.
-            Each project automatically gets 3 environments (Development, Staging, Production)
-            when created. You can manage additional environments from the Environments page.
+            {t('projects.infoDesc')}
           </p>
         </div>
       </div>

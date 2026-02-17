@@ -13,8 +13,10 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Zap, Loader2 } from 'lucide-react'
 import { ModeToggle } from '@/components/mode-toggle'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 export default function LoginPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -36,7 +38,7 @@ export default function LoginPage() {
       })
 
       if (!response.ok) {
-        throw new Error('Invalid email or password')
+        throw new Error(t('auth.login.invalidCredentials'))
       }
 
       const data = await response.json()
@@ -45,7 +47,7 @@ export default function LoginPage() {
 
       navigate('/dashboard')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An unexpected error occurred')
+      setError(err instanceof Error ? err.message : t('auth.login.genericError'))
     } finally {
       setIsLoading(false)
     }
@@ -68,9 +70,9 @@ export default function LoginPage() {
         <div className="w-full max-w-md">
           <Card className="border-border/40 shadow-primary/5 shadow-xl">
             <CardHeader className="space-y-1">
-              <CardTitle className="text-2xl font-bold tracking-tight">Login</CardTitle>
+              <CardTitle className="text-2xl font-bold tracking-tight">{t('auth.login.title')}</CardTitle>
               <CardDescription>
-                Enter your email and password to access your account
+                {t('auth.login.subtitle')}
               </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-4">
@@ -81,7 +83,7 @@ export default function LoginPage() {
                   </div>
                 )}
                 <div className="grid gap-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email">{t('auth.login.emailLabel')}</Label>
                   <Input
                     id="email"
                     type="email"
@@ -93,12 +95,12 @@ export default function LoginPage() {
                 </div>
                 <div className="grid gap-2">
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="password">Password</Label>
+                    <Label htmlFor="password">{t('auth.login.passwordLabel')}</Label>
                     <Link
                       to="/forgot-password"
                       className="text-primary text-sm underline-offset-4 hover:underline"
                     >
-                      Forgot password?
+                      {t('auth.login.forgotPassword')}
                     </Link>
                   </div>
                   <Input
@@ -113,22 +115,22 @@ export default function LoginPage() {
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Signing In...
+                      {t('auth.login.signingIn')}
                     </>
                   ) : (
-                    'Sign In'
+                    t('auth.login.signInButton')
                   )}
                 </Button>
               </form>
             </CardContent>
             <CardFooter className="flex flex-col gap-4">
               <div className="text-muted-foreground text-center text-sm">
-                Don&apos;t have an account?{' '}
+                {t('auth.login.noAccount')}{' '}
                 <Link
                   to="/signup"
                   className="text-primary font-medium underline-offset-4 hover:underline"
                 >
-                  Create account
+                  {t('auth.login.createAccount')}
                 </Link>
               </div>
             </CardFooter>

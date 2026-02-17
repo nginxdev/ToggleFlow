@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import { Button } from '@/components/ui/button'
 import { Plus, Layers, Trash2, Edit, Loader2 } from 'lucide-react'
@@ -33,6 +34,7 @@ interface Environment {
 }
 
 export default function EnvironmentsPage() {
+  const { t } = useTranslation()
   const [environments, setEnvironments] = useState<Environment[]>([])
   const [loading, setLoading] = useState(true)
   const [projectId, setProjectId] = useState<number | null>(null)
@@ -100,28 +102,28 @@ export default function EnvironmentsPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Environments</h1>
+            <h1 className="text-3xl font-bold tracking-tight">{t('environments.title')}</h1>
             <p className="text-muted-foreground mt-1">
-              Manage deployment environments for your feature flags
+              {t('environments.subtitle')}
             </p>
           </div>
           <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
             <DialogTrigger asChild>
               <Button size="sm">
                 <Plus className="mr-2 h-4 w-4" />
-                New Environment
+                {t('environments.newEnvironment')}
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Create New Environment</DialogTitle>
+                <DialogTitle>{t('environments.createEnvironment')}</DialogTitle>
                 <DialogDescription>
-                  Add a new environment to manage feature flag states
+                  {t('environments.createDesc')}
                 </DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="name">Environment Name</Label>
+                  <Label htmlFor="name">{t('environments.name')}</Label>
                   <Input
                     id="name"
                     placeholder="e.g., Development, Testing, Staging, Production"
@@ -130,7 +132,7 @@ export default function EnvironmentsPage() {
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="key">Environment Key</Label>
+                  <Label htmlFor="key">{t('environments.key')}</Label>
                   <Input
                     id="key"
                     placeholder="environment-key"
@@ -140,13 +142,13 @@ export default function EnvironmentsPage() {
                     }
                   />
                   <p className="text-xs text-muted-foreground">
-                    Auto-generated from name, but you can customize it
+                    {t('environments.keyHint')}
                   </p>
                 </div>
               </div>
               <DialogFooter>
                 <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
-                  Cancel
+                  {t('common.cancel')}
                 </Button>
                 <Button
                   onClick={handleCreateEnvironment}
@@ -155,10 +157,10 @@ export default function EnvironmentsPage() {
                   {isCreating ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Creating...
+                      {t('common.creating')}
                     </>
                   ) : (
-                    'Create Environment'
+                    t('environments.createEnvironment')
                   )}
                 </Button>
               </DialogFooter>
@@ -168,18 +170,17 @@ export default function EnvironmentsPage() {
 
         {/* Environments Table */}
         {loading ? (
-          <div className="text-center py-12 text-muted-foreground">Loading...</div>
+          <div className="text-center py-12 text-muted-foreground">{t('common.loading')}</div>
         ) : environments.length === 0 ? (
           <div className="border rounded-lg p-12 text-center">
             <Layers className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-            <h3 className="text-lg font-semibold mb-2">No Environments</h3>
+            <h3 className="text-lg font-semibold mb-2">{t('environments.noEnvironments')}</h3>
             <p className="text-muted-foreground max-w-md mx-auto mb-4">
-              Create your first environment to start managing feature flags across different
-              deployment stages.
+              {t('environments.noEnvironmentsDesc')}
             </p>
             <Button onClick={() => setIsCreateDialogOpen(true)}>
               <Plus className="mr-2 h-4 w-4" />
-              Create Environment
+              {t('environments.createEnvironment')}
             </Button>
           </div>
         ) : (
@@ -187,10 +188,10 @@ export default function EnvironmentsPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Environment Name</TableHead>
-                  <TableHead>Key</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead>{t('environments.name')}</TableHead>
+                  <TableHead>{t('environments.key')}</TableHead>
+                  <TableHead>{t('environments.status')}</TableHead>
+                  <TableHead className="text-right">{t('common.actions')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -209,7 +210,7 @@ export default function EnvironmentsPage() {
                             : ''
                         }
                       >
-                        {env.key === 'production' ? 'Live' : 'Active'}
+                        {env.key === 'production' ? t('common.live') : t('common.active')}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
@@ -231,12 +232,9 @@ export default function EnvironmentsPage() {
 
         {/* Info Card */}
         <div className="bg-muted/50 border rounded-lg p-4">
-          <h3 className="font-semibold mb-2">About Environments</h3>
+          <h3 className="font-semibold mb-2">{t('environments.infoTitle')}</h3>
           <p className="text-sm text-muted-foreground">
-            Environments allow you to manage feature flags across different deployment stages.
-            Each environment can have different flag states, enabling you to test features
-            before releasing them to production. Enter any name you want - common examples
-            include Development, Testing, Staging, and Production.
+            {t('environments.infoDesc')}
           </p>
         </div>
       </div>

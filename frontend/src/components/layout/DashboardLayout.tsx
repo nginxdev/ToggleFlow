@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import {
   Zap,
   Flag,
@@ -28,6 +29,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { projectsApi, environmentsApi } from '@/lib/api'
+import { LanguageSelector } from '@/components/LanguageSelector'
 
 interface SidebarItemProps {
   icon: React.ReactNode
@@ -63,6 +65,7 @@ function SidebarItem({ icon, label, href, active }: SidebarItemProps) {
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const location = useLocation()
   const navigate = useNavigate()
+  const { t } = useTranslation()
   
   const [projects, setProjects] = useState<any[]>([])
   const [selectedProject, setSelectedProject] = useState<any>(null)
@@ -113,16 +116,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }
 
   const navItems = [
-    { icon: <Flag className="h-4 w-4" />, label: 'Feature Flags', href: '/dashboard/flags' },
-    { icon: <Folder className="h-4 w-4" />, label: 'Projects', href: '/dashboard/projects' },
-    { icon: <Users className="h-4 w-4" />, label: 'Segments', href: '/dashboard/segments' },
+    { icon: <Flag className="h-4 w-4" />, label: t('nav.featureFlags'), href: '/dashboard/flags' },
+    { icon: <Folder className="h-4 w-4" />, label: t('nav.projects'), href: '/dashboard/projects' },
+    { icon: <Users className="h-4 w-4" />, label: t('nav.segments'), href: '/dashboard/segments' },
     {
       icon: <Layers className="h-4 w-4" />,
-      label: 'Environments',
+      label: t('nav.environments'),
       href: '/dashboard/environments',
     },
-    { icon: <Activity className="h-4 w-4" />, label: 'Audit Log', href: '/dashboard/audit-log' },
-    { icon: <Settings className="h-4 w-4" />, label: 'Settings', href: '/dashboard/settings' },
+    { icon: <Activity className="h-4 w-4" />, label: t('nav.auditLog'), href: '/dashboard/audit-log' },
+    { icon: <Settings className="h-4 w-4" />, label: t('nav.settings'), href: '/dashboard/settings' },
   ]
 
   return (
@@ -154,11 +157,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <div className="px-3 pb-4">
             <div className="bg-muted/50 rounded-none p-4">
               <p className="text-muted-foreground mb-2 text-xs font-semibold tracking-wider uppercase">
-                Usage
+                {t('common.usage')}
               </p>
               <div className="space-y-2">
                 <div className="flex justify-between text-xs">
-                  <span>Flags</span>
+                  <span>{t('common.flags')}</span>
                   <span>12 / 50</span>
                 </div>
                 <div className="bg-border h-1.5 w-full">
@@ -179,12 +182,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="flex items-center gap-2 font-semibold">
-                  {loading ? 'Loading...' : (selectedProject?.name || 'No Project')}
+                  {loading ? t('common.loading') : (selectedProject?.name || t('common.selectProject'))}
                   <ChevronDown className="h-4 w-4 opacity-50" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-56">
-                <DropdownMenuLabel>Switch Project</DropdownMenuLabel>
+                <DropdownMenuLabel>{t('common.switchProject')}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 {projects.map((project) => (
                   <DropdownMenuItem
@@ -196,7 +199,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   </DropdownMenuItem>
                 ))}
                 {projects.length === 0 && !loading && (
-                  <DropdownMenuItem disabled>No projects found</DropdownMenuItem>
+                  <DropdownMenuItem disabled>{t('common.noProjects')}</DropdownMenuItem>
                 )}
               </DropdownMenuContent>
             </DropdownMenu>
@@ -208,12 +211,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm" className="flex items-center gap-2">
                   <Layers className="h-3.5 w-3.5" />
-                  {loading ? 'Loading...' : (selectedEnvironment?.name || 'No Environment')}
+                  {loading ? t('common.loading') : (selectedEnvironment?.name || t('common.noEnvironments'))}
                   <ChevronDown className="h-3.5 w-3.5 opacity-50" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start">
-                <DropdownMenuLabel>Switch Environment</DropdownMenuLabel>
+                <DropdownMenuLabel>{t('common.switchEnvironment')}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 {environments.map((env) => (
                   <DropdownMenuItem
@@ -230,7 +233,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   </DropdownMenuItem>
                 ))}
                 {environments.length === 0 && !loading && (
-                  <DropdownMenuItem disabled>No environments</DropdownMenuItem>
+                  <DropdownMenuItem disabled>{t('common.noEnvironments')}</DropdownMenuItem>
                 )}
               </DropdownMenuContent>
             </DropdownMenu>
@@ -241,12 +244,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <Search className="text-muted-foreground absolute top-2.5 left-2.5 h-4 w-4" />
               <Input
                 type="search"
-                placeholder="Search flags..."
+                placeholder={t('common.search')}
                 className="w-[200px] pl-8 lg:w-[300px]"
               />
             </div>
 
             <ModeToggle />
+
+            <LanguageSelector />
 
             <Button variant="ghost" size="icon" className="relative">
               <Bell className="h-5 w-5" />
@@ -264,15 +269,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuLabel>{t('auth.myAccount')}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>Profile</DropdownMenuItem>
-                <DropdownMenuItem>API Keys</DropdownMenuItem>
-                <DropdownMenuItem>Teams</DropdownMenuItem>
+                <DropdownMenuItem>{t('auth.profile')}</DropdownMenuItem>
+                <DropdownMenuItem>{t('auth.apiKeys')}</DropdownMenuItem>
+                <DropdownMenuItem>{t('auth.teams')}</DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout} className="text-destructive">
                   <LogOut className="mr-2 h-4 w-4" />
-                  Log out
+                  {t('common.signOut')}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
