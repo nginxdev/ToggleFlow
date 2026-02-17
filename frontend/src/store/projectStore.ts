@@ -17,6 +17,7 @@ interface ProjectState {
 
   selectEnvironment: (env: Environment) => void
   createEnvironment: (projectId: string, data: { name: string; key: string }) => Promise<void>
+  updateEnvironment: (id: string, data: { name?: string; key?: string }) => Promise<void>
   deleteEnvironment: (id: string) => Promise<void>
   fetchEnvironments: (projectId: string) => Promise<void>
 }
@@ -118,6 +119,19 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     set({ environments: envs })
     if (!get().selectedEnvironment && envs.length > 0) {
       set({ selectedEnvironment: envs[0] })
+    }
+  },
+
+  updateEnvironment: async (id, data) => {
+    await environmentsApi.update(id, data)
+    const projectId = get().selectedProject?.id
+    if (projectId) {
+      const envs = await environmentsApi.getByProject(projectId)
+      set({ environments: envs })
+      const selected = get().selectedEnvironment
+      if (selected?.id === id) {
+        set({ selectedEnvironment: envs.find((e: Environment) => e.id === id) || selected })
+      }
     }
   },
 
