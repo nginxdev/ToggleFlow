@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import DashboardLayout from '@/components/layout/DashboardLayout'
@@ -6,6 +6,13 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Switch } from '@/components/ui/switch'
 import { Separator } from '@/components/ui/separator'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import {
   ChevronRight,
   Settings as SettingsIcon,
@@ -17,14 +24,91 @@ import {
   Trash2,
   Copy,
   Terminal,
+  Loader2,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { flagsApi } from '@/lib/api'
 
 export default function FlagDetailsPage() {
   const { t } = useTranslation()
-  useParams()
+  const { id } = useParams()
+  const [flag, setFlag] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('targeting')
-  const [flagStatus, setFlagStatus] = useState(true)
+  const [selectedEnvId, setSelectedEnvId] = useState<string>('')
+  const [isToggling, setIsToggling] = useState(false)
+
+  useEffect(() => {
+    if (id) {
+      fetchFlagDetails()
+    }
+  }, [id])
+
+  const fetchFlagDetails = async () => {
+    try {
+      const data = await flagsApi.getOne(Number(id))
+      setFlag(data)
+      
+      // Select first environment by default if not set
+      if (!selectedEnvId && data.project?.environments?.length > 0) {
+        setSelectedEnvId(String(data.project.environments[0].id))
+      }
+    } catch (error) {
+      console.error('Failed to fetch flag details:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleToggleStatus = async (checked: boolean) => {
+    if (!selectedEnvId) return
+    
+    setIsToggling(true)
+    try {
+      await flagsApi.updateFlagState(Number(id), Number(selectedEnvId), { isEnabled: checked })
+      
+      // Update local state
+      const updatedFlag = { ...flag }
+      const stateIndex = updatedFlag.flagStates?.findIndex(
+        (s: any) => s.environmentId === Number(selectedEnvId)
+      )
+      
+      if (stateIndex >= 0) {
+        updatedFlag.flagStates[stateIndex].isEnabled = checked
+      }
+      
+      setFlag(updatedFlag)
+    } catch (error) {
+      console.error('Failed to update flag status:', error)
+    } finally {
+      setIsToggling(false)
+    }
+  }
+
+  if (loading) {
+    return (
+      <DashboardLayout>
+        <div className="flex h-96 items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      </DashboardLayout>
+    )
+  }
+
+  if (!flag) {
+    return (
+      <DashboardLayout>
+        <div className="flex h-96 items-center justify-center">
+          <p className="text-muted-foreground">Flag not found</p>
+        </div>
+      </DashboardLayout>
+    )
+  }
+
+  const currentFlagState = flag.flagStates?.find(
+    (s: any) => s.environmentId === Number(selectedEnvId)
+  )
+  const isEnabled = currentFlagState?.isEnabled || false
 
   const tabs = [
     { id: 'targeting', label: t('flagDetails.tabs.targeting'), icon: <Users className="h-4 w-4" /> },
@@ -43,7 +127,7 @@ export default function FlagDetailsPage() {
             {t('nav.featureFlags')}
           </Link>
           <ChevronRight className="h-4 w-4" />
-          <span className="text-foreground font-medium">new-pricing-page</span>
+          <span className="text-foreground font-medium">{flag.name}</span>
         </nav>
 
         {/* Header */}
@@ -53,10 +137,10 @@ export default function FlagDetailsPage() {
               <GitBranch className="h-6 w-6" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold tracking-tight">New Pricing Page</h1>
+              <h1 className="text-3xl font-bold tracking-tight">{flag.name}</h1>
               <div className="mt-1 flex items-center gap-2">
                 <code className="text-muted-foreground bg-muted px-1.5 py-0.5 font-mono text-sm">
-                  new-pricing-page
+                  {flag.key}
                 </code>
                 <Button variant="ghost" size="icon" className="h-6 w-6">
                   <Copy className="h-3 w-3" />
@@ -66,32 +150,38 @@ export default function FlagDetailsPage() {
                   variant="secondary"
                   className="rounded-full px-2 py-0 text-[10px] font-bold tracking-wider uppercase"
                 >
-                  Boolean
+                  {flag.type}
                 </Badge>
               </div>
             </div>
           </div>
           <div className="flex items-center gap-3">
+             <Select value={selectedEnvId} onValueChange={setSelectedEnvId}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Select Environment" />
+              </SelectTrigger>
+              <SelectContent>
+                {flag.project?.environments?.map((env: any) => (
+                  <SelectItem key={env.id} value={String(env.id)}>
+                    {env.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             <div className="bg-muted/50 border-border mr-4 flex items-center gap-2 border px-3 py-1.5">
               <span className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
                 {t('flagDetails.status')}
               </span>
-              <Switch checked={flagStatus} onCheckedChange={setFlagStatus} />
+              <Switch checked={isEnabled} onCheckedChange={handleToggleStatus} disabled={isToggling} />
               <span
                 className={cn(
                   'text-sm font-medium',
-                  flagStatus ? 'text-primary' : 'text-muted-foreground',
+                  isEnabled ? 'text-primary' : 'text-muted-foreground',
                 )}
               >
-                {flagStatus ? t('flagDetails.servingOn') : t('flagDetails.servingOff')}
+                {isEnabled ? t('flagDetails.servingOn') : t('flagDetails.servingOff')}
               </span>
             </div>
-            <Button variant="outline" size="sm">
-              {t('flagDetails.discardChanges')}
-            </Button>
-            <Button size="sm" className="font-semibold">
-              {t('flagDetails.saveChanges')}
-            </Button>
           </div>
         </div>
 
@@ -183,46 +273,30 @@ export default function FlagDetailsPage() {
                   <GitBranch className="text-primary h-5 w-5" />
                   <h3 className="font-bold">{t('flagDetails.variations.title')}</h3>
                 </div>
-                <Button variant="outline" size="sm" className="gap-2">
-                  <Plus className="h-4 w-4" />
-                  {t('flagDetails.variations.addVariation')}
-                </Button>
               </div>
               <div className="p-0">
                 <div className="text-muted-foreground border-border bg-muted/30 grid grid-cols-12 gap-4 border-b p-4 text-xs font-semibold tracking-widest uppercase">
                   <div className="col-span-3">{t('flagDetails.variations.variationColumn')}</div>
                   <div className="col-span-7">{t('flagDetails.variations.descriptionColumn')}</div>
-                  <div className="col-span-2 text-right">{t('common.actions')}</div>
                 </div>
                 <div className="divide-border divide-y">
-                  <div className="grid grid-cols-12 items-center gap-4 p-4">
-                    <div className="col-span-3">
-                      <code className="text-primary font-mono text-[13px] font-bold">true</code>
+                  {(flag.variations as any[])?.map((variation: any, index: number) => (
+                    <div key={index} className="grid grid-cols-12 items-center gap-4 p-4">
+                      <div className="col-span-3">
+                        <code className="text-primary font-mono text-[13px] font-bold">
+                          {JSON.stringify(variation.value)}
+                        </code>
+                      </div>
+                      <div className="col-span-7 text-sm">
+                        {variation.name || variation.description || '-'}
+                      </div>
                     </div>
-                    <div className="col-span-7 text-sm">
-                      Serves the new pricing layout to users.
-                    </div>
-                    <div className="col-span-2 text-right">
-                      <Button variant="ghost" size="icon" className="text-muted-foreground h-8 w-8">
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-12 items-center gap-4 p-4">
-                    <div className="col-span-3">
-                      <code className="text-muted-foreground font-mono text-[13px] font-bold">
-                        false
-                      </code>
-                    </div>
-                    <div className="text-muted-foreground col-span-7 text-sm">
-                      Serves the legacy pricing layout.
-                    </div>
-                    <div className="col-span-2 text-right">
-                      <Button variant="ghost" size="icon" className="text-muted-foreground h-8 w-8">
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
+                  ))}
+                  {(!flag.variations || (flag.variations as any[]).length === 0) && (
+                     <div className="p-4 text-center text-muted-foreground text-sm">
+                        No variations defined for boolean flag (Implicit true/false)
+                     </div>
+                  )}
                 </div>
               </div>
             </section>

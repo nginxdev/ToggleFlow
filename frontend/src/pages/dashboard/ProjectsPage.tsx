@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useTranslation } from 'react-i18next'
+import { useTranslation, Trans } from 'react-i18next'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import { Button } from '@/components/ui/button'
 import { Plus, Folder, Trash2, Edit, Loader2 } from 'lucide-react'
@@ -26,6 +26,16 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 
 interface Project {
   id: number
@@ -50,6 +60,9 @@ export default function ProjectsPage() {
     key: '',
     description: '',
   })
+
+  const [projectToDelete, setProjectToDelete] = useState<Project | null>(null)
+  const [deleteConfirmation, setDeleteConfirmation] = useState('')
 
   useEffect(() => {
     fetchProjects()
@@ -88,11 +101,12 @@ export default function ProjectsPage() {
     }
   }
 
-  const handleDeleteProject = async (projectId: number) => {
-    if (!confirm('Are you sure you want to delete this project? This will delete all flags and environments.')) return
+  const confirmDeleteProject = async () => {
+    if (!projectToDelete) return
 
     try {
-      await projectsApi.delete(projectId)
+      await projectsApi.delete(projectToDelete.id)
+      setProjectToDelete(null)
       fetchProjects()
     } catch (error) {
       console.error('Failed to delete project:', error)
@@ -251,7 +265,7 @@ export default function ProjectsPage() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => handleDeleteProject(project.id)}
+                          onClick={() => setProjectToDelete(project)}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -272,6 +286,51 @@ export default function ProjectsPage() {
           </p>
         </div>
       </div>
+
+      <AlertDialog 
+        open={!!projectToDelete} 
+        onOpenChange={(open) => {
+          if (!open) {
+            setProjectToDelete(null)
+            setDeleteConfirmation('')
+          }
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('projects.deleteTitle')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('projects.deleteConfirm')}
+            </AlertDialogDescription>
+            <div className="mt-4 w-full">
+              <Label htmlFor="confirm-delete" className="mb-2 block">
+                <Trans
+                  i18nKey="projects.deleteInstruction"
+                  values={{ key: projectToDelete?.key }}
+                  components={{ strong: <span className="font-mono font-bold" /> }}
+                />
+              </Label>
+              <Input
+                id="confirm-delete"
+                value={deleteConfirmation}
+                onChange={(e) => setDeleteConfirmation(e.target.value)}
+                placeholder={projectToDelete?.key}
+                className="w-full"
+              />
+            </div>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              onClick={confirmDeleteProject}
+              disabled={deleteConfirmation !== projectToDelete?.key}
+            >
+              {t('projects.deleteAction')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </DashboardLayout>
   )
 }
