@@ -12,7 +12,7 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
-import { MoreVertical, Plus, Filter, Loader2 } from 'lucide-react'
+import { MoreVertical, Plus, Filter, Loader2, Flag } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -146,8 +146,16 @@ export default function FlagsPage() {
 
         {/* Table */}
         {flags.length === 0 ? (
-          <div className="text-center py-12 text-muted-foreground">
-            No feature flags yet. Create your first flag to get started!
+          <div className="border rounded-lg p-12 text-center">
+            <Flag className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
+            <h3 className="text-lg font-semibold mb-2">No Feature Flags Yet</h3>
+            <p className="text-muted-foreground max-w-md mx-auto mb-4">
+              Create your first feature flag to start controlling features across your environments.
+            </p>
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              Create Your First Flag
+            </Button>
           </div>
         ) : (
           <div className="border rounded-lg">
@@ -231,6 +239,16 @@ export default function FlagsPage() {
             </Table>
           </div>
         )}
+
+        {/* Info Card */}
+        <div className="bg-muted/50 border rounded-lg p-4">
+          <h3 className="font-semibold mb-2">About Feature Flags</h3>
+          <p className="text-sm text-muted-foreground">
+            Feature flags allow you to control which features are enabled in your application
+            without deploying new code. Toggle flags on or off per environment to gradually
+            roll out new features, perform A/B testing, or quickly disable problematic features.
+          </p>
+        </div>
       </div>
     </DashboardLayout>
   )
