@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useTranslation, Trans } from 'react-i18next'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import { Button } from '@/components/ui/button'
-import { Plus, Folder, Trash2, Edit, Loader2 } from 'lucide-react'
+import { Plus, Folder, Trash2, Loader2 } from 'lucide-react'
 import {
   Table,
   TableBody,
@@ -259,9 +259,6 @@ export default function ProjectsPage() {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
-                        <Button variant="ghost" size="icon">
-                          <Edit className="h-4 w-4" />
-                        </Button>
                         <Button
                           variant="ghost"
                           size="icon"

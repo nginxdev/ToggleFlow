@@ -45,4 +45,8 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
   get flagState() {
     return this.prisma.flagState;
   }
+
+  get $transaction() {
+    return this.prisma.$transaction.bind(this.prisma);
+  }
 }
