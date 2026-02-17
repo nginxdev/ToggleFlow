@@ -149,17 +149,18 @@ export default function SettingsPage() {
                 />
               </div>
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="email">{t('settings.email')}</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="your.email@example.com"
-                defaultValue={user?.email || ''}
-                disabled
-              />
-            </div>
-             <div className="grid gap-2">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="email">{t('settings.email')}</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="your.email@example.com"
+                  defaultValue={user?.email || ''}
+                  disabled
+                />
+              </div>
+              <div className="grid gap-2">
                 <Label htmlFor="language">{t('settings.language')}</Label>
                 <Select
                   value={formData.language}
@@ -176,10 +177,8 @@ export default function SettingsPage() {
                     ))}
                   </SelectContent>
                 </Select>
-             </div>
-            <p className="text-sm text-muted-foreground">
-              User ID: {user?.userId || 'N/A'}
-            </p>
+              </div>
+            </div>
           </CardContent>
           <CardFooter>
             <Button onClick={handleSaveProfile} disabled={profileLoading}>
