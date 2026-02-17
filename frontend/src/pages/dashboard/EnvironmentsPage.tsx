@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import { Button } from '@/components/ui/button'
@@ -34,7 +34,6 @@ export default function EnvironmentsPage() {
     selectedProject,
     createEnvironment,
     deleteEnvironment,
-    fetchEnvironments,
   } = useProjectStore()
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [isCreating, setIsCreating] = useState(false)
@@ -42,12 +41,6 @@ export default function EnvironmentsPage() {
     name: '',
     key: '',
   })
-
-  useEffect(() => {
-    if (selectedProject) {
-      fetchEnvironments(selectedProject.id)
-    }
-  }, [selectedProject, fetchEnvironments])
 
   const handleCreateEnvironment = async () => {
     if (!newEnvironment.name || !newEnvironment.key || !selectedProject) return
