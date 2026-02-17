@@ -1,0 +1,77 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  username  String
+  password  String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  projects  Project[]
+}
+
+model Project {
+  id           Int           @id @default(autoincrement())
+  name         String
+  key          String        @unique
+  description  String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  users        User[]
+  environments Environment[]
+  flags        FeatureFlag[]
+}
+
+model Environment {
+  id         Int         @id @default(autoincrement())
+  name       String
+  key        String
+  apiKey     String      @unique @default(uuid())
+  projectId  Int
+  project    Project     @relation(fields: [projectId], references: [id])
+  flagStates FlagState[]
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  @@unique([projectId, key])
+}
+
+model FeatureFlag {
+  id           Int         @id @default(autoincrement())
+  name         String
+  key          String      @unique
+  description  String?
+  type         String      @default("boolean") // boolean, string, number, json
+  variations   Json?       // List of possible variations
+  defaultValue String
+  projectId    Int
+  project      Project     @relation(fields: [projectId], references: [id])
+  flagStates   FlagState[]
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+model FlagState {
+  id            Int         @id @default(autoincrement())
+  isEnabled     Boolean     @default(false)
+  rules         Json?       // Targeting rules for this environment
+  flagId        Int
+  flag          FeatureFlag @relation(fields: [flagId], references: [id])
+  environmentId Int
+  environment   Environment @relation(fields: [environmentId], references: [id])
+  updatedAt     DateTime    @updatedAt
+
+  @@unique([flagId, environmentId])
+}
