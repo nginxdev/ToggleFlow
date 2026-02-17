@@ -209,3 +209,22 @@ export const flagsApi = {
     return response.json()
   },
 }
+
+// Users API
+export const usersApi = {
+  getProfile: async () => {
+    const response = await apiFetch(`${API_URL}/auth/profile`, {
+      headers: getAuthHeaders(),
+    })
+    return response.json()
+  },
+
+  updateProfile: async (data: { firstName?: string; lastName?: string; language?: string }) => {
+    const response = await apiFetch(`${API_URL}/users/profile`, {
+      method: 'PATCH',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data),
+    })
+    return response.json()
+  },
+}

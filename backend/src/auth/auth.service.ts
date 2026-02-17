@@ -36,8 +36,20 @@ export class AuthService {
     };
   }
 
-  async register(email: string, username: string, password: string) {
-    const user = await this.usersService.create(email, username, password);
+  async register(
+    email: string,
+    username: string,
+    password: string,
+    firstName?: string,
+    lastName?: string,
+  ) {
+    const user = await this.usersService.create(
+      email,
+      username,
+      password,
+      firstName,
+      lastName,
+    );
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password: _password, ...userWithoutPassword } = user;
     return this.login(userWithoutPassword);

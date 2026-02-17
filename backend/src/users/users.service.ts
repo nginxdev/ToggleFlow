@@ -19,6 +19,9 @@ export class UsersService {
     return {
       userId: user.id,
       username: user.username,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      language: user.language,
       password: user.password,
       email: user.email,
     };
@@ -28,6 +31,8 @@ export class UsersService {
     email: string,
     username: string,
     password: string,
+    firstName?: string,
+    lastName?: string,
   ): Promise<IUser> {
     // Check if user already exists
     const existingUser = await this.prisma.user.findUnique({
@@ -47,12 +52,38 @@ export class UsersService {
         email,
         username,
         password: hashedPassword,
+        firstName,
+        lastName,
       },
     });
 
     return {
       userId: user.id,
       username: user.username,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      language: user.language,
+      password: user.password,
+      email: user.email,
+    };
+  }
+
+  async updateProfile(userId: number, data: { firstName?: string; lastName?: string; language?: string }): Promise<IUser> {
+    const user = await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        language: data.language,
+      },
+    });
+
+    return {
+      userId: user.id,
+      username: user.username,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      language: user.language,
       password: user.password,
       email: user.email,
     };

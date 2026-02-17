@@ -3,15 +3,34 @@ import { useTranslation } from 'react-i18next'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { User, Key, Bell, Shield, Loader2 } from 'lucide-react'
 import { Switch } from '@/components/ui/switch'
+import { Button } from '@/components/ui/button'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { SUPPORTED_LANGUAGES } from '@/lib/constants'
 
 export default function SettingsPage() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [profileLoading, setProfileLoading] = useState(false)
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    language: 'en',
+  })
+
+  useEffect(() => {
+    setFormData(prev => ({ ...prev, language: i18n.language }))
+  }, [i18n.language])
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -25,9 +44,18 @@ export default function SettingsPage() {
         if (response.ok) {
           const data = await response.json()
           setUser(data)
+          setFormData(prev => ({
+            ...prev,
+            firstName: data.firstName || '',
+            lastName: data.lastName || '',
+          }))
+          
+          if (data.language && data.language !== i18n.language) {
+             i18n.changeLanguage(data.language)
+          }
         }
       } catch (error) {
-        console.error('Failed to fetch user profile:', error)
+        // quiet failure
       } finally {
         setLoading(false)
       }
@@ -35,6 +63,40 @@ export default function SettingsPage() {
 
     fetchUserProfile()
   }, [])
+
+  const handleSaveProfile = async () => {
+    setProfileLoading(true)
+    try {
+      const token = localStorage.getItem('token')
+      const response = await fetch('http://localhost:3000/api/users/profile', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+           firstName: formData.firstName,
+           lastName: formData.lastName,
+           language: formData.language,
+        }),
+      })
+
+      if (response.ok) {
+        const updatedUser = await response.json()
+        setUser(updatedUser)
+        if (formData.language !== i18n.language) {
+            i18n.changeLanguage(formData.language)
+        }
+        // Ideally show success toast here
+      } else {
+        console.error('Failed to update profile')
+      }
+    } catch (error) {
+      // enhanced error handling could go here
+    } finally {
+      setProfileLoading(false)
+    }
+  }
 
   if (loading) {
     return (
@@ -67,14 +129,25 @@ export default function SettingsPage() {
             <CardDescription>{t('settings.profileDesc')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid gap-2">
-              <Label htmlFor="username">{t('settings.username')}</Label>
-              <Input
-                id="username"
-                placeholder="Username"
-                defaultValue={user?.username || ''}
-                disabled
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="firstName">{t('settings.firstName')}</Label>
+                <Input
+                  id="firstName"
+                  value={formData.firstName}
+                  onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                  placeholder="John"
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="lastName">{t('settings.lastName')}</Label>
+                <Input
+                  id="lastName"
+                  value={formData.lastName}
+                  onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                   placeholder="Doe"
+                />
+              </div>
             </div>
             <div className="grid gap-2">
               <Label htmlFor="email">{t('settings.email')}</Label>
@@ -86,10 +159,34 @@ export default function SettingsPage() {
                 disabled
               />
             </div>
+             <div className="grid gap-2">
+                <Label htmlFor="language">{t('settings.language')}</Label>
+                <Select
+                  value={formData.language}
+                  onValueChange={(value) => setFormData({ ...formData, language: value })}
+                >
+                  <SelectTrigger id="language">
+                    <SelectValue placeholder="Select Language" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {SUPPORTED_LANGUAGES.map((lang) => (
+                      <SelectItem key={lang.code} value={lang.code}>
+                        {lang.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+             </div>
             <p className="text-sm text-muted-foreground">
               User ID: {user?.userId || 'N/A'}
             </p>
           </CardContent>
+          <CardFooter>
+            <Button onClick={handleSaveProfile} disabled={profileLoading}>
+              {profileLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {t('common.save')}
+            </Button>
+          </CardFooter>
         </Card>
 
         {/* API Keys */}
@@ -151,6 +248,11 @@ export default function SettingsPage() {
               {t('settings.notificationsComingSoon')}
             </p>
           </CardContent>
+           <CardFooter>
+            <Button disabled>
+              {t('common.save')}
+            </Button>
+          </CardFooter>
         </Card>
 
         {/* Security */}
@@ -167,6 +269,11 @@ export default function SettingsPage() {
               {t('settings.securityInfo')}
             </p>
           </CardContent>
+           <CardFooter>
+            <Button disabled>
+              {t('common.save')}
+            </Button>
+          </CardFooter>
         </Card>
       </div>
     </DashboardLayout>

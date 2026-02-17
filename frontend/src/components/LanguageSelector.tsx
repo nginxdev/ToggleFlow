@@ -10,23 +10,27 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
 
-const languages = [
-  { code: 'en', name: 'English', flag: '🇬🇧' },
-  { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
-  { code: 'fr', name: 'Français', flag: '🇫🇷' },
-  { code: 'it', name: 'Italiano', flag: '🇮🇹' },
-  { code: 'te', name: 'తెలుగు', flag: '🇮🇳' },
-]
+import { SUPPORTED_LANGUAGES } from '@/lib/constants'
+import { usersApi } from '@/lib/api'
 
 export function LanguageSelector() {
   const { i18n } = useTranslation()
-  const currentLang = languages.find((lang) => lang.code === i18n.language) || languages[0]
+  const currentLang = SUPPORTED_LANGUAGES.find((lang) => lang.code === i18n.language) || SUPPORTED_LANGUAGES[0]
 
-  const changeLanguage = (langCode: string) => {
-    console.log('Changing language from', i18n.language, 'to', langCode)
-    i18n.changeLanguage(langCode).then(() => {
-      console.log('Language changed successfully to', i18n.language)
-    })
+  const changeLanguage = async (langCode: string) => {
+    if (langCode === i18n.language) return
+    
+    i18n.changeLanguage(langCode)
+    
+    // If user is logged in, save preference
+    const token = localStorage.getItem('token')
+    if (token) {
+      try {
+        await usersApi.updateProfile({ language: langCode })
+      } catch (error) {
+        console.error('Failed to save language preference:', error)
+      }
+    }
   }
 
   return (
@@ -39,7 +43,7 @@ export function LanguageSelector() {
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>Language</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        {languages.map((language) => (
+        {SUPPORTED_LANGUAGES.map((language) => (
           <DropdownMenuItem
             key={language.code}
             onClick={() => changeLanguage(language.code)}
