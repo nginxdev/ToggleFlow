@@ -43,7 +43,6 @@ interface FeatureFlag {
 export default function FlagsPage() {
   const [flags, setFlags] = useState<FeatureFlag[]>([])
   const [loading, setLoading] = useState(true)
-  const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null)
   const [togglingFlags, setTogglingFlags] = useState<Set<string>>(new Set())
 
   useEffect(() => {
@@ -53,7 +52,6 @@ export default function FlagsPage() {
         const projects = await projectsApi.getAll()
         if (projects.length > 0) {
           const projectId = projects[0].id
-          setSelectedProjectId(projectId)
           
           // Fetch flags for the first project
           const flagsData = await flagsApi.getByProject(projectId)

@@ -144,6 +144,34 @@ export class ProjectsService {
     // Verify ownership
     await this.findOne(id, userId);
 
+    // Get all flags for this project to delete their states
+    const flags = await this.prisma.featureFlag.findMany({
+      where: { projectId: id },
+      select: { id: true },
+    });
+
+    // Delete all flag states for all flags in this project
+    if (flags.length > 0) {
+      await this.prisma.flagState.deleteMany({
+        where: {
+          flagId: {
+            in: flags.map((f) => f.id),
+          },
+        },
+      });
+    }
+
+    // Delete all flags for this project
+    await this.prisma.featureFlag.deleteMany({
+      where: { projectId: id },
+    });
+
+    // Delete all environments for this project
+    await this.prisma.environment.deleteMany({
+      where: { projectId: id },
+    });
+
+    // Finally delete the project
     await this.prisma.project.delete({
       where: { id },
     });

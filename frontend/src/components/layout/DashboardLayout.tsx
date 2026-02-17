@@ -11,8 +11,8 @@ import {
   ChevronDown,
   Bell,
   User,
-  Plus,
   LogOut,
+  Folder,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -114,6 +114,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const navItems = [
     { icon: <Flag className="h-4 w-4" />, label: 'Feature Flags', href: '/dashboard/flags' },
+    { icon: <Folder className="h-4 w-4" />, label: 'Projects', href: '/dashboard/projects' },
     { icon: <Users className="h-4 w-4" />, label: 'Segments', href: '/dashboard/segments' },
     {
       icon: <Layers className="h-4 w-4" />,
@@ -174,34 +175,65 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* Top Header */}
         <header className="border-border bg-background/80 sticky top-0 z-30 flex h-16 items-center justify-between border-b px-4 backdrop-blur-md sm:px-8">
           <div className="flex items-center gap-4">
+            {/* Project Selector */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="flex items-center gap-2 font-semibold">
-                  Default Project
-                  <ChevronDown className="text-muted-foreground h-4 w-4" />
+                  {loading ? 'Loading...' : (selectedProject?.name || 'No Project')}
+                  <ChevronDown className="h-4 w-4 opacity-50" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-56">
-                <DropdownMenuLabel>Projects</DropdownMenuLabel>
+                <DropdownMenuLabel>Switch Project</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>Default Project</DropdownMenuItem>
-                <DropdownMenuItem>Mobile App</DropdownMenuItem>
-                <DropdownMenuItem>Marketing Site</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-primary font-medium">
-                  <Plus className="mr-2 h-4 w-4" />
-                  New Project
-                </DropdownMenuItem>
+                {projects.map((project) => (
+                  <DropdownMenuItem
+                    key={project.id}
+                    onClick={() => handleProjectChange(project)}
+                    className={selectedProject?.id === project.id ? 'bg-accent' : ''}
+                  >
+                    {project.name}
+                  </DropdownMenuItem>
+                ))}
+                {projects.length === 0 && !loading && (
+                  <DropdownMenuItem disabled>No projects found</DropdownMenuItem>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
 
             <Separator orientation="vertical" className="h-6" />
 
-            <div className="flex items-center gap-2 px-2 text-sm font-medium">
-              <span className="h-2 w-2 rounded-full bg-green-500" />
-              Production
-              <ChevronDown className="text-muted-foreground h-4 w-4" />
-            </div>
+            {/* Environment Selector */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="flex items-center gap-2">
+                  <Layers className="h-3.5 w-3.5" />
+                  {loading ? 'Loading...' : (selectedEnvironment?.name || 'No Environment')}
+                  <ChevronDown className="h-3.5 w-3.5 opacity-50" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                <DropdownMenuLabel>Switch Environment</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {environments.map((env) => (
+                  <DropdownMenuItem
+                    key={env.id}
+                    onClick={() => setSelectedEnvironment(env)}
+                    className={selectedEnvironment?.id === env.id ? 'bg-accent' : ''}
+                  >
+                    <span className={env.key === 'production' ? 'flex items-center gap-2' : ''}>
+                      {env.key === 'production' && (
+                        <span className="h-2 w-2 rounded-full bg-green-500" />
+                      )}
+                      {env.name}
+                    </span>
+                  </DropdownMenuItem>
+                ))}
+                {environments.length === 0 && !loading && (
+                  <DropdownMenuItem disabled>No environments</DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           <div className="flex items-center gap-4">

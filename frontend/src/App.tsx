@@ -5,6 +5,7 @@ import SignUpPage from '@/pages/auth/SignUpPage'
 import ForgotPasswordPage from '@/pages/auth/ForgotPasswordPage'
 import FlagsPage from '@/pages/dashboard/FlagsPage'
 import FlagDetailsPage from '@/pages/dashboard/FlagDetailsPage'
+import ProjectsPage from '@/pages/dashboard/ProjectsPage'
 import SegmentsPage from '@/pages/dashboard/SegmentsPage'
 import EnvironmentsPage from '@/pages/dashboard/EnvironmentsPage'
 import AuditLogPage from '@/pages/dashboard/AuditLogPage'
@@ -23,6 +24,7 @@ export function App() {
         <Route path="/dashboard" element={<ProtectedRoute><Navigate to="/dashboard/flags" replace /></ProtectedRoute>} />
         <Route path="/dashboard/flags" element={<ProtectedRoute><FlagsPage /></ProtectedRoute>} />
         <Route path="/dashboard/flags/:id" element={<ProtectedRoute><FlagDetailsPage /></ProtectedRoute>} />
+        <Route path="/dashboard/projects" element={<ProtectedRoute><ProjectsPage /></ProtectedRoute>} />
         <Route path="/dashboard/segments" element={<ProtectedRoute><SegmentsPage /></ProtectedRoute>} />
         <Route path="/dashboard/environments" element={<ProtectedRoute><EnvironmentsPage /></ProtectedRoute>} />
         <Route path="/dashboard/audit-log" element={<ProtectedRoute><AuditLogPage /></ProtectedRoute>} />
