@@ -11,27 +11,23 @@ export default function AuditLogPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">{t('auditLog.title')}</h1>
-            <p className="text-muted-foreground mt-1">
-              {t('auditLog.subtitle')}
-            </p>
+            <p className="text-muted-foreground mt-1">{t('auditLog.subtitle')}</p>
           </div>
         </div>
 
-        <div className="border rounded-lg p-12 text-center">
-          <Activity className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-          <h3 className="text-lg font-semibold mb-2">{t('auditLog.comingSoon')}</h3>
-          <p className="text-muted-foreground max-w-md mx-auto mb-4">
+        <div className="rounded-lg border p-12 text-center">
+          <Activity className="text-muted-foreground mx-auto mb-4 h-16 w-16" />
+          <h3 className="mb-2 text-lg font-semibold">{t('auditLog.comingSoon')}</h3>
+          <p className="text-muted-foreground mx-auto mb-4 max-w-md">
             {t('auditLog.comingSoonDesc')}
           </p>
-          <p className="text-sm text-muted-foreground">
-            {t('auditLog.underDevelopment')}
-          </p>
+          <p className="text-muted-foreground text-sm">{t('auditLog.underDevelopment')}</p>
         </div>
 
         {/* Info */}
-        <div className="bg-muted/50 border rounded-lg p-4">
-          <h3 className="font-semibold mb-2">{t('auditLog.plannedFeatures')}</h3>
-          <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+        <div className="bg-muted/50 rounded-lg border p-4">
+          <h3 className="mb-2 font-semibold">{t('auditLog.plannedFeatures')}</h3>
+          <ul className="text-muted-foreground list-inside list-disc space-y-1 text-sm">
             <li>{t('auditLog.timeline')}</li>
             <li>{t('auditLog.filtering')}</li>
             <li>{t('auditLog.export')}</li>

@@ -15,13 +15,14 @@ import { usersApi } from '@/lib/api'
 
 export function LanguageSelector() {
   const { i18n } = useTranslation()
-  const currentLang = SUPPORTED_LANGUAGES.find((lang) => lang.code === i18n.language) || SUPPORTED_LANGUAGES[0]
+  const currentLang =
+    SUPPORTED_LANGUAGES.find((lang) => lang.code === i18n.language) || SUPPORTED_LANGUAGES[0]
 
   const changeLanguage = async (langCode: string) => {
     if (langCode === i18n.language) return
-    
+
     i18n.changeLanguage(langCode)
-    
+
     // If user is logged in, save preference
     const token = localStorage.getItem('token')
     if (token) {

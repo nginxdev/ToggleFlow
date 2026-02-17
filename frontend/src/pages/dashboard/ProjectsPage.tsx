@@ -38,14 +38,18 @@ import {
 } from '@/components/ui/alert-dialog'
 
 interface Project {
-  id: number
+  id: string
   name: string
   key: string
   description?: string
-  createdAt: string
+  environments: Array<{
+    id: string
+    name: string
+    key: string
+  }>
   _count?: {
-    environments: number
     flags: number
+    environments: number
   }
 }
 
@@ -89,7 +93,7 @@ export default function ProjectsPage() {
         key: newProject.key,
         description: newProject.description || undefined,
       })
-      
+
       setIsCreateDialogOpen(false)
       setNewProject({ name: '', key: '', description: '' })
       fetchProjects()
@@ -126,7 +130,7 @@ export default function ProjectsPage() {
     return (
       <DashboardLayout>
         <div className="flex h-96 items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
         </div>
       </DashboardLayout>
     )
@@ -139,9 +143,7 @@ export default function ProjectsPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">{t('projects.title')}</h1>
-            <p className="text-muted-foreground mt-1">
-              {t('projects.subtitle')}
-            </p>
+            <p className="text-muted-foreground mt-1">{t('projects.subtitle')}</p>
           </div>
           <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
             <DialogTrigger asChild>
@@ -151,11 +153,9 @@ export default function ProjectsPage() {
               </Button>
             </DialogTrigger>
             <DialogContent>
-                <DialogHeader>
+              <DialogHeader>
                 <DialogTitle>{t('projects.createNew')}</DialogTitle>
-                <DialogDescription>
-                  {t('projects.createDesc')}
-                </DialogDescription>
+                <DialogDescription>{t('projects.createDesc')}</DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="grid gap-2">
@@ -175,9 +175,7 @@ export default function ProjectsPage() {
                     value={newProject.key}
                     onChange={(e) => setNewProject({ ...newProject, key: e.target.value })}
                   />
-                  <p className="text-xs text-muted-foreground">
-                    {t('projects.keyHint')}
-                  </p>
+                  <p className="text-muted-foreground text-xs">{t('projects.keyHint')}</p>
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="description">{t('projects.description')}</Label>
@@ -213,10 +211,10 @@ export default function ProjectsPage() {
 
         {/* Projects Table */}
         {projects.length === 0 ? (
-          <div className="border rounded-lg p-12 text-center">
-            <Folder className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-            <h3 className="text-lg font-semibold mb-2">{t('projects.noProjects')}</h3>
-            <p className="text-muted-foreground max-w-md mx-auto mb-4">
+          <div className="rounded-lg border p-12 text-center">
+            <Folder className="text-muted-foreground mx-auto mb-4 h-16 w-16" />
+            <h3 className="mb-2 text-lg font-semibold">{t('projects.noProjects')}</h3>
+            <p className="text-muted-foreground mx-auto mb-4 max-w-md">
               {t('projects.noProjectsDesc')}
             </p>
             <Button onClick={() => setIsCreateDialogOpen(true)}>
@@ -225,7 +223,7 @@ export default function ProjectsPage() {
             </Button>
           </div>
         ) : (
-          <div className="border rounded-lg">
+          <div className="rounded-lg border">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -241,21 +239,17 @@ export default function ProjectsPage() {
                 {projects.map((project) => (
                   <TableRow key={project.id}>
                     <TableCell className="font-medium">{project.name}</TableCell>
-                    <TableCell className="font-mono text-sm text-muted-foreground">
+                    <TableCell className="text-muted-foreground font-mono text-sm">
                       {project.key}
                     </TableCell>
-                    <TableCell className="text-sm text-muted-foreground max-w-xs truncate">
+                    <TableCell className="text-muted-foreground max-w-xs truncate text-sm">
                       {project.description || '-'}
                     </TableCell>
                     <TableCell>
-                      <Badge variant="secondary">
-                        {project._count?.environments || 0}
-                      </Badge>
+                      <Badge variant="secondary">{project._count?.environments || 0}</Badge>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="secondary">
-                        {project._count?.flags || 0}
-                      </Badge>
+                      <Badge variant="secondary">{project._count?.flags || 0}</Badge>
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
@@ -276,16 +270,14 @@ export default function ProjectsPage() {
         )}
 
         {/* Info Card */}
-        <div className="bg-muted/50 border rounded-lg p-4">
-          <h3 className="font-semibold mb-2">{t('projects.infoTitle')}</h3>
-          <p className="text-sm text-muted-foreground">
-            {t('projects.infoDesc')}
-          </p>
+        <div className="bg-muted/50 rounded-lg border p-4">
+          <h3 className="mb-2 font-semibold">{t('projects.infoTitle')}</h3>
+          <p className="text-muted-foreground text-sm">{t('projects.infoDesc')}</p>
         </div>
       </div>
 
-      <AlertDialog 
-        open={!!projectToDelete} 
+      <AlertDialog
+        open={!!projectToDelete}
         onOpenChange={(open) => {
           if (!open) {
             setProjectToDelete(null)
@@ -296,9 +288,7 @@ export default function ProjectsPage() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{t('projects.deleteTitle')}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {t('projects.deleteConfirm')}
-            </AlertDialogDescription>
+            <AlertDialogDescription>{t('projects.deleteConfirm')}</AlertDialogDescription>
             <div className="mt-4 w-full">
               <Label htmlFor="confirm-delete" className="mb-2 block">
                 <Trans

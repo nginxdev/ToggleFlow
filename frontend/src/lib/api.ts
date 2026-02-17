@@ -55,7 +55,7 @@ export const projectsApi = {
     return response.json()
   },
 
-  getOne: async (id: number) => {
+  getOne: async (id: string) => {
     const response = await apiFetch(`${API_URL}/projects/${id}`, {
       headers: getAuthHeaders(),
     })
@@ -71,7 +71,7 @@ export const projectsApi = {
     return response.json()
   },
 
-  update: async (id: number, data: { name?: string; key?: string; description?: string }) => {
+  update: async (id: string, data: { name?: string; key?: string; description?: string }) => {
     const response = await apiFetch(`${API_URL}/projects/${id}`, {
       method: 'PATCH',
       headers: getAuthHeaders(),
@@ -80,7 +80,7 @@ export const projectsApi = {
     return response.json()
   },
 
-  delete: async (id: number) => {
+  delete: async (id: string) => {
     const response = await apiFetch(`${API_URL}/projects/${id}`, {
       method: 'DELETE',
       headers: getAuthHeaders(),
@@ -91,14 +91,14 @@ export const projectsApi = {
 
 // Environments API
 export const environmentsApi = {
-  getByProject: async (projectId: number) => {
+  getByProject: async (projectId: string) => {
     const response = await apiFetch(`${API_URL}/projects/${projectId}/environments`, {
       headers: getAuthHeaders(),
     })
     return response.json()
   },
 
-  create: async (projectId: number, data: { name: string; key: string }) => {
+  create: async (projectId: string, data: { name: string; key: string }) => {
     const response = await apiFetch(`${API_URL}/projects/${projectId}/environments`, {
       method: 'POST',
       headers: getAuthHeaders(),
@@ -107,7 +107,7 @@ export const environmentsApi = {
     return response.json()
   },
 
-  update: async (id: number, data: { name?: string; key?: string }) => {
+  update: async (id: string, data: { name?: string; key?: string }) => {
     const response = await apiFetch(`${API_URL}/environments/${id}`, {
       method: 'PATCH',
       headers: getAuthHeaders(),
@@ -116,10 +116,11 @@ export const environmentsApi = {
     return response.json()
   },
 
-  delete: async (id: number) => {
+  delete: async (id: string) => {
     const response = await apiFetch(`${API_URL}/environments/${id}`, {
       method: 'DELETE',
       headers: getAuthHeaders(),
+      body: JSON.stringify({}),
     })
     return response.json()
   },
@@ -127,14 +128,14 @@ export const environmentsApi = {
 
 // Flags API
 export const flagsApi = {
-  getByProject: async (projectId: number) => {
+  getByProject: async (projectId: string) => {
     const response = await apiFetch(`${API_URL}/projects/${projectId}/flags`, {
       headers: getAuthHeaders(),
     })
     return response.json()
   },
 
-  getOne: async (id: number) => {
+  getOne: async (id: string) => {
     const response = await apiFetch(`${API_URL}/flags/${id}`, {
       headers: getAuthHeaders(),
     })
@@ -142,7 +143,7 @@ export const flagsApi = {
   },
 
   create: async (
-    projectId: number,
+    projectId: string,
     data: {
       name: string
       key: string
@@ -161,7 +162,7 @@ export const flagsApi = {
   },
 
   update: async (
-    id: number,
+    id: string,
     data: {
       name?: string
       key?: string
@@ -179,15 +180,16 @@ export const flagsApi = {
     return response.json()
   },
 
-  delete: async (id: number) => {
+  delete: async (id: string) => {
     const response = await apiFetch(`${API_URL}/flags/${id}`, {
       method: 'DELETE',
       headers: getAuthHeaders(),
+      body: JSON.stringify({}),
     })
     return response.json()
   },
 
-  toggleFlagState: async (flagId: number, environmentId: number, isEnabled: boolean) => {
+  toggleFlagState: async (flagId: string, environmentId: string, isEnabled: boolean) => {
     const response = await apiFetch(`${API_URL}/flags/${flagId}/environments/${environmentId}`, {
       method: 'PATCH',
       headers: getAuthHeaders(),
@@ -197,8 +199,8 @@ export const flagsApi = {
   },
 
   updateFlagState: async (
-    flagId: number,
-    environmentId: number,
+    flagId: string,
+    environmentId: string,
     data: { isEnabled?: boolean; rules?: any },
   ) => {
     const response = await apiFetch(`${API_URL}/flags/${flagId}/environments/${environmentId}`, {

@@ -12,9 +12,7 @@ export default function SegmentsPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">{t('segments.title')}</h1>
-            <p className="text-muted-foreground mt-1">
-              {t('segments.subtitle')}
-            </p>
+            <p className="text-muted-foreground mt-1">{t('segments.subtitle')}</p>
           </div>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" disabled>
@@ -28,15 +26,13 @@ export default function SegmentsPage() {
           </div>
         </div>
 
-        <div className="border rounded-lg p-12 text-center">
-          <Users className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-          <h3 className="text-lg font-semibold mb-2">{t('segments.comingSoon')}</h3>
-          <p className="text-muted-foreground max-w-md mx-auto mb-4">
+        <div className="rounded-lg border p-12 text-center">
+          <Users className="text-muted-foreground mx-auto mb-4 h-16 w-16" />
+          <h3 className="mb-2 text-lg font-semibold">{t('segments.comingSoon')}</h3>
+          <p className="text-muted-foreground mx-auto mb-4 max-w-md">
             {t('segments.comingSoonDesc')}
           </p>
-          <p className="text-sm text-muted-foreground">
-            {t('segments.underDevelopment')}
-          </p>
+          <p className="text-muted-foreground text-sm">{t('segments.underDevelopment')}</p>
         </div>
       </div>
     </DashboardLayout>

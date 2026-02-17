@@ -66,7 +66,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const location = useLocation()
   const navigate = useNavigate()
   const { t } = useTranslation()
-  
+
   const [projects, setProjects] = useState<any[]>([])
   const [selectedProject, setSelectedProject] = useState<any>(null)
   const [environments, setEnvironments] = useState<any[]>([])
@@ -124,8 +124,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       label: t('nav.environments'),
       href: '/dashboard/environments',
     },
-    { icon: <Activity className="h-4 w-4" />, label: t('nav.auditLog'), href: '/dashboard/audit-log' },
-    { icon: <Settings className="h-4 w-4" />, label: t('nav.settings'), href: '/dashboard/settings' },
+    {
+      icon: <Activity className="h-4 w-4" />,
+      label: t('nav.auditLog'),
+      href: '/dashboard/audit-log',
+    },
+    {
+      icon: <Settings className="h-4 w-4" />,
+      label: t('nav.settings'),
+      href: '/dashboard/settings',
+    },
   ]
 
   return (
@@ -182,7 +190,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="flex items-center gap-2 font-semibold">
-                  {loading ? t('common.loading') : (selectedProject?.name || t('common.selectProject'))}
+                  {loading
+                    ? t('common.loading')
+                    : selectedProject?.name || t('common.selectProject')}
                   <ChevronDown className="h-4 w-4 opacity-50" />
                 </Button>
               </DropdownMenuTrigger>
@@ -211,7 +221,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm" className="flex items-center gap-2">
                   <Layers className="h-3.5 w-3.5" />
-                  {loading ? t('common.loading') : (selectedEnvironment?.name || t('common.noEnvironments'))}
+                  {loading
+                    ? t('common.loading')
+                    : selectedEnvironment?.name || t('common.noEnvironments')}
                   <ChevronDown className="h-3.5 w-3.5 opacity-50" />
                 </Button>
               </DropdownMenuTrigger>

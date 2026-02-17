@@ -7,7 +7,6 @@ import {
   Param,
   Delete,
   UseGuards,
-  ParseIntPipe,
 } from '@nestjs/common';
 import { EnvironmentsService } from './environments.service';
 import { CreateEnvironmentDto } from './dto/create-environment.dto';
@@ -20,13 +19,13 @@ export class EnvironmentsController {
   constructor(private readonly environmentsService: EnvironmentsService) {}
 
   @Get('projects/:projectId/environments')
-  findByProject(@Param('projectId', ParseIntPipe) projectId: number) {
+  findByProject(@Param('projectId') projectId: string) {
     return this.environmentsService.findByProject(projectId);
   }
 
   @Post('projects/:projectId/environments')
   create(
-    @Param('projectId', ParseIntPipe) projectId: number,
+    @Param('projectId') projectId: string,
     @Body() createEnvironmentDto: CreateEnvironmentDto,
   ) {
     return this.environmentsService.create(createEnvironmentDto, projectId);
@@ -34,14 +33,14 @@ export class EnvironmentsController {
 
   @Patch('environments/:id')
   update(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
     @Body() updateEnvironmentDto: UpdateEnvironmentDto,
   ) {
     return this.environmentsService.update(id, updateEnvironmentDto);
   }
 
   @Delete('environments/:id')
-  delete(@Param('id', ParseIntPipe) id: number) {
+  delete(@Param('id') id: string) {
     return this.environmentsService.delete(id);
   }
 }

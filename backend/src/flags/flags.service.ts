@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateFlagDto } from './dto/create-flag.dto';
 import { UpdateFlagDto } from './dto/update-flag.dto';
@@ -8,7 +12,7 @@ import { UpdateFlagStateDto } from './dto/update-flag-state.dto';
 export class FlagsService {
   constructor(private prisma: PrismaService) {}
 
-  async findByProject(projectId: number) {
+  async findByProject(projectId: string) {
     return this.prisma.featureFlag.findMany({
       where: { projectId },
       include: {
@@ -24,7 +28,7 @@ export class FlagsService {
     });
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     const flag = await this.prisma.featureFlag.findUnique({
       where: { id },
       include: {
@@ -48,7 +52,7 @@ export class FlagsService {
     return flag;
   }
 
-  async create(createFlagDto: CreateFlagDto, projectId: number) {
+  async create(createFlagDto: CreateFlagDto, projectId: string) {
     // Check if key already exists
     const existing = await this.prisma.featureFlag.findFirst({
       where: {
@@ -94,7 +98,7 @@ export class FlagsService {
     return this.findOne(flag.id);
   }
 
-  async update(id: number, updateFlagDto: UpdateFlagDto) {
+  async update(id: string, updateFlagDto: UpdateFlagDto) {
     const flag = await this.prisma.featureFlag.findUnique({
       where: { id },
     });
@@ -130,7 +134,7 @@ export class FlagsService {
     });
   }
 
-  async delete(id: number) {
+  async delete(id: string) {
     const flag = await this.prisma.featureFlag.findUnique({
       where: { id },
     });
@@ -147,8 +151,8 @@ export class FlagsService {
   }
 
   async updateFlagState(
-    flagId: number,
-    environmentId: number,
+    flagId: string,
+    environmentId: string,
     updateFlagStateDto: UpdateFlagStateDto,
   ) {
     // Check if flag state exists

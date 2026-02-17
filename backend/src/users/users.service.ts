@@ -27,6 +27,26 @@ export class UsersService {
     };
   }
 
+  async findById(userId: string): Promise<IUser | undefined> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      return undefined;
+    }
+
+    return {
+      userId: user.id,
+      username: user.username,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      language: user.language,
+      password: user.password,
+      email: user.email,
+    };
+  }
+
   async create(
     email: string,
     username: string,
@@ -68,7 +88,10 @@ export class UsersService {
     };
   }
 
-  async updateProfile(userId: number, data: { firstName?: string; lastName?: string; language?: string }): Promise<IUser> {
+  async updateProfile(
+    userId: string,
+    data: { firstName?: string; lastName?: string; language?: string },
+  ): Promise<IUser> {
     const user = await this.prisma.user.update({
       where: { id: userId },
       data: {

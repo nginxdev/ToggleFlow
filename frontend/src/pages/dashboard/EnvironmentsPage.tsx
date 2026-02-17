@@ -27,7 +27,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
 interface Environment {
-  id: number
+  id: string
   name: string
   key: string
   createdAt: string
@@ -37,7 +37,7 @@ export default function EnvironmentsPage() {
   const { t } = useTranslation()
   const [environments, setEnvironments] = useState<Environment[]>([])
   const [loading, setLoading] = useState(true)
-  const [projectId, setProjectId] = useState<number | null>(null)
+  const [projectId, setProjectId] = useState<string | null>(null)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [isCreating, setIsCreating] = useState(false)
   const [newEnvironment, setNewEnvironment] = useState({
@@ -103,9 +103,7 @@ export default function EnvironmentsPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">{t('environments.title')}</h1>
-            <p className="text-muted-foreground mt-1">
-              {t('environments.subtitle')}
-            </p>
+            <p className="text-muted-foreground mt-1">{t('environments.subtitle')}</p>
           </div>
           <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
             <DialogTrigger asChild>
@@ -117,9 +115,7 @@ export default function EnvironmentsPage() {
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>{t('environments.createEnvironment')}</DialogTitle>
-                <DialogDescription>
-                  {t('environments.createDesc')}
-                </DialogDescription>
+                <DialogDescription>{t('environments.createDesc')}</DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="grid gap-2">
@@ -137,13 +133,9 @@ export default function EnvironmentsPage() {
                     id="key"
                     placeholder={t('environments.keyPlaceholder')}
                     value={newEnvironment.key}
-                    onChange={(e) =>
-                      setNewEnvironment({ ...newEnvironment, key: e.target.value })
-                    }
+                    onChange={(e) => setNewEnvironment({ ...newEnvironment, key: e.target.value })}
                   />
-                  <p className="text-xs text-muted-foreground">
-                    {t('environments.keyHint')}
-                  </p>
+                  <p className="text-muted-foreground text-xs">{t('environments.keyHint')}</p>
                 </div>
               </div>
               <DialogFooter>
@@ -170,12 +162,12 @@ export default function EnvironmentsPage() {
 
         {/* Environments Table */}
         {loading ? (
-          <div className="text-center py-12 text-muted-foreground">{t('common.loading')}</div>
+          <div className="text-muted-foreground py-12 text-center">{t('common.loading')}</div>
         ) : environments.length === 0 ? (
-          <div className="border rounded-lg p-12 text-center">
-            <Layers className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-            <h3 className="text-lg font-semibold mb-2">{t('environments.noEnvironments')}</h3>
-            <p className="text-muted-foreground max-w-md mx-auto mb-4">
+          <div className="rounded-lg border p-12 text-center">
+            <Layers className="text-muted-foreground mx-auto mb-4 h-16 w-16" />
+            <h3 className="mb-2 text-lg font-semibold">{t('environments.noEnvironments')}</h3>
+            <p className="text-muted-foreground mx-auto mb-4 max-w-md">
               {t('environments.noEnvironmentsDesc')}
             </p>
             <Button onClick={() => setIsCreateDialogOpen(true)}>
@@ -184,7 +176,7 @@ export default function EnvironmentsPage() {
             </Button>
           </div>
         ) : (
-          <div className="border rounded-lg">
+          <div className="rounded-lg border">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -198,16 +190,14 @@ export default function EnvironmentsPage() {
                 {environments.map((env) => (
                   <TableRow key={env.id}>
                     <TableCell className="font-medium">{env.name}</TableCell>
-                    <TableCell className="font-mono text-sm text-muted-foreground">
+                    <TableCell className="text-muted-foreground font-mono text-sm">
                       {env.key}
                     </TableCell>
                     <TableCell>
                       <Badge
                         variant={env.key === 'production' ? 'default' : 'secondary'}
                         className={
-                          env.key === 'production'
-                            ? 'bg-green-500 hover:bg-green-600'
-                            : ''
+                          env.key === 'production' ? 'bg-green-500 hover:bg-green-600' : ''
                         }
                       >
                         {env.key === 'production' ? t('common.live') : t('common.active')}
@@ -231,11 +221,9 @@ export default function EnvironmentsPage() {
         )}
 
         {/* Info Card */}
-        <div className="bg-muted/50 border rounded-lg p-4">
-          <h3 className="font-semibold mb-2">{t('environments.infoTitle')}</h3>
-          <p className="text-sm text-muted-foreground">
-            {t('environments.infoDesc')}
-          </p>
+        <div className="bg-muted/50 rounded-lg border p-4">
+          <h3 className="mb-2 font-semibold">{t('environments.infoTitle')}</h3>
+          <p className="text-muted-foreground text-sm">{t('environments.infoDesc')}</p>
         </div>
       </div>
     </DashboardLayout>

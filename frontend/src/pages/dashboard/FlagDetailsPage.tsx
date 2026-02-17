@@ -21,7 +21,6 @@ import {
   History,
   Activity,
   Plus,
-  Trash2,
   Copy,
   Terminal,
   Loader2,
@@ -46,12 +45,13 @@ export default function FlagDetailsPage() {
 
   const fetchFlagDetails = async () => {
     try {
-      const data = await flagsApi.getOne(Number(id))
+      if (!id) return
+      const data = await flagsApi.getOne(id)
       setFlag(data)
-      
+
       // Select first environment by default if not set
       if (!selectedEnvId && data.project?.environments?.length > 0) {
-        setSelectedEnvId(String(data.project.environments[0].id))
+        setSelectedEnvId(data.project.environments[0].id)
       }
     } catch (error) {
       console.error('Failed to fetch flag details:', error)
@@ -61,22 +61,22 @@ export default function FlagDetailsPage() {
   }
 
   const handleToggleStatus = async (checked: boolean) => {
-    if (!selectedEnvId) return
-    
+    if (!selectedEnvId || !id) return
+
     setIsToggling(true)
     try {
-      await flagsApi.updateFlagState(Number(id), Number(selectedEnvId), { isEnabled: checked })
-      
+      await flagsApi.updateFlagState(id, selectedEnvId, { isEnabled: checked })
+
       // Update local state
       const updatedFlag = { ...flag }
       const stateIndex = updatedFlag.flagStates?.findIndex(
-        (s: any) => s.environmentId === Number(selectedEnvId)
+        (s: any) => s.environmentId === selectedEnvId,
       )
-      
+
       if (stateIndex >= 0) {
         updatedFlag.flagStates[stateIndex].isEnabled = checked
       }
-      
+
       setFlag(updatedFlag)
     } catch (error) {
       console.error('Failed to update flag status:', error)
@@ -89,7 +89,7 @@ export default function FlagDetailsPage() {
     return (
       <DashboardLayout>
         <div className="flex h-96 items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
         </div>
       </DashboardLayout>
     )
@@ -105,17 +105,27 @@ export default function FlagDetailsPage() {
     )
   }
 
-  const currentFlagState = flag.flagStates?.find(
-    (s: any) => s.environmentId === Number(selectedEnvId)
-  )
+  const currentFlagState = flag.flagStates?.find((s: any) => s.environmentId === selectedEnvId)
   const isEnabled = currentFlagState?.isEnabled || false
 
   const tabs = [
-    { id: 'targeting', label: t('flagDetails.tabs.targeting'), icon: <Users className="h-4 w-4" /> },
-    { id: 'variations', label: t('flagDetails.tabs.variations'), icon: <GitBranch className="h-4 w-4" /> },
+    {
+      id: 'targeting',
+      label: t('flagDetails.tabs.targeting'),
+      icon: <Users className="h-4 w-4" />,
+    },
+    {
+      id: 'variations',
+      label: t('flagDetails.tabs.variations'),
+      icon: <GitBranch className="h-4 w-4" />,
+    },
     { id: 'rules', label: t('flagDetails.tabs.rules'), icon: <Terminal className="h-4 w-4" /> },
     { id: 'history', label: t('flagDetails.tabs.history'), icon: <History className="h-4 w-4" /> },
-    { id: 'settings', label: t('flagDetails.tabs.settings'), icon: <SettingsIcon className="h-4 w-4" /> },
+    {
+      id: 'settings',
+      label: t('flagDetails.tabs.settings'),
+      icon: <SettingsIcon className="h-4 w-4" />,
+    },
   ]
 
   return (
@@ -156,13 +166,13 @@ export default function FlagDetailsPage() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-             <Select value={selectedEnvId} onValueChange={setSelectedEnvId}>
+            <Select value={selectedEnvId} onValueChange={setSelectedEnvId}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Select Environment" />
               </SelectTrigger>
               <SelectContent>
                 {flag.project?.environments?.map((env: any) => (
-                  <SelectItem key={env.id} value={String(env.id)}>
+                  <SelectItem key={env.id} value={env.id}>
                     {env.name}
                   </SelectItem>
                 ))}
@@ -172,7 +182,11 @@ export default function FlagDetailsPage() {
               <span className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
                 {t('flagDetails.status')}
               </span>
-              <Switch checked={isEnabled} onCheckedChange={handleToggleStatus} disabled={isToggling} />
+              <Switch
+                checked={isEnabled}
+                onCheckedChange={handleToggleStatus}
+                disabled={isToggling}
+              />
               <span
                 className={cn(
                   'text-sm font-medium',
@@ -235,7 +249,9 @@ export default function FlagDetailsPage() {
                 </div>
                 <div className="space-y-4 p-6">
                   <div className="flex items-center gap-4">
-                    <span className="w-32 text-sm font-medium">{t('flagDetails.targeting.whenOn')}</span>
+                    <span className="w-32 text-sm font-medium">
+                      {t('flagDetails.targeting.whenOn')}
+                    </span>
                     <div className="flex flex-1 gap-2">
                       <Button
                         variant="secondary"
@@ -250,7 +266,9 @@ export default function FlagDetailsPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
-                    <span className="w-32 text-sm font-medium">{t('flagDetails.targeting.whenOff')}</span>
+                    <span className="w-32 text-sm font-medium">
+                      {t('flagDetails.targeting.whenOff')}
+                    </span>
                     <div className="flex flex-1 gap-2">
                       <Button variant="secondary" disabled>
                         {t('flagDetails.targeting.serve')}
@@ -293,9 +311,9 @@ export default function FlagDetailsPage() {
                     </div>
                   ))}
                   {(!flag.variations || (flag.variations as any[]).length === 0) && (
-                     <div className="p-4 text-center text-muted-foreground text-sm">
-                        No variations defined for boolean flag (Implicit true/false)
-                     </div>
+                    <div className="text-muted-foreground p-4 text-center text-sm">
+                      No variations defined for boolean flag (Implicit true/false)
+                    </div>
                   )}
                 </div>
               </div>

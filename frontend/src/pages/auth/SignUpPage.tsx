@@ -88,7 +88,9 @@ export default function SignUpPage() {
         <div className="w-full max-w-md">
           <Card className="border-border/40 shadow-primary/5 shadow-xl">
             <CardHeader className="space-y-1">
-              <CardTitle className="text-2xl font-bold tracking-tight">{t('auth.signup.title')}</CardTitle>
+              <CardTitle className="text-2xl font-bold tracking-tight">
+                {t('auth.signup.title')}
+              </CardTitle>
               <CardDescription>{t('auth.signup.subtitle')}</CardDescription>
             </CardHeader>
             <form onSubmit={handleSubmit}>
@@ -144,7 +146,7 @@ export default function SignUpPage() {
                   />
                 </div>
               </CardContent>
-              <CardFooter className="flex flex-col gap-4 mt-6">
+              <CardFooter className="mt-6 flex flex-col gap-4">
                 <Button type="submit" className="w-full" disabled={isLoading}>
                   {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   {t('auth.signup.submitButton')}

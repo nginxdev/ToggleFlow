@@ -30,12 +30,10 @@ export function SessionTimeoutHandler() {
       <DialogContent className="sm:max-w-md" showCloseButton={false}>
         <DialogHeader>
           <DialogTitle>{t('auth.sessionTimeout')}</DialogTitle>
-          <DialogDescription>
-            {t('auth.sessionExpired')}
-          </DialogDescription>
+          <DialogDescription>{t('auth.sessionExpired')}</DialogDescription>
         </DialogHeader>
         <div className="flex items-center justify-center py-4">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <Loader2 className="text-primary h-8 w-8 animate-spin" />
         </div>
       </DialogContent>
     </Dialog>

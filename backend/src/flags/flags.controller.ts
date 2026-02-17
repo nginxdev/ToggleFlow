@@ -7,7 +7,6 @@ import {
   Param,
   Delete,
   UseGuards,
-  ParseIntPipe,
 } from '@nestjs/common';
 import { FlagsService } from './flags.service';
 import { CreateFlagDto } from './dto/create-flag.dto';
@@ -21,42 +20,43 @@ export class FlagsController {
   constructor(private readonly flagsService: FlagsService) {}
 
   @Get('projects/:projectId/flags')
-  findByProject(@Param('projectId', ParseIntPipe) projectId: number) {
+  findByProject(@Param('projectId') projectId: string) {
     return this.flagsService.findByProject(projectId);
   }
 
   @Get('flags/:id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
+  findOne(@Param('id') id: string) {
     return this.flagsService.findOne(id);
   }
 
   @Post('projects/:projectId/flags')
   create(
-    @Param('projectId', ParseIntPipe) projectId: number,
+    @Param('projectId') projectId: string,
     @Body() createFlagDto: CreateFlagDto,
   ) {
     return this.flagsService.create(createFlagDto, projectId);
   }
 
   @Patch('flags/:id')
-  update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() updateFlagDto: UpdateFlagDto,
-  ) {
+  update(@Param('id') id: string, @Body() updateFlagDto: UpdateFlagDto) {
     return this.flagsService.update(id, updateFlagDto);
   }
 
   @Delete('flags/:id')
-  delete(@Param('id', ParseIntPipe) id: number) {
+  delete(@Param('id') id: string) {
     return this.flagsService.delete(id);
   }
 
   @Patch('flags/:flagId/environments/:environmentId')
   updateFlagState(
-    @Param('flagId', ParseIntPipe) flagId: number,
-    @Param('environmentId', ParseIntPipe) environmentId: number,
+    @Param('flagId') flagId: string,
+    @Param('environmentId') environmentId: string,
     @Body() updateFlagStateDto: UpdateFlagStateDto,
   ) {
-    return this.flagsService.updateFlagState(flagId, environmentId, updateFlagStateDto);
+    return this.flagsService.updateFlagState(
+      flagId,
+      environmentId,
+      updateFlagStateDto,
+    );
   }
 }

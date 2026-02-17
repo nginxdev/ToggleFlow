@@ -23,14 +23,70 @@ export function App() {
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         {/* Dashboard Routes - Protected */}
-        <Route path="/dashboard" element={<ProtectedRoute><Navigate to="/dashboard/flags" replace /></ProtectedRoute>} />
-        <Route path="/dashboard/flags" element={<ProtectedRoute><FlagsPage /></ProtectedRoute>} />
-        <Route path="/dashboard/flags/:id" element={<ProtectedRoute><FlagDetailsPage /></ProtectedRoute>} />
-        <Route path="/dashboard/projects" element={<ProtectedRoute><ProjectsPage /></ProtectedRoute>} />
-        <Route path="/dashboard/segments" element={<ProtectedRoute><SegmentsPage /></ProtectedRoute>} />
-        <Route path="/dashboard/environments" element={<ProtectedRoute><EnvironmentsPage /></ProtectedRoute>} />
-        <Route path="/dashboard/audit-log" element={<ProtectedRoute><AuditLogPage /></ProtectedRoute>} />
-        <Route path="/dashboard/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Navigate to="/dashboard/flags" replace />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/flags"
+          element={
+            <ProtectedRoute>
+              <FlagsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/flags/:id"
+          element={
+            <ProtectedRoute>
+              <FlagDetailsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/projects"
+          element={
+            <ProtectedRoute>
+              <ProjectsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/segments"
+          element={
+            <ProtectedRoute>
+              <SegmentsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/environments"
+          element={
+            <ProtectedRoute>
+              <EnvironmentsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/audit-log"
+          element={
+            <ProtectedRoute>
+              <AuditLogPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/settings"
+          element={
+            <ProtectedRoute>
+              <SettingsPage />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
   )

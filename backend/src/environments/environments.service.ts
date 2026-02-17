@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateEnvironmentDto } from './dto/create-environment.dto';
 import { UpdateEnvironmentDto } from './dto/update-environment.dto';
@@ -7,7 +11,7 @@ import { UpdateEnvironmentDto } from './dto/update-environment.dto';
 export class EnvironmentsService {
   constructor(private prisma: PrismaService) {}
 
-  async findByProject(projectId: number) {
+  async findByProject(projectId: string) {
     return this.prisma.environment.findMany({
       where: { projectId },
       orderBy: {
@@ -16,7 +20,7 @@ export class EnvironmentsService {
     });
   }
 
-  async create(createEnvironmentDto: CreateEnvironmentDto, projectId: number) {
+  async create(createEnvironmentDto: CreateEnvironmentDto, projectId: string) {
     // Check if key already exists in this project
     const existing = await this.prisma.environment.findFirst({
       where: {
@@ -26,7 +30,9 @@ export class EnvironmentsService {
     });
 
     if (existing) {
-      throw new ConflictException('Environment key already exists in this project');
+      throw new ConflictException(
+        'Environment key already exists in this project',
+      );
     }
 
     return this.prisma.environment.create({
@@ -38,7 +44,7 @@ export class EnvironmentsService {
     });
   }
 
-  async update(id: number, updateEnvironmentDto: UpdateEnvironmentDto) {
+  async update(id: string, updateEnvironmentDto: UpdateEnvironmentDto) {
     const environment = await this.prisma.environment.findUnique({
       where: { id },
     });
@@ -58,7 +64,9 @@ export class EnvironmentsService {
       });
 
       if (existing) {
-        throw new ConflictException('Environment key already exists in this project');
+        throw new ConflictException(
+          'Environment key already exists in this project',
+        );
       }
     }
 
@@ -68,7 +76,7 @@ export class EnvironmentsService {
     });
   }
 
-  async delete(id: number) {
+  async delete(id: string) {
     const environment = await this.prisma.environment.findUnique({
       where: { id },
     });

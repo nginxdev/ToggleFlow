@@ -8,7 +8,6 @@ import {
   Delete,
   UseGuards,
   Request as NestRequest,
-  ParseIntPipe,
 } from '@nestjs/common';
 import { Request } from 'express';
 import { ProjectsService } from './projects.service';
@@ -23,35 +22,38 @@ export class ProjectsController {
 
   @Get()
   findAll(@NestRequest() req: Request) {
-    const userId = (req.user as any).userId;
+    const userId = (req.user as { userId: string }).userId;
     return this.projectsService.findAll(userId);
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number, @NestRequest() req: Request) {
-    const userId = (req.user as any).userId;
+  findOne(@Param('id') id: string, @NestRequest() req: Request) {
+    const userId = (req.user as { userId: string }).userId;
     return this.projectsService.findOne(id, userId);
   }
 
   @Post()
-  create(@Body() createProjectDto: CreateProjectDto, @NestRequest() req: Request) {
-    const userId = (req.user as any).userId;
+  create(
+    @Body() createProjectDto: CreateProjectDto,
+    @NestRequest() req: Request,
+  ) {
+    const userId = (req.user as { userId: string }).userId;
     return this.projectsService.create(createProjectDto, userId);
   }
 
   @Patch(':id')
   update(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
     @Body() updateProjectDto: UpdateProjectDto,
     @NestRequest() req: Request,
   ) {
-    const userId = (req.user as any).userId;
+    const userId = (req.user as { userId: string }).userId;
     return this.projectsService.update(id, updateProjectDto, userId);
   }
 
   @Delete(':id')
-  delete(@Param('id', ParseIntPipe) id: number, @NestRequest() req: Request) {
-    const userId = (req.user as any).userId;
+  delete(@Param('id') id: string, @NestRequest() req: Request) {
+    const userId = (req.user as { userId: string }).userId;
     return this.projectsService.delete(id, userId);
   }
 }

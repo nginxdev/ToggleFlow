@@ -3,7 +3,14 @@ import { useTranslation } from 'react-i18next'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { User, Key, Bell, Shield, Loader2 } from 'lucide-react'
 import { Switch } from '@/components/ui/switch'
@@ -29,7 +36,7 @@ export default function SettingsPage() {
   })
 
   useEffect(() => {
-    setFormData(prev => ({ ...prev, language: i18n.language }))
+    setFormData((prev) => ({ ...prev, language: i18n.language }))
   }, [i18n.language])
 
   useEffect(() => {
@@ -44,14 +51,14 @@ export default function SettingsPage() {
         if (response.ok) {
           const data = await response.json()
           setUser(data)
-          setFormData(prev => ({
+          setFormData((prev) => ({
             ...prev,
             firstName: data.firstName || '',
             lastName: data.lastName || '',
           }))
-          
+
           if (data.language && data.language !== i18n.language) {
-             i18n.changeLanguage(data.language)
+            i18n.changeLanguage(data.language)
           }
         }
       } catch (error) {
@@ -75,9 +82,9 @@ export default function SettingsPage() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-           firstName: formData.firstName,
-           lastName: formData.lastName,
-           language: formData.language,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          language: formData.language,
         }),
       })
 
@@ -85,7 +92,7 @@ export default function SettingsPage() {
         const updatedUser = await response.json()
         setUser(updatedUser)
         if (formData.language !== i18n.language) {
-            i18n.changeLanguage(formData.language)
+          i18n.changeLanguage(formData.language)
         }
         // Ideally show success toast here
       } else {
@@ -102,7 +109,7 @@ export default function SettingsPage() {
     return (
       <DashboardLayout>
         <div className="flex h-96 items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
         </div>
       </DashboardLayout>
     )
@@ -110,13 +117,11 @@ export default function SettingsPage() {
 
   return (
     <DashboardLayout>
-      <div className="flex flex-col gap-6 p-6 max-w-4xl">
+      <div className="flex max-w-4xl flex-col gap-6 p-6">
         {/* Header */}
         <div>
           <h1 className="text-3xl font-bold tracking-tight">{t('settings.title')}</h1>
-          <p className="text-muted-foreground mt-1">
-            {t('settings.subtitle')}
-          </p>
+          <p className="text-muted-foreground mt-1">{t('settings.subtitle')}</p>
         </div>
 
         {/* Profile Settings */}
@@ -145,7 +150,7 @@ export default function SettingsPage() {
                   id="lastName"
                   value={formData.lastName}
                   onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                   placeholder="Doe"
+                  placeholder="Doe"
                 />
               </div>
             </div>
@@ -198,9 +203,7 @@ export default function SettingsPage() {
             <CardDescription>{t('settings.apiKeysDesc')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              {t('settings.apiKeysInfo')}
-            </p>
+            <p className="text-muted-foreground text-sm">{t('settings.apiKeysInfo')}</p>
           </CardContent>
         </Card>
 
@@ -217,7 +220,7 @@ export default function SettingsPage() {
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <Label>{t('settings.emailNotifications')}</Label>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   {t('settings.emailNotificationsDesc')}
                 </p>
               </div>
@@ -227,7 +230,7 @@ export default function SettingsPage() {
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <Label>{t('settings.flagChangeAlerts')}</Label>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   {t('settings.flagChangeAlertsDesc')}
                 </p>
               </div>
@@ -237,20 +240,14 @@ export default function SettingsPage() {
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <Label>{t('settings.weeklyReports')}</Label>
-                <p className="text-sm text-muted-foreground">
-                  {t('settings.weeklyReportsDesc')}
-                </p>
+                <p className="text-muted-foreground text-sm">{t('settings.weeklyReportsDesc')}</p>
               </div>
               <Switch disabled />
             </div>
-            <p className="text-sm text-muted-foreground">
-              {t('settings.notificationsComingSoon')}
-            </p>
+            <p className="text-muted-foreground text-sm">{t('settings.notificationsComingSoon')}</p>
           </CardContent>
-           <CardFooter>
-            <Button disabled>
-              {t('common.save')}
-            </Button>
+          <CardFooter>
+            <Button disabled>{t('common.save')}</Button>
           </CardFooter>
         </Card>
 
@@ -264,14 +261,10 @@ export default function SettingsPage() {
             <CardDescription>{t('settings.securityDesc')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              {t('settings.securityInfo')}
-            </p>
+            <p className="text-muted-foreground text-sm">{t('settings.securityInfo')}</p>
           </CardContent>
-           <CardFooter>
-            <Button disabled>
-              {t('common.save')}
-            </Button>
+          <CardFooter>
+            <Button disabled>{t('common.save')}</Button>
           </CardFooter>
         </Card>
       </div>

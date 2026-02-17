@@ -13,7 +13,7 @@ datasource db {
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
+  id        String    @id @default(uuid())
   email     String    @unique
   username  String
   firstName String?
@@ -26,7 +26,7 @@ model User {
 }
 
 model Project {
-  id           Int           @id @default(autoincrement())
+  id           String        @id @default(uuid())
   name         String
   key          String        @unique
   description  String?
@@ -38,11 +38,11 @@ model Project {
 }
 
 model Environment {
-  id         Int         @id @default(autoincrement())
+  id         String      @id @default(uuid())
   name       String
   key        String
   apiKey     String      @unique @default(uuid())
-  projectId  Int
+  projectId  String
   project    Project     @relation(fields: [projectId], references: [id])
   flagStates FlagState[]
   createdAt  DateTime    @default(now())
@@ -52,14 +52,14 @@ model Environment {
 }
 
 model FeatureFlag {
-  id           Int         @id @default(autoincrement())
+  id           String      @id @default(uuid())
   name         String
   key          String      @unique
   description  String?
   type         String      @default("boolean") // boolean, string, number, json
   variations   Json?       // List of possible variations
   defaultValue String
-  projectId    Int
+  projectId    String
   project      Project     @relation(fields: [projectId], references: [id])
   flagStates   FlagState[]
   createdAt    DateTime    @default(now())
@@ -67,12 +67,12 @@ model FeatureFlag {
 }
 
 model FlagState {
-  id            Int         @id @default(autoincrement())
+  id            String      @id @default(uuid())
   isEnabled     Boolean     @default(false)
   rules         Json?       // Targeting rules for this environment
-  flagId        Int
+  flagId        String
   flag          FeatureFlag @relation(fields: [flagId], references: [id])
-  environmentId Int
+  environmentId String
   environment   Environment @relation(fields: [environmentId], references: [id])
   updatedAt     DateTime    @updatedAt
 

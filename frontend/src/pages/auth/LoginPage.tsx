@@ -70,10 +70,10 @@ export default function LoginPage() {
         <div className="w-full max-w-md">
           <Card className="border-border/40 shadow-primary/5 shadow-xl">
             <CardHeader className="space-y-1">
-              <CardTitle className="text-2xl font-bold tracking-tight">{t('auth.login.title')}</CardTitle>
-              <CardDescription>
-                {t('auth.login.subtitle')}
-              </CardDescription>
+              <CardTitle className="text-2xl font-bold tracking-tight">
+                {t('auth.login.title')}
+              </CardTitle>
+              <CardDescription>{t('auth.login.subtitle')}</CardDescription>
             </CardHeader>
             <CardContent className="grid gap-4">
               <form onSubmit={handleSubmit} className="grid gap-4">

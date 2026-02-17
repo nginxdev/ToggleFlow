@@ -1,8 +1,11 @@
 -- CreateTable
 CREATE TABLE "User" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "username" TEXT NOT NULL,
+    "firstName" TEXT,
+    "lastName" TEXT,
+    "language" TEXT NOT NULL DEFAULT 'en',
     "password" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -12,7 +15,7 @@ CREATE TABLE "User" (
 
 -- CreateTable
 CREATE TABLE "Project" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "key" TEXT NOT NULL,
     "description" TEXT,
@@ -24,11 +27,11 @@ CREATE TABLE "Project" (
 
 -- CreateTable
 CREATE TABLE "Environment" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "key" TEXT NOT NULL,
     "apiKey" TEXT NOT NULL,
-    "projectId" INTEGER NOT NULL,
+    "projectId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -37,14 +40,14 @@ CREATE TABLE "Environment" (
 
 -- CreateTable
 CREATE TABLE "FeatureFlag" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "key" TEXT NOT NULL,
     "description" TEXT,
     "type" TEXT NOT NULL DEFAULT 'boolean',
     "variations" JSONB,
     "defaultValue" TEXT NOT NULL,
-    "projectId" INTEGER NOT NULL,
+    "projectId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -53,11 +56,11 @@ CREATE TABLE "FeatureFlag" (
 
 -- CreateTable
 CREATE TABLE "FlagState" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "isEnabled" BOOLEAN NOT NULL DEFAULT false,
     "rules" JSONB,
-    "flagId" INTEGER NOT NULL,
-    "environmentId" INTEGER NOT NULL,
+    "flagId" TEXT NOT NULL,
+    "environmentId" TEXT NOT NULL,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "FlagState_pkey" PRIMARY KEY ("id")
@@ -65,8 +68,8 @@ CREATE TABLE "FlagState" (
 
 -- CreateTable
 CREATE TABLE "_ProjectToUser" (
-    "A" INTEGER NOT NULL,
-    "B" INTEGER NOT NULL,
+    "A" TEXT NOT NULL,
+    "B" TEXT NOT NULL,
 
     CONSTRAINT "_ProjectToUser_AB_pkey" PRIMARY KEY ("A","B")
 );
