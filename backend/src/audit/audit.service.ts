@@ -18,6 +18,7 @@ export class AuditService {
         entity: data.entity,
         entityId: data.entityId,
         userId: data.userId,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         payload: data.payload || {},
       },
     });
@@ -30,7 +31,7 @@ export class AuditService {
     });
   }
 
-  async findByProject(projectId: string) {
+  async findByProject() {
     // This might require a join or a specific project column in AuditLog if we want to filter by project efficiently
     // For now, we'll keep it simple or filter by userId/entityId if needed.
     // Given the current schema, we'd need to fetch logs for all flags/envs in a project.

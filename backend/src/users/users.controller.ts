@@ -1,4 +1,13 @@
-import { Controller, Post, Body, Patch, UseGuards, Request as NestRequest, Get, NotFoundException } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Patch,
+  UseGuards,
+  Request as NestRequest,
+  Get,
+  NotFoundException,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
@@ -22,8 +31,11 @@ export class UsersController {
 
   @UseGuards(AuthGuard('jwt'))
   @Patch('profile')
-  updateProfile(@NestRequest() req: Request, @Body() updateProfileDto: UpdateProfileDto) {
-    const user = (req.user as { userId: string });
+  updateProfile(
+    @NestRequest() req: Request,
+    @Body() updateProfileDto: UpdateProfileDto,
+  ) {
+    const user = req.user as { userId: string };
     return this.usersService.updateProfile(user.userId, updateProfileDto);
   }
 

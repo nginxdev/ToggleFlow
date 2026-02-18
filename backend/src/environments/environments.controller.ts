@@ -32,7 +32,11 @@ export class EnvironmentsController {
     @NestRequest() req: Request,
   ) {
     const userId = (req.user as { userId: string }).userId;
-    return this.environmentsService.create(createEnvironmentDto, projectId, userId);
+    return this.environmentsService.create(
+      createEnvironmentDto,
+      projectId,
+      userId,
+    );
   }
 
   @Patch('environments/:id')

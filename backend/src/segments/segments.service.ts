@@ -15,7 +15,11 @@ export class SegmentsService {
     private auditService: AuditService,
   ) {}
 
-  async create(createSegmentDto: CreateSegmentDto, projectId: string, userId: string) {
+  async create(
+    createSegmentDto: CreateSegmentDto,
+    projectId: string,
+    userId: string,
+  ) {
     const existing = await this.prisma.segment.findFirst({
       where: {
         projectId,
@@ -76,7 +80,9 @@ export class SegmentsService {
       });
 
       if (existing) {
-        throw new ConflictException('Segment key already exists in this project');
+        throw new ConflictException(
+          'Segment key already exists in this project',
+        );
       }
     }
 

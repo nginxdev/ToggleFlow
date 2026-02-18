@@ -1,4 +1,5 @@
+import { Prisma } from '@prisma/client';
 export class UpdateFlagStateDto {
   isEnabled?: boolean;
-  rules?: any; // JSON object for targeting rules
+  rules?: Prisma.InputJsonValue; // JSON object for targeting rules
 }

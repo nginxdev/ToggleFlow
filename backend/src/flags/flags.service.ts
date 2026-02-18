@@ -74,7 +74,11 @@ export class FlagsService {
     return flag;
   }
 
-  async create(createFlagDto: CreateFlagDto, projectId: string, userId: string) {
+  async create(
+    createFlagDto: CreateFlagDto,
+    projectId: string,
+    userId: string,
+  ) {
     // Check if key already exists
     const existing = await this.prisma.featureFlag.findFirst({
       where: {
@@ -87,7 +91,9 @@ export class FlagsService {
     }
 
     // Auto-generate variations for boolean flags if not provided
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     let variations = createFlagDto.variations || [];
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     if (createFlagDto.type === 'boolean' && variations.length === 0) {
       variations = [
         { id: crypto.randomUUID(), name: 'True', value: 'true' },
@@ -103,6 +109,7 @@ export class FlagsService {
         description: createFlagDto.description,
         type: createFlagDto.type || 'boolean',
         defaultValue: createFlagDto.defaultValue,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         variations: variations,
         projectId,
       },
@@ -158,12 +165,14 @@ export class FlagsService {
       }
     }
 
-
-// ... (inside class)
+    // ... (inside class)
 
     // Prevent deletion of default boolean variations
     if (flag.type === 'boolean' && updateFlagDto.variations) {
-      const newVariations = updateFlagDto.variations as any[];
+      const newVariations = updateFlagDto.variations as Array<{
+        name: string;
+        value: string;
+      }>;
 
       for (const defaultVar of DEFAULT_BOOLEAN_VARIATIONS) {
         const exists = newVariations.some(
@@ -217,7 +226,7 @@ export class FlagsService {
       throw new NotFoundException(`Feature flag with ID ${id} not found`);
     }
 
-    if (!(flag as any).isArchived) {
+    if (flag.isArchived === false) {
       throw new ConflictException('Flag must be archived before deletion');
     }
 
@@ -327,6 +336,7 @@ export class FlagsService {
       payload: {
         environment: updated.environment.key,
         isEnabled: updated.isEnabled,
+
         rules: updated.rules,
       },
     });

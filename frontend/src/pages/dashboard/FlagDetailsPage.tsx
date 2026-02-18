@@ -352,26 +352,7 @@ export default function FlagDetailsPage() {
     setDraftVariations(newVariations)
   }
 
-  const handleSaveIndividualTargeting = async (userId: string, variationId: string, isRemoval = false) => {
-    if (!flag || !selectedEnvId) return
-    
-    let currentRules = { ...(draftRules || { targeting: { individual: [] } }) }
-    if (!currentRules.targeting) currentRules.targeting = {}
-    if (!currentRules.targeting.individual) currentRules.targeting.individual = []
-    
-    if (isRemoval) {
-      currentRules.targeting.individual = currentRules.targeting.individual.filter((i: any) => i.userId !== userId)
-    } else {
-      const existing = currentRules.targeting.individual.find((i: any) => i.userId === userId)
-      if (existing) {
-        existing.variationId = variationId
-      } else {
-        currentRules.targeting.individual.push({ userId, variationId })
-      }
-    }
-    
-    setDraftRules(currentRules)
-  }
+
 
   const handleUpdateDefaultVariation = async (variationId: string) => {
     if (!flag || !selectedEnvId) return
@@ -697,65 +678,7 @@ export default function FlagDetailsPage() {
                 </div>
               </section>
                 
-                <section className="border-border bg-card border rounded-lg overflow-hidden">
-                <div className="border-border flex items-center justify-between border-b p-4 bg-muted/10">
-                  <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wider">{t('flagDetails.targeting.individualTitle')}</h4>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="gap-2 bg-background"
-                      onClick={() => {
-                        const userId = prompt('Enter User ID:')
-                        if (userId && flag.variations?.[0]) {
-                          handleSaveIndividualTargeting(userId, flag.variations[0].id)
-                        }
-                      }}
-                    >
-                      <Plus className="h-4 w-4" />
-                      {t('flagDetails.targeting.addUsers')}
-                    </Button>
-                </div>
-                <div>
-                  <div className="divide-border divide-y">
-                    {(draftRules?.targeting?.individual || []).map((override: any) => (
-                      <div key={override.userId} className="flex items-center justify-between p-4">
-                        <div className="flex items-center gap-4">
-                          <code className="bg-muted px-2 py-1 rounded text-sm">{override.userId}</code>
-                          <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                          <Select 
-                            value={override.variationId} 
-                            onValueChange={(val) => handleSaveIndividualTargeting(override.userId, val)}
-                          >
-                            <SelectTrigger className="w-[180px] h-8">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {(flag.variations || []).map(v => (
-                                <SelectItem key={v.id} value={v.id}>{v.name}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="h-8 w-8 text-destructive"
-                          onClick={() => handleSaveIndividualTargeting(override.userId, override.variationId, true)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ))}
-                    {(draftRules?.targeting?.individual?.length === 0 || !draftRules?.targeting?.individual) && (
-                      <div className="bg-muted/10 p-8 text-center">
-                        <p className="text-muted-foreground text-sm">
-                          {t('flagDetails.targeting.noUsers')}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </section>
+
 
               <section className="border-border bg-card border rounded-lg overflow-hidden">
                 <div className="border-border flex items-center justify-between border-b p-4 bg-muted/10">

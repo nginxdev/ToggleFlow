@@ -217,8 +217,6 @@
       "noSegmentsAvailable": "Keine Segmente gefunden",
       "noSegmentsTargeted": "Keine Segmente gezielt. Fügen Sie ein Segment hinzu, um bestimmte Benutzergruppen anzusprechen.",
       "unknownSegment": "Unbekanntes Segment",
-      "addUsers": "Benutzer hinzufügen",
-      "noUsers": "Für diesen Indikator sind keine Benutzer spezifisch Zielgruppen.",
       "defaultRule": "Standardregel",
       "whenOn": "Wenn Indikator AN ist",
       "whenOff": "Wenn Indikator AUS ist",

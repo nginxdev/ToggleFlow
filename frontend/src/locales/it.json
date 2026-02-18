@@ -215,8 +215,6 @@
       "noSegmentsAvailable": "Nessun segmento trovato",
       "noSegmentsTargeted": "Nessun segmento mirato. Aggiungi un segmento per indirizzare gruppi di utenti specifici.",
       "unknownSegment": "Segmento Sconosciuto",
-      "addUsers": "Aggiungi utenti",
-      "noUsers": "Nessun utente specificamente mirato per questo flag.",
       "defaultRule": "Regola Predefinita",
       "whenOn": "Quando il flag è ATTIVO",
       "whenOff": "Quando il flag è DISATTIVATO",

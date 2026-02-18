@@ -95,7 +95,12 @@ export class UsersService {
 
   async updateProfile(
     userId: string,
-    data: { firstName?: string; lastName?: string; language?: string; lastProjectId?: string | null },
+    data: {
+      firstName?: string;
+      lastName?: string;
+      language?: string;
+      lastProjectId?: string | null;
+    },
   ): Promise<IUser> {
     const user = await this.prisma.user.update({
       where: { id: userId },

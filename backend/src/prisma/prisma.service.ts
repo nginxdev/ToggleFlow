@@ -55,6 +55,7 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
   }
 
   get $transaction() {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return this.prisma.$transaction.bind(this.prisma);
   }
 }
