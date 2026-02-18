@@ -2,7 +2,7 @@
   "nav": {
     "featureFlags": "Indicateurs de Fonctionnalité",
     "projects": "Projets",
-    "segments": "Segments d'Utilisateurs",
+    "segments": "Segments",
     "environments": "Environnements",
     "auditLog": "Journal d'Audit",
     "settings": "Paramètres"
@@ -133,11 +133,11 @@
     "deleteAction": "Supprimer l'Environnement"
   },
   "segments": {
-    "title": "Segments d'Utilisateurs",
+    "title": "Segments",
     "subtitle": "Ciblez des groupes d'utilisateurs spécifiques avec les indicateurs de fonctionnalité",
     "newSegment": "Nouveau Segment",
-    "comingSoon": "Segments d'Utilisateurs Bientôt Disponibles",
-    "comingSoonDesc": "Créez et gérez des segments d'utilisateurs pour cibler des groupes spécifiques avec vos indicateurs de fonctionnalité. Définissez des segments basés sur les attributs des utilisateurs, leur comportement ou des règles personnalisées.",
+    "comingSoon": "Segments Bientôt Disponibles",
+    "comingSoonDesc": "Créez et gérez des segments pour cibler des groupes spécifiques avec vos indicateurs de fonctionnalité. Définissez des segments basés sur les attributs des utilisateurs, leur comportement ou des règles personnalisées.",
     "underDevelopment": "Cette fonctionnalité est actuellement en développement.",
     "create": "Créer un Segment",
     "edit": "Modifier le Segment",

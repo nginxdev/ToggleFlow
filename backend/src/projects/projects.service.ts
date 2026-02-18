@@ -99,11 +99,13 @@ export class ProjectsService {
               name: 'Development',
               key: 'development',
               projectId: project.id,
+              requireConfirmation: true,
             },
             {
               name: 'Test',
               key: 'test',
               projectId: project.id,
+              requireConfirmation: true,
             },
             {
               name: 'Production',

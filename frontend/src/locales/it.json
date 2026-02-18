@@ -2,7 +2,7 @@
   "nav": {
     "featureFlags": "Flag di Funzionalità",
     "projects": "Progetti",
-    "segments": "Segmenti Utente",
+    "segments": "Segmenti",
     "environments": "Ambienti",
     "auditLog": "Registro di Controllo",
     "settings": "Impostazioni"
@@ -124,11 +124,11 @@
     "deleteAction": "Elimina Ambiente"
   },
   "segments": {
-    "title": "Segmenti Utente",
+    "title": "Segmenti",
     "subtitle": "Indirizza gruppi di utenti specifici con i flag di funzionalità",
     "newSegment": "Nuovo Segmento",
-    "comingSoon": "Segmenti Utente Prossimamente",
-    "comingSoonDesc": "Crea e gestisci segmenti di utenti per indirizzare gruppi specifici con i tuoi flag di funzionalità. Definisci segmenti basati su attributi utente, comportamento o regole personalizzate.",
+    "comingSoon": "Segmenti Prossimamente",
+    "comingSoonDesc": "Crea e gestisci segmenti per indirizzare gruppi specifici con i tuoi flag di funzionalità. Definisci segmenti basati su attributi utente, comportamento o regole personalizzate.",
     "underDevelopment": "Questa funzionalità è attualmente in sviluppo.",
     "create": "Crea Segmento",
     "edit": "Modifica Segmento",

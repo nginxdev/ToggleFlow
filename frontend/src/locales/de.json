@@ -2,7 +2,7 @@
   "nav": {
     "featureFlags": "Feature-Flags",
     "projects": "Projekte",
-    "segments": "Benutzersegmente",
+    "segments": "Segmente",
     "environments": "Umgebungen",
     "auditLog": "Audit-Protokoll",
     "settings": "Einstellungen"
@@ -126,11 +126,11 @@
     "requireConfirmationDesc": "Alle Änderungen an Feature-Flags in dieser Umgebung erfordern eine explizite Bestätigung, bevor sie angewendet werden."
   },
   "segments": {
-    "title": "Benutzersegmente",
+    "title": "Segmente",
     "subtitle": "Zielen Sie auf bestimmte Benutzergruppen mit Feature-Flags ab",
     "newSegment": "Neues Segment",
-    "comingSoon": "Benutzersegmente demnächst verfügbar",
-    "comingSoonDesc": "Erstellen und verwalten Sie Benutzersegmente, um bestimmte Gruppen mit Ihren Feature-Flags anzusprechen. Definieren Sie Segmente basierend auf Benutzerattributen, Verhalten oder benutzerdefinierten Regeln.",
+    "comingSoon": "Segmente demnächst verfügbar",
+    "comingSoonDesc": "Erstellen und verwalten Sie Segmente, um bestimmte Gruppen mit Ihren Feature-Flags anzusprechen. Definieren Sie Segmente basierend auf Benutzerattributen, Verhalten oder benutzerdefinierten Regeln.",
     "underDevelopment": "Diese Funktion befindet sich derzeit in der Entwicklung.",
     "create": "Segment erstellen",
     "edit": "Segment bearbeiten",

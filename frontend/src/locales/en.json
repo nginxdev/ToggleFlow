@@ -2,7 +2,7 @@
   "nav": {
     "featureFlags": "Feature Flags",
     "projects": "Projects",
-    "segments": "User Segments",
+    "segments": "Segments",
     "environments": "Environments",
     "auditLog": "Audit Log",
     "settings": "Settings"
@@ -141,15 +141,15 @@
     "requireConfirmationDesc": "All changes to feature flags in this environment will require explicit confirmation before being applied."
   },
   "segments": {
-    "title": "User Segments",
+    "title": "Segments",
     "subtitle": "Target specific user groups with feature flags",
     "newSegment": "New Segment",
-    "comingSoon": "User Segments Coming Soon",
-    "comingSoonDesc": "Create and manage user segments to target specific groups with your feature flags. Define segments based on user attributes, behavior, or custom rules.",
+    "comingSoon": "Segments Coming Soon",
+    "comingSoonDesc": "Create and manage segments to target specific groups with your feature flags. Define segments based on user attributes, behavior, or custom rules.",
     "underDevelopment": "This feature is currently under development.",
     "create": "Create Segment",
     "edit": "Edit Segment",
-    "descHelper": "Create reusable user segments for targeting.",
+    "descHelper": "Create reusable segments for targeting.",
     "searchPlaceholder": "Search segments...",
     "defineGroup": "Define a group of users based on their attributes.",
     "targetingRule": "Targeting Rule",
