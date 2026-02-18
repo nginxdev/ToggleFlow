@@ -9,6 +9,7 @@ import { CreateFlagDto } from './dto/create-flag.dto';
 import { UpdateFlagDto } from './dto/update-flag.dto';
 import { UpdateFlagStateDto } from './dto/update-flag-state.dto';
 import { AuditService } from '../audit/audit.service';
+import { DEFAULT_BOOLEAN_VARIATIONS } from './constants';
 
 @Injectable()
 export class FlagsService {
@@ -156,18 +157,23 @@ export class FlagsService {
         throw new ConflictException('Flag key already exists');
       }
     }
-    // Prevent deletion of boolean variations if they are 'true' or 'false'
+
+
+// ... (inside class)
+
+    // Prevent deletion of default boolean variations
     if (flag.type === 'boolean' && updateFlagDto.variations) {
-      const oldVariations = flag.variations as any[];
       const newVariations = updateFlagDto.variations as any[];
 
-      const hasTrue = newVariations.some((v) => v.value === 'true');
-      const hasFalse = newVariations.some((v) => v.value === 'false');
-
-      if (!hasTrue || !hasFalse) {
-        throw new BadRequestException(
-          'Boolean flags must have both "true" and "false" variations',
+      for (const defaultVar of DEFAULT_BOOLEAN_VARIATIONS) {
+        const exists = newVariations.some(
+          (v) => v.value === defaultVar.value && v.name === defaultVar.name,
         );
+        if (!exists) {
+          throw new BadRequestException(
+            `Boolean flags must include the default "${defaultVar.name}" variation.`,
+          );
+        }
       }
     }
 

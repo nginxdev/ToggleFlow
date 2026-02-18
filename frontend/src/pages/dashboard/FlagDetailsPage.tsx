@@ -42,6 +42,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useFlagStore } from '@/store/flagStore'
+import { DEFAULT_BOOLEAN_VARIATIONS } from '@/lib/constants'
 
 export default function FlagDetailsPage() {
   const { t } = useTranslation()
@@ -66,6 +67,12 @@ export default function FlagDetailsPage() {
   const [showVariationDialog, setShowVariationDialog] = useState(false)
   const [editingVariation, setEditingVariation] = useState<{ id?: string, name: string, value: string, type?: string } | null>(null)
   
+  // Local state for drafts
+  const [draftVariations, setDraftVariations] = useState<any[]>([])
+  const [draftRules, setDraftRules] = useState<any>({})
+  const [isSavingVariations, setIsSavingVariations] = useState(false)
+  const [isSavingRules, setIsSavingRules] = useState(false)
+
   const currentUser = JSON.parse(localStorage.getItem('user') || '{}')
   const isSuperUser = currentUser.isSuperUser || currentUser.email === 'john.doe@toggleflow.com'
 
@@ -100,6 +107,58 @@ export default function FlagDetailsPage() {
 
   const currentFlagState = flag?.flagStates?.find((s: any) => s.environmentId === selectedEnvId)
   const isEnabled = currentFlagState?.isEnabled || false
+
+  // Stabilize dependencies stringified
+  const flagVariationsJson = JSON.stringify(flag?.variations || [])
+  const flagRulesJson = JSON.stringify(currentFlagState?.rules || {})
+
+  useEffect(() => {
+    if (flag) {
+      setDraftVariations(JSON.parse(flagVariationsJson))
+    }
+  }, [flagVariationsJson])
+
+  useEffect(() => {
+    if (currentFlagState) {
+      setDraftRules(JSON.parse(flagRulesJson))
+    }
+  }, [flagRulesJson])
+
+  const hasVariationChanges = flagVariationsJson !== JSON.stringify(draftVariations)
+  const hasRuleChanges = flagRulesJson !== JSON.stringify(draftRules)
+
+  const handleCancelVariations = () => {
+    setDraftVariations(JSON.parse(flagVariationsJson))
+  }
+
+  const handleCancelRules = () => {
+    setDraftRules(JSON.parse(flagRulesJson))
+  }
+
+  const handleSaveVariationsChanges = async () => {
+    if (!id) return
+    setIsSavingVariations(true)
+    try {
+      await updateFlag(id, { variations: draftVariations })
+      // No need to setDraftVariations here as the useEffect will sync it when flag updates
+    } catch (error) {
+      console.error('Failed to update variations:', error)
+    } finally {
+      setIsSavingVariations(false)
+    }
+  }
+
+  const handleSaveRulesChanges = async () => {
+    if (!id || !selectedEnvId) return
+    setIsSavingRules(true)
+    try {
+      await updateFlagState(id, selectedEnvId, { rules: draftRules })
+    } catch (error) {
+      console.error('Failed to update rules:', error)
+    } finally {
+      setIsSavingRules(false)
+    }
+  }
 
   const handleToggleStatus = async (checked: boolean) => {
     if (!selectedEnvId || !id) return
@@ -190,7 +249,7 @@ export default function FlagDetailsPage() {
   const handleSaveVariation = async () => {
     if (!flag || !editingVariation) return
     
-    let newVariations = [...(flag.variations || [])]
+    let newVariations = [...(draftVariations || [])]
     if (editingVariation.id) {
       // Edit
       newVariations = newVariations.map(v => v.id === editingVariation.id ? { 
@@ -214,41 +273,46 @@ export default function FlagDetailsPage() {
       return
     }
     
-    try {
-      await updateFlag(flag.id, { variations: newVariations })
-      setShowVariationDialog(false)
-      setEditingVariation(null)
-    } catch (error) {
-      console.error('Failed to update variations:', error)
-    }
+    setDraftVariations(newVariations)
+    setShowVariationDialog(false)
+    setEditingVariation(null)
   }
+
+
+
+// ... (inside component)
 
   const handleDeleteVariation = async (variationId: string) => {
     if (!flag) return
-    const variation = flag.variations?.find(v => v.id === variationId)
-    if (flag.type === 'boolean' && variation && (variation.value === 'true' || variation.value === 'false')) {
-      alert('Default boolean variations cannot be deleted')
-      return
+    const variation = draftVariations?.find(v => v.id === variationId)
+    
+    // Only prevent deletion of default boolean variations defined in constants
+    if (flag.type === 'boolean' && variation) {
+      const isDefault = DEFAULT_BOOLEAN_VARIATIONS.some(
+        (dv: { name: string; value: string }) => dv.name === variation.name && dv.value === variation.value
+      )
+      
+      if (isDefault) {
+        alert('Default boolean variations cannot be deleted')
+        return
+      }
     }
-    const newVariations = (flag.variations || []).filter(v => v.id !== variationId)
-    try {
-      await updateFlag(flag.id, { variations: newVariations })
-    } catch (error) {
-      console.error('Failed to delete variation:', error)
-    }
+    
+    const newVariations = (draftVariations || []).filter(v => v.id !== variationId)
+    setDraftVariations(newVariations)
   }
 
   const handleSaveIndividualTargeting = async (userId: string, variationId: string, isRemoval = false) => {
-    if (!flag || !selectedEnvId || !currentFlagState) return
+    if (!flag || !selectedEnvId) return
     
-    let currentRules = { ...(currentFlagState.rules || { targeting: { individual: [] } }) }
+    let currentRules = { ...(draftRules || { targeting: { individual: [] } }) }
     if (!currentRules.targeting) currentRules.targeting = {}
     if (!currentRules.targeting.individual) currentRules.targeting.individual = []
     
     if (isRemoval) {
-      currentRules.targeting.individual = currentRules.targeting.individual.filter(i => i.userId !== userId)
+      currentRules.targeting.individual = currentRules.targeting.individual.filter((i: any) => i.userId !== userId)
     } else {
-      const existing = currentRules.targeting.individual.find(i => i.userId === userId)
+      const existing = currentRules.targeting.individual.find((i: any) => i.userId === userId)
       if (existing) {
         existing.variationId = variationId
       } else {
@@ -256,45 +320,33 @@ export default function FlagDetailsPage() {
       }
     }
     
-    try {
-      await updateFlagState(flag.id, selectedEnvId, { rules: currentRules })
-    } catch (error) {
-      console.error('Failed to update targeting:', error)
-    }
+    setDraftRules(currentRules)
   }
 
   const handleUpdateDefaultVariation = async (variationId: string) => {
-    if (!flag || !selectedEnvId || !currentFlagState) return
+    if (!flag || !selectedEnvId) return
     
-    let currentRules = { ...(currentFlagState.rules || { targeting: {} }) }
+    let currentRules = { ...(draftRules || { targeting: {} }) }
     if (!currentRules.targeting) currentRules.targeting = {}
     currentRules.targeting.defaultVariationId = variationId
     
-    try {
-      await updateFlagState(flag.id, selectedEnvId, { rules: currentRules })
-    } catch (error) {
-      console.error('Failed to update default variation:', error)
-    }
+    setDraftRules(currentRules)
   }
 
   const handleUpdateOffVariation = async (variationId: string) => {
-    if (!flag || !selectedEnvId || !currentFlagState) return
+    if (!flag || !selectedEnvId) return
     
-    let currentRules = { ...(currentFlagState.rules || { targeting: {} }) }
+    let currentRules = { ...(draftRules || { targeting: {} }) }
     if (!currentRules.targeting) currentRules.targeting = {}
     currentRules.targeting.offVariationId = variationId
     
-    try {
-      await updateFlagState(flag.id, selectedEnvId, { rules: currentRules })
-    } catch (error) {
-      console.error('Failed to update off variation:', error)
-    }
+    setDraftRules(currentRules)
   }
 
   const handleAddRule = async () => {
-    if (!flag || !selectedEnvId || !currentFlagState) return
+    if (!flag || !selectedEnvId) return
     
-    let currentRules = { ...(currentFlagState.rules || {}) }
+    let currentRules = { ...(draftRules || {}) }
     if (!currentRules.targeting) currentRules.targeting = {}
     if (!currentRules.targeting.rules) currentRules.targeting.rules = []
     
@@ -306,43 +358,31 @@ export default function FlagDetailsPage() {
       variationId: flag.variations?.[0]?.id || ''
     })
     
-    try {
-      await updateFlagState(flag.id, selectedEnvId, { rules: currentRules })
-    } catch (error) {
-      console.error('Failed to add rule:', error)
-    }
+    setDraftRules(currentRules)
   }
 
   const handleUpdateRule = async (ruleId: string, updates: any) => {
-    if (!flag || !selectedEnvId || !currentFlagState) return
+    if (!flag || !selectedEnvId) return
     
-    let currentRules = { ...(currentFlagState.rules || {}) }
+    let currentRules = { ...(draftRules || {}) }
     if (!currentRules.targeting?.rules) return
     
-    currentRules.targeting.rules = currentRules.targeting.rules.map(r => 
+    currentRules.targeting.rules = currentRules.targeting.rules.map((r: any) => 
       r.id === ruleId ? { ...r, ...updates } : r
     )
     
-    try {
-      await updateFlagState(flag.id, selectedEnvId, { rules: currentRules })
-    } catch (error) {
-      console.error('Failed to update rule:', error)
-    }
+    setDraftRules(currentRules)
   }
 
   const handleDeleteRule = async (ruleId: string) => {
-    if (!flag || !selectedEnvId || !currentFlagState) return
+    if (!flag || !selectedEnvId) return
     
-    let currentRules = { ...(currentFlagState.rules || {}) }
+    let currentRules = { ...(draftRules || {}) }
     if (!currentRules.targeting?.rules) return
     
-    currentRules.targeting.rules = currentRules.targeting.rules.filter(r => r.id !== ruleId)
+    currentRules.targeting.rules = currentRules.targeting.rules.filter((r: any) => r.id !== ruleId)
     
-    try {
-      await updateFlagState(flag.id, selectedEnvId, { rules: currentRules })
-    } catch (error) {
-      console.error('Failed to delete rule:', error)
-    }
+    setDraftRules(currentRules)
   }
 
   const hasChanges =
@@ -495,31 +535,63 @@ export default function FlagDetailsPage() {
 
         <div className="py-2">
           {activeTab === 'targeting' && (
-            <div className="grid gap-6">
-              <section className="border-border bg-card border">
-                <div className="border-border flex items-center justify-between border-b p-4">
+            <div className="flex flex-col gap-4">
+                <div className="flex items-center justify-between px-1">
                   <div className="flex items-center gap-3">
                     <Users className="text-primary h-5 w-5" />
-                    <h3 className="font-bold">{t('flagDetails.targeting.title')}</h3>
+                    <h3 className="font-bold text-lg">{t('flagDetails.targeting.title')}</h3>
                   </div>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="gap-2"
-                    onClick={() => {
-                      const userId = prompt('Enter User ID:')
-                      if (userId && flag.variations?.[0]) {
-                        handleSaveIndividualTargeting(userId, flag.variations[0].id)
-                      }
-                    }}
-                  >
-                    <Plus className="h-4 w-4" />
-                    {t('flagDetails.targeting.addUsers')}
-                  </Button>
+                  <div className="flex gap-2">
+                    {hasRuleChanges && (
+                      <Button
+                        variant="ghost" 
+                        onClick={handleCancelRules}
+                        disabled={isSavingRules}
+                      >
+                        {t('common.cancel')}
+                      </Button>
+                    )}
+                    <Button 
+                      onClick={handleSaveRulesChanges} 
+                      disabled={!hasRuleChanges || isSavingRules}
+                      className="gap-2"
+                    >
+                      {isSavingRules ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          {t('common.saving')}
+                        </>
+                      ) : (
+                        <>
+                          <Check className="h-4 w-4" />
+                          {t('flagDetails.saveChanges')}
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+                
+                <section className="border-border bg-card border rounded-lg overflow-hidden">
+                <div className="border-border flex items-center justify-between border-b p-4 bg-muted/10">
+                  <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wider">Individual Targeting</h4>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="gap-2 bg-background"
+                      onClick={() => {
+                        const userId = prompt('Enter User ID:')
+                        if (userId && flag.variations?.[0]) {
+                          handleSaveIndividualTargeting(userId, flag.variations[0].id)
+                        }
+                      }}
+                    >
+                      <Plus className="h-4 w-4" />
+                      {t('flagDetails.targeting.addUsers')}
+                    </Button>
                 </div>
                 <div>
                   <div className="divide-border divide-y">
-                    {(currentFlagState?.rules?.targeting?.individual || []).map((override) => (
+                    {(draftRules?.targeting?.individual || []).map((override: any) => (
                       <div key={override.userId} className="flex items-center justify-between p-4">
                         <div className="flex items-center gap-4">
                           <code className="bg-muted px-2 py-1 rounded text-sm">{override.userId}</code>
@@ -548,7 +620,7 @@ export default function FlagDetailsPage() {
                         </Button>
                       </div>
                     ))}
-                    {(currentFlagState?.rules?.targeting?.individual?.length === 0 || !currentFlagState?.rules?.targeting?.individual) && (
+                    {(draftRules?.targeting?.individual?.length === 0 || !draftRules?.targeting?.individual) && (
                       <div className="bg-muted/10 p-8 text-center">
                         <p className="text-muted-foreground text-sm">
                           {t('flagDetails.targeting.noUsers')}
@@ -559,11 +631,11 @@ export default function FlagDetailsPage() {
                 </div>
               </section>
 
-              <section className="border-border bg-card border">
-                <div className="border-border flex items-center justify-between border-b p-4">
+              <section className="border-border bg-card border rounded-lg overflow-hidden">
+                <div className="border-border flex items-center justify-between border-b p-4 bg-muted/10">
                   <div className="flex items-center gap-3">
-                    <Activity className="text-primary h-5 w-5" />
-                    <h3 className="font-bold">{t('flagDetails.targeting.defaultRule')}</h3>
+                    <Activity className="text-primary h-4 w-4" />
+                    <h3 className="font-medium text-sm text-muted-foreground uppercase tracking-wider">{t('flagDetails.targeting.defaultRule')}</h3>
                   </div>
                 </div>
                 <div className="space-y-4 p-6">
@@ -574,7 +646,7 @@ export default function FlagDetailsPage() {
                     <div className="flex flex-1 items-center gap-3">
                       <span className="text-muted-foreground text-sm">{t('flagDetails.targeting.serve')}</span>
                       <Select 
-                        value={currentFlagState?.rules?.targeting?.defaultVariationId || flag.variations?.[0]?.id || ''} 
+                        value={draftRules?.targeting?.defaultVariationId || flag.variations?.[0]?.id || ''} 
                         onValueChange={handleUpdateDefaultVariation}
                       >
                         <SelectTrigger className="flex-1">
@@ -595,7 +667,7 @@ export default function FlagDetailsPage() {
                     <div className="flex flex-1 items-center gap-3">
                       <span className="text-muted-foreground text-sm">{t('flagDetails.targeting.serve')}</span>
                       <Select 
-                        value={currentFlagState?.rules?.targeting?.offVariationId || flag.variations?.find(v => v.value === flag.defaultValue)?.id || flag.variations?.[0]?.id || ''} 
+                        value={draftRules?.targeting?.offVariationId || flag.variations?.find(v => v.value === flag.defaultValue)?.id || flag.variations?.[0]?.id || ''} 
                         onValueChange={handleUpdateOffVariation}
                       >
                         <SelectTrigger className="flex-1">
@@ -615,25 +687,56 @@ export default function FlagDetailsPage() {
           )}
 
           {activeTab === 'variations' && (
-            <div className="grid gap-6">
-              <section className="border-border bg-card border">
-                <div className="border-border flex items-center justify-between border-b p-4">
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center justify-between px-1">
                   <div className="flex items-center gap-3">
                     <GitBranch className="text-primary h-5 w-5" />
-                    <h3 className="font-bold">{t('flagDetails.variations.title')}</h3>
+                    <h3 className="font-bold text-lg">{t('flagDetails.variations.title')}</h3>
                   </div>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="gap-2"
-                    onClick={() => {
-                      setEditingVariation({ name: '', value: '' })
-                      setShowVariationDialog(true)
-                    }}
-                  >
-                    <Plus className="h-4 w-4" />
-                    {t('flagDetails.variations.addVariation')}
-                  </Button>
+                  <div className="flex gap-2">
+                    {hasVariationChanges && (
+                      <Button
+                        variant="ghost"
+                        onClick={handleCancelVariations}
+                        disabled={isSavingVariations}
+                      >
+                        {t('common.cancel')}
+                      </Button>
+                    )}
+                    <Button 
+                      onClick={handleSaveVariationsChanges} 
+                      disabled={!hasVariationChanges || isSavingVariations}
+                      className="gap-2"
+                    >
+                      {isSavingVariations ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          {t('common.saving')}
+                        </>
+                      ) : (
+                        <>
+                          <Check className="h-4 w-4" />
+                          {t('flagDetails.saveChanges')}
+                        </>
+                      )}
+                    </Button>
+                  </div>
+              </div>
+              <section className="border-border bg-card border rounded-lg overflow-hidden">
+                <div className="border-border flex items-center justify-between border-b p-4 bg-muted/10">
+                   <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wider">Variations List</h4>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="gap-2 bg-background"
+                      onClick={() => {
+                        setEditingVariation({ name: '', value: '' })
+                        setShowVariationDialog(true)
+                      }}
+                    >
+                      <Plus className="h-4 w-4" />
+                      {t('flagDetails.variations.addVariation')}
+                    </Button>
                 </div>
                 <div>
                   <div className="text-muted-foreground border-border bg-muted/30 grid grid-cols-12 gap-4 border-b p-4 text-xs font-semibold tracking-widest uppercase">
@@ -643,7 +746,7 @@ export default function FlagDetailsPage() {
                     <div className="col-span-1"></div>
                   </div>
                   <div className="divide-border divide-y">
-                    {(flag.variations || []).map((variation: any) => (
+                    {(draftVariations || []).map((variation: any) => (
                       <div key={variation.id} className="grid grid-cols-12 items-center gap-4 p-4 hover:bg-muted/30 transition-colors">
                         <div className="col-span-3 font-medium">
                           {variation.name}
@@ -677,7 +780,12 @@ export default function FlagDetailsPage() {
                             variant="ghost" 
                             size="icon" 
                             className="h-8 w-8 text-destructive"
-                            disabled={flag.type === 'boolean' && (variation.value === 'true' || variation.value === 'false')}
+                            disabled={
+                              flag.type === 'boolean' && 
+                              DEFAULT_BOOLEAN_VARIATIONS.some(
+                                (dv: { name: string; value: string }) => dv.name === variation.name && dv.value === variation.value
+                              )
+                            }
                             onClick={() => handleDeleteVariation(variation.id)}
                           >
                             <Trash2 className="h-4 w-4" />
@@ -685,7 +793,7 @@ export default function FlagDetailsPage() {
                         </div>
                       </div>
                     ))}
-                    {(!flag.variations || flag.variations.length === 0) && (
+                    {(!draftVariations || draftVariations.length === 0) && (
                       <div className="text-muted-foreground p-12 text-center text-sm">
                         <div className="mb-2 flex justify-center">
                           <GitBranch className="h-8 w-8 opacity-20" />
@@ -779,26 +887,58 @@ export default function FlagDetailsPage() {
           )}
 
           {activeTab === 'rules' && (
-            <div className="grid gap-6">
-              <section className="border-border bg-card border">
-                <div className="border-border flex items-center justify-between border-b p-4">
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center justify-between px-1">
                   <div className="flex items-center gap-3">
                     <Terminal className="text-primary h-5 w-5" />
-                    <h3 className="font-bold">{t('flagDetails.tabs.rules')}</h3>
+                    <h3 className="font-bold text-lg">{t('flagDetails.tabs.rules')}</h3>
                   </div>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="gap-2"
-                    onClick={handleAddRule}
-                  >
-                    <Plus className="h-4 w-4" />
-                    Add Rule
-                  </Button>
+                  <div className="flex gap-2">
+                    {hasRuleChanges && (
+                      <Button
+                        variant="ghost"
+                        onClick={handleCancelRules}
+                        disabled={isSavingRules}
+                      >
+                        {t('common.cancel')}
+                      </Button>
+                    )}
+                    <Button 
+                      onClick={handleSaveRulesChanges} 
+                      disabled={!hasRuleChanges || isSavingRules}
+                      className="gap-2"
+                    >
+                      {isSavingRules ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          {t('common.saving')}
+                        </>
+                      ) : (
+                        <>
+                          <Check className="h-4 w-4" />
+                          {t('flagDetails.saveChanges')}
+                        </>
+                      )}
+                    </Button>
+                  </div>
+              </div>
+
+              <section className="border-border bg-card border rounded-lg overflow-hidden">
+                <div className="border-border flex items-center justify-between border-b p-4 bg-muted/10">
+                   <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wider">Custom Rules</h4>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="gap-2 bg-background"
+                      onClick={handleAddRule}
+                    >
+                      <Plus className="h-4 w-4" />
+                      Add Rule
+                    </Button>
                 </div>
                 <div>
                   <div className="divide-border divide-y">
-                    {(currentFlagState?.rules?.targeting?.rules || []).map((rule, idx) => (
+                    {(draftRules?.targeting?.rules || []).map((rule: any, idx: number) => (
                       <div key={rule.id} className="p-6 space-y-4">
                         <div className="flex items-center justify-between">
                           <h4 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Rule #{idx + 1}</h4>
@@ -866,7 +1006,7 @@ export default function FlagDetailsPage() {
                         </div>
                       </div>
                     ))}
-                    {(currentFlagState?.rules?.targeting?.rules?.length === 0 || !currentFlagState?.rules?.targeting?.rules) && (
+                    {(draftRules?.targeting?.rules?.length === 0 || !draftRules?.targeting?.rules) && (
                       <div className="bg-muted/10 p-12 text-center">
                         <Terminal className="h-12 w-12 mx-auto mb-4 opacity-10" />
                         <h4 className="font-medium text-muted-foreground mb-1">No custom rules</h4>
