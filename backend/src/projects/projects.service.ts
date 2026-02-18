@@ -105,6 +105,7 @@ export class ProjectsService {
             name: 'Production',
             key: 'production',
             projectId: project.id,
+            requireConfirmation: true,
           },
         ],
       });

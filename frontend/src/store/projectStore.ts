@@ -1,23 +1,27 @@
 import { create } from 'zustand'
-import { projectsApi, environmentsApi } from '@/lib/api'
+import { projectsApi, environmentsApi, usersApi } from '@/lib/api'
 import type { Project, Environment } from '@/types'
 
 interface ProjectState {
   projects: Project[]
   selectedProject: Project | null
   environments: Environment[]
-  selectedEnvironment: Environment | null
   loading: boolean
 
   fetchProjects: () => Promise<void>
-  selectProject: (project: Project) => void
+  selectProject: (project: Project, persist?: boolean) => Promise<void>
   refreshProjects: () => Promise<void>
   createProject: (data: { name: string; key: string; description?: string }) => Promise<void>
   deleteProject: (id: string) => Promise<void>
 
-  selectEnvironment: (env: Environment) => void
-  createEnvironment: (projectId: string, data: { name: string; key: string }) => Promise<void>
-  updateEnvironment: (id: string, data: { name?: string; key?: string }) => Promise<void>
+  createEnvironment: (
+    projectId: string,
+    data: { name: string; key: string; requireConfirmation?: boolean },
+  ) => Promise<void>
+  updateEnvironment: (
+    id: string,
+    data: { name?: string; key?: string; requireConfirmation?: boolean },
+  ) => Promise<void>
   deleteEnvironment: (id: string) => Promise<void>
   fetchEnvironments: (projectId: string) => Promise<void>
 }
@@ -28,7 +32,6 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
   projects: [],
   selectedProject: null,
   environments: [],
-  selectedEnvironment: null,
   loading: false,
 
   fetchProjects: async () => {
@@ -40,6 +43,20 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
       try {
         const projects = await projectsApi.getAll()
         set({ projects })
+
+        // Get user profile to check for lastProjectId
+        try {
+          const userProfile = await usersApi.getProfile()
+          if (userProfile.lastProjectId) {
+            const lastProject = projects.find((p: Project) => p.id === userProfile.lastProjectId)
+            if (lastProject) {
+              await get().selectProject(lastProject, false) // false means don't persist back to DB since we just read it
+              return
+            }
+          }
+        } catch (profileError) {
+          console.error('Failed to fetch profile in fetchProjects:', profileError)
+        }
 
         if (projects.length > 0 && !get().selectedProject) {
           await get().selectProject(projects[0])
@@ -55,21 +72,22 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     return projectsFetchPromise
   },
 
-  selectProject: async (project) => {
+  selectProject: async (project, persist = true) => {
     set({ selectedProject: project, loading: true })
 
     try {
+      // Save last selected project to DB
+      if (persist) {
+        usersApi.updateProfile({ lastProjectId: project.id }).catch((err) => {
+          console.error('Failed to save last selected project:', err)
+        })
+      }
+
       const environments = await environmentsApi.getByProject(project.id)
       set({ environments })
-
-      if (environments.length > 0) {
-        set({ selectedEnvironment: environments[0] })
-      } else {
-        set({ selectedEnvironment: null })
-      }
     } catch (error) {
       console.error('Failed to fetch environments for project:', error)
-      set({ environments: [], selectedEnvironment: null })
+      set({ environments: [] })
     } finally {
       set({ loading: false })
     }
@@ -109,17 +127,10 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     await get().refreshProjects()
   },
 
-  selectEnvironment: (env) => {
-    set({ selectedEnvironment: env })
-  },
-
   createEnvironment: async (projectId, data) => {
     await environmentsApi.create(projectId, data)
     const envs = await environmentsApi.getByProject(projectId)
     set({ environments: envs })
-    if (!get().selectedEnvironment && envs.length > 0) {
-      set({ selectedEnvironment: envs[0] })
-    }
   },
 
   updateEnvironment: async (id, data) => {
@@ -128,10 +139,6 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     if (projectId) {
       const envs = await environmentsApi.getByProject(projectId)
       set({ environments: envs })
-      const selected = get().selectedEnvironment
-      if (selected?.id === id) {
-        set({ selectedEnvironment: envs.find((e: Environment) => e.id === id) || selected })
-      }
     }
   },
 
@@ -141,9 +148,6 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     if (projectId) {
       const envs = await environmentsApi.getByProject(projectId)
       set({ environments: envs })
-      if (get().selectedEnvironment?.id === id) {
-        set({ selectedEnvironment: envs.length > 0 ? envs[0] : null })
-      }
     }
   },
 

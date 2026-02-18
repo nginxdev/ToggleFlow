@@ -1,28 +1,31 @@
-import * as React from 'react'
-import { cn } from '@/lib/utils'
+import * as React from "react"
+import { Switch as SwitchPrimitive } from "radix-ui"
 
-interface SwitchProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  checked?: boolean
-  onCheckedChange?: (checked: boolean) => void
+import { cn } from "@/lib/utils"
+
+function Switch({
+  className,
+  size = "default",
+  ...props
+}: React.ComponentProps<typeof SwitchPrimitive.Root> & {
+  size?: "sm" | "default"
+}) {
+  return (
+    <SwitchPrimitive.Root
+      data-slot="switch"
+      data-size={size}
+      className={cn(
+        "data-checked:bg-primary data-unchecked:bg-input focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 dark:data-unchecked:bg-input/80 shrink-0 rounded-none border border-transparent shadow-xs focus-visible:ring-3 aria-invalid:ring-3 data-[size=default]:h-[18.4px] data-[size=default]:w-[32px] data-[size=sm]:h-[14px] data-[size=sm]:w-[24px] cursor-pointer peer group/switch relative inline-flex items-center transition-all outline-none after:absolute after:-inset-x-3 after:-inset-y-2 data-disabled:cursor-not-allowed data-disabled:opacity-50",
+        className
+      )}
+      {...props}
+    >
+      <SwitchPrimitive.Thumb
+        data-slot="switch-thumb"
+        className="bg-background dark:data-unchecked:bg-foreground dark:data-checked:bg-primary-foreground rounded-none group-data-[size=default]/switch:size-4 group-data-[size=sm]/switch:size-3 group-data-[size=default]/switch:data-checked:translate-x-[calc(100%-2px)] group-data-[size=sm]/switch:data-checked:translate-x-[calc(100%-2px)] group-data-[size=default]/switch:data-unchecked:translate-x-0 group-data-[size=sm]/switch:data-unchecked:translate-x-0 pointer-events-none block ring-0 transition-transform"
+      />
+    </SwitchPrimitive.Root>
+  )
 }
-
-const Switch = React.forwardRef<HTMLInputElement, SwitchProps>(
-  ({ className, checked, onCheckedChange, ...props }, ref) => {
-    return (
-      <label className={cn('relative inline-flex cursor-pointer items-center', className)}>
-        <input
-          type="checkbox"
-          className="peer sr-only"
-          checked={checked}
-          onChange={(e) => onCheckedChange?.(e.target.checked)}
-          ref={ref}
-          {...props}
-        />
-        <div className="peer border-input bg-muted after:bg-foreground peer-checked:bg-primary peer-checked:after:bg-primary-foreground peer-focus:ring-ring h-5 w-9 border transition-all peer-focus:ring-2 peer-focus:ring-offset-2 peer-focus:outline-none after:absolute after:top-[2px] after:left-[2px] after:h-4 after:after:w-4 after:transition-all peer-checked:after:translate-x-full disabled:cursor-not-allowed disabled:opacity-50" />
-      </label>
-    )
-  },
-)
-Switch.displayName = 'Switch'
 
 export { Switch }

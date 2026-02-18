@@ -45,10 +45,10 @@
     "name": "Name",
     "key": "Schlüssel",
     "type": "Typ",
-    "status": "Status (Produktion)",
+    "status": "Serve",
     "actions": "Aktionen",
-    "enabled": "Aktiviert",
-    "disabled": "Deaktiviert",
+    "enabled": "AN",
+    "disabled": "AUS",
     "deleteConfirm": "Sind Sie sicher, dass Sie dieses Flag löschen möchten?",
     "infoTitle": "Über Feature-Flags",
     "infoDesc": "Feature-Flags ermöglichen es Ihnen zu steuern, welche Funktionen in Ihrer Anwendung aktiviert sind, ohne neuen Code bereitzustellen. Schalten Sie Flags pro Umgebung ein oder aus, um neue Funktionen schrittweise einzuführen, A/B-Tests durchzuführen oder problematische Funktionen schnell zu deaktivieren.",
@@ -121,7 +121,9 @@
     "deleteWarning": "Diese Umgebung und alle zugehörigen Flag-Zustände werden dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.",
     "deleteProtected": "Dies ist eine Standardumgebung und kann nicht gelöscht werden. Standardumgebungen (Development, Test, Production) sind geschützt.",
     "deleteInstruction": "Geben Sie <strong>{{name}}</strong> ein, um das Löschen zu bestätigen",
-    "deleteAction": "Umgebung löschen"
+    "deleteAction": "Umgebung löschen",
+    "requireConfirmation": "Änderungen erfordern Bestätigung",
+    "requireConfirmationDesc": "Alle Änderungen an Feature-Flags in dieser Umgebung erfordern eine explizite Bestätigung, bevor sie angewendet werden."
   },
   "segments": {
     "title": "Benutzersegmente",
@@ -210,9 +212,9 @@
     },
     "saveChanges": "Änderungen speichern",
     "discardChanges": "Änderungen verwerfen",
-    "status": "Status",
-    "servingOn": "Dient AN",
-    "servingOff": "Dient AUS",
+    "status": "Serve",
+    "servingOn": "AN",
+    "servingOff": "AUS",
     "settings": {
       "general": "Allgemeine Einstellungen",
       "keyReadOnly": "Der Indikatorschlüssel kann nach der Erstellung nicht mehr geändert werden",

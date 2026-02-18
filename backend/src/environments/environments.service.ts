@@ -50,6 +50,7 @@ export class EnvironmentsService {
         name: createEnvironmentDto.name,
         key: createEnvironmentDto.key,
         projectId,
+        requireConfirmation: createEnvironmentDto.requireConfirmation || false,
       },
     });
 
@@ -96,7 +97,10 @@ export class EnvironmentsService {
 
     const updated = await this.prisma.environment.update({
       where: { id },
-      data: updateEnvironmentDto,
+      data: {
+        ...updateEnvironmentDto,
+        requireConfirmation: updateEnvironmentDto.requireConfirmation,
+      },
     });
 
     await this.auditService.log({

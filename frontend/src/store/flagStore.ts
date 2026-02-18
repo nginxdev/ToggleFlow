@@ -19,6 +19,11 @@ interface FlagState {
   unarchiveFlag: (id: string) => Promise<void>
   deleteFlag: (id: string) => Promise<void>
   toggleFlag: (flagId: string, environmentId: string, currentState: boolean) => Promise<void>
+  updateFlagState: (
+    flagId: string,
+    environmentId: string,
+    data: { isEnabled?: boolean; rules?: any },
+  ) => Promise<void>
 }
 
 export const useFlagStore = create<FlagState>((set, get) => ({
@@ -76,8 +81,8 @@ export const useFlagStore = create<FlagState>((set, get) => ({
     return newFlag
   },
 
-  updateFlag: async (id, data) => {
-    const updated = await flagsApi.update(id, data)
+  updateFlag: async (id: string, data: Partial<FeatureFlag>) => {
+    const updated = await flagsApi.update(id, data as any)
     set((state) => ({
       flags: state.flags.map((f) => (f.id === id ? { ...f, ...updated } : f)),
       archivedFlags: state.archivedFlags.map((f) => (f.id === id ? { ...f, ...updated } : f)),
@@ -86,16 +91,17 @@ export const useFlagStore = create<FlagState>((set, get) => ({
     }))
   },
 
-  archiveFlag: async (id) => {
+  archiveFlag: async (id: string) => {
     try {
       await flagsApi.archive(id)
       const { flags, archivedFlags, selectedFlag } = get()
       const flagToArchive = flags.find((f) => f.id === id)
 
       if (flagToArchive) {
+        const archived: FeatureFlag = { ...flagToArchive, isArchived: true }
         set({
           flags: flags.filter((f) => f.id !== id),
-          archivedFlags: [...archivedFlags, { ...flagToArchive, isArchived: true }],
+          archivedFlags: [...archivedFlags, archived],
           selectedFlag:
             selectedFlag?.id === id ? { ...selectedFlag, isArchived: true } : selectedFlag,
         })
@@ -106,16 +112,17 @@ export const useFlagStore = create<FlagState>((set, get) => ({
     }
   },
 
-  unarchiveFlag: async (id) => {
+  unarchiveFlag: async (id: string) => {
     try {
       await flagsApi.unarchive(id)
       const { flags, archivedFlags, selectedFlag } = get()
       const flagToRestore = archivedFlags.find((f) => f.id === id)
 
       if (flagToRestore) {
+        const restored: FeatureFlag = { ...flagToRestore, isArchived: false }
         set({
           archivedFlags: archivedFlags.filter((f) => f.id !== id),
-          flags: [...flags, { ...flagToRestore, isArchived: false }],
+          flags: [...flags, restored],
           selectedFlag:
             selectedFlag?.id === id ? { ...selectedFlag, isArchived: false } : selectedFlag,
         })
@@ -126,7 +133,7 @@ export const useFlagStore = create<FlagState>((set, get) => ({
     }
   },
 
-  deleteFlag: async (id) => {
+  deleteFlag: async (id: string) => {
     try {
       await flagsApi.delete(id)
       const { flags, archivedFlags, selectedFlag } = get()
@@ -142,20 +149,20 @@ export const useFlagStore = create<FlagState>((set, get) => ({
   },
 
   toggleFlag: async (flagId, environmentId, currentState) => {
-    const updateFlagState = (flag: FeatureFlag) => {
-      if (flag.id !== flagId) return flag
-      const newEnvs = flag.environments.map((env) => {
-        if (env.environmentId !== environmentId) return env
-        return { ...env, isEnabled: !currentState }
+    const updateFlagStateList = (flag: FeatureFlag) => {
+      if (flag.id !== flagId || !flag.flagStates) return flag
+      const newStates = flag.flagStates.map((state) => {
+        if (state.environmentId !== environmentId) return state
+        return { ...state, isEnabled: !currentState }
       })
-      return { ...flag, environments: newEnvs }
+      return { ...flag, flagStates: newStates }
     }
 
     set((state) => ({
-      flags: state.flags.map(updateFlagState),
+      flags: state.flags.map(updateFlagStateList),
       selectedFlag:
         state.selectedFlag?.id === flagId
-          ? updateFlagState(state.selectedFlag)
+          ? updateFlagStateList(state.selectedFlag)
           : state.selectedFlag,
     }))
 
@@ -163,6 +170,30 @@ export const useFlagStore = create<FlagState>((set, get) => ({
       await flagsApi.toggleFlagState(flagId, environmentId, !currentState)
     } catch (error) {
       console.error('Toggle failed', error)
+      // Revert on error if necessary
     }
+  },
+
+  updateFlagState: async (flagId, environmentId, data) => {
+    const updated = await flagsApi.updateFlagState(flagId, environmentId, data)
+
+    set((state) => {
+      const updateFlagStateList = (flag: FeatureFlag) => {
+        if (flag.id !== flagId || !flag.flagStates) return flag
+        const newStates = flag.flagStates.map((s) => {
+          if (s.environmentId !== environmentId) return s
+          return { ...s, ...updated }
+        })
+        return { ...flag, flagStates: newStates }
+      }
+
+      return {
+        flags: state.flags.map(updateFlagStateList),
+        selectedFlag:
+          state.selectedFlag?.id === flagId
+            ? updateFlagStateList(state.selectedFlag)
+            : state.selectedFlag,
+      }
+    })
   },
 }))

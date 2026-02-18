@@ -86,7 +86,10 @@ export const environmentsApi = {
     return response.json()
   },
 
-  create: async (projectId: string, data: { name: string; key: string }) => {
+  create: async (
+    projectId: string,
+    data: { name: string; key: string; requireConfirmation?: boolean },
+  ) => {
     const response = await apiFetch(`${API_URL}/projects/${projectId}/environments`, {
       method: 'POST',
       headers: getAuthHeaders(),
@@ -95,7 +98,10 @@ export const environmentsApi = {
     return response.json()
   },
 
-  update: async (id: string, data: { name?: string; key?: string }) => {
+  update: async (
+    id: string,
+    data: { name?: string; key?: string; requireConfirmation?: boolean },
+  ) => {
     const response = await apiFetch(`${API_URL}/environments/${id}`, {
       method: 'PATCH',
       headers: getAuthHeaders(),
@@ -239,7 +245,12 @@ export const usersApi = {
     return response.json()
   },
 
-  updateProfile: async (data: { firstName?: string; lastName?: string; language?: string }) => {
+  updateProfile: async (data: {
+    firstName?: string
+    lastName?: string
+    language?: string
+    lastProjectId?: string
+  }) => {
     const response = await apiFetch(`${API_URL}/users/profile`, {
       method: 'PATCH',
       headers: getAuthHeaders(),

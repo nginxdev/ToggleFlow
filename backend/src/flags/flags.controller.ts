@@ -85,7 +85,7 @@ export class FlagsController {
     return this.flagsService.updateFlagState(
       flagId,
       environmentId,
-      updateFlagStateDto.isEnabled ?? false,
+      updateFlagStateDto,
       userId,
     );
   }

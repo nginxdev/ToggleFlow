@@ -45,10 +45,10 @@
     "name": "Name",
     "key": "Key",
     "type": "Type",
-    "status": "Status (Production)",
+    "status": "Serve",
     "actions": "Actions",
-    "enabled": "Enabled",
-    "disabled": "Disabled",
+    "enabled": "ON",
+    "disabled": "OFF",
     "deleteConfirm": "Are you sure you want to delete this flag?",
     "infoTitle": "About Feature Flags",
     "infoDesc": "Feature flags allow you to control which features are enabled in your application without deploying new code. Toggle flags on or off per environment to gradually roll out new features, perform A/B testing, or quickly disable problematic features.",
@@ -130,7 +130,9 @@
     "deleteWarning": "This will permanently delete this environment and all associated flag states. This action cannot be undone.",
     "deleteProtected": "This is a default environment and cannot be deleted. Default environments (Development, Test, Production) are protected.",
     "deleteInstruction": "Type <strong>{{name}}</strong> to confirm deletion",
-    "deleteAction": "Delete Environment"
+    "deleteAction": "Delete Environment",
+    "requireConfirmation": "Changes need confirmation",
+    "requireConfirmationDesc": "All changes to feature flags in this environment will require explicit confirmation before being applied."
   },
   "segments": {
     "title": "User Segments",
@@ -208,20 +210,30 @@
       "defaultRule": "Default Rule",
       "whenOn": "When flag is ON",
       "whenOff": "When flag is OFF",
-      "serve": "Serve"
+      "serve": "Serve",
+      "serveVariation": "Serve variation",
+      "addUserOverride": "Add user override",
+      "value": "Value",
+      "attribute": "Attribute",
+      "operator": "Operator"
     },
     "variations": {
       "title": "Flag Variations",
       "addVariation": "Add variation",
+      "editVariation": "Edit variation",
+      "deleteVariation": "Delete variation",
       "variationColumn": "Variation",
+      "valueColumn": "Value",
+      "nameColumn": "Name",
       "descriptionColumn": "Description",
-      "noVariations": "No variations defined for boolean flag (Implicit true/false)"
+      "noVariations": "No variations defined for boolean flag (Implicit true/false)",
+      "invalidValue": "Invalid value for type {{type}}"
     },
     "saveChanges": "Save changes",
     "discardChanges": "Discard changes",
-    "status": "Status",
-    "servingOn": "Serving ON",
-    "servingOff": "Serving OFF",
+    "status": "Serve",
+    "servingOn": "ON",
+    "servingOff": "OFF",
     "settings": {
       "general": "General Settings",
       "keyReadOnly": "Flag key cannot be changed after creation",

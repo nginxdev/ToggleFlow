@@ -70,10 +70,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const {
     projects,
     selectedProject,
-    selectProject,
-    environments,
-    selectedEnvironment,
-    selectEnvironment,
     loading,
     fetchProjects,
   } = useProjectStore()
@@ -83,7 +79,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }, [fetchProjects])
 
   const handleProjectChange = (project: any) => {
-    selectProject(project)
+    useProjectStore.getState().selectProject(project)
   }
 
   const handleLogout = () => {
@@ -192,39 +188,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
             <Separator orientation="vertical" className="h-6" />
 
-            {/* Environment Selector */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="flex items-center gap-2">
-                  <Layers className="h-3.5 w-3.5" />
-                  {loading
-                    ? t('common.loading')
-                    : selectedEnvironment?.name || t('common.noEnvironments')}
-                  <ChevronDown className="h-3.5 w-3.5 opacity-50" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start">
-                <DropdownMenuLabel>{t('common.switchEnvironment')}</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                {environments.map((env) => (
-                  <DropdownMenuItem
-                    key={env.id}
-                    onClick={() => selectEnvironment(env)}
-                    className={selectedEnvironment?.id === env.id ? 'bg-accent' : ''}
-                  >
-                    <span className={env.key === 'production' ? 'flex items-center gap-2' : ''}>
-                      {env.key === 'production' && (
-                        <span className="h-2 w-2 rounded-full bg-green-500" />
-                      )}
-                      {env.name}
-                    </span>
-                  </DropdownMenuItem>
-                ))}
-                {environments.length === 0 && !loading && (
-                  <DropdownMenuItem disabled>{t('common.noEnvironments')}</DropdownMenuItem>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
 
           <div className="flex items-center gap-4">

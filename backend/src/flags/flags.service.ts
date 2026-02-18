@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   ConflictException,
+  BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateFlagDto } from './dto/create-flag.dto';
@@ -84,6 +85,15 @@ export class FlagsService {
       throw new ConflictException('Flag key already exists');
     }
 
+    // Auto-generate variations for boolean flags if not provided
+    let variations = createFlagDto.variations || [];
+    if (createFlagDto.type === 'boolean' && variations.length === 0) {
+      variations = [
+        { id: crypto.randomUUID(), name: 'True', value: 'true' },
+        { id: crypto.randomUUID(), name: 'False', value: 'false' },
+      ];
+    }
+
     // Create the flag
     const flag = await this.prisma.featureFlag.create({
       data: {
@@ -92,7 +102,7 @@ export class FlagsService {
         description: createFlagDto.description,
         type: createFlagDto.type || 'boolean',
         defaultValue: createFlagDto.defaultValue,
-        variations: createFlagDto.variations || [],
+        variations: variations,
         projectId,
       },
     });
@@ -144,6 +154,20 @@ export class FlagsService {
 
       if (existing) {
         throw new ConflictException('Flag key already exists');
+      }
+    }
+    // Prevent deletion of boolean variations if they are 'true' or 'false'
+    if (flag.type === 'boolean' && updateFlagDto.variations) {
+      const oldVariations = flag.variations as any[];
+      const newVariations = updateFlagDto.variations as any[];
+
+      const hasTrue = newVariations.some((v) => v.value === 'true');
+      const hasFalse = newVariations.some((v) => v.value === 'false');
+
+      if (!hasTrue || !hasFalse) {
+        throw new BadRequestException(
+          'Boolean flags must have both "true" and "false" variations',
+        );
       }
     }
 
@@ -257,7 +281,7 @@ export class FlagsService {
   async updateFlagState(
     flagId: string,
     environmentId: string,
-    isEnabled: boolean,
+    updateFlagStateDto: UpdateFlagStateDto,
     userId: string,
   ) {
     // Check if flag state exists
@@ -282,16 +306,23 @@ export class FlagsService {
           environmentId,
         },
       },
-      data: { isEnabled },
+      data: {
+        isEnabled: updateFlagStateDto.isEnabled,
+        rules: updateFlagStateDto.rules,
+      },
       include: { environment: true, flag: true },
     });
 
     await this.auditService.log({
-      action: 'FLAG_TOGGLED',
+      action: 'FLAG_STATE_UPDATED',
       entity: 'FeatureFlag',
       entityId: flagId,
       userId,
-      payload: { environment: updated.environment.key, isEnabled },
+      payload: {
+        environment: updated.environment.key,
+        isEnabled: updated.isEnabled,
+        rules: updated.rules,
+      },
     });
 
     return updated;

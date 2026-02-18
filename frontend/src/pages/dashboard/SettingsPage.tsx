@@ -23,6 +23,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { SUPPORTED_LANGUAGES } from '@/types'
+import { usersApi } from '@/lib/api'
 
 export default function SettingsPage() {
   const { t, i18n } = useTranslation()
@@ -47,29 +48,21 @@ export default function SettingsPage() {
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const token = localStorage.getItem('token')
-        const response = await fetch('http://localhost:3000/api/auth/profile', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        const data = await usersApi.getProfile()
+        setUser(data)
+        setFormData((prev) => ({
+          ...prev,
+          firstName: data.firstName || '',
+          lastName: data.lastName || '',
+        }))
+        setOriginalFormData({
+          firstName: data.firstName || '',
+          lastName: data.lastName || '',
+          language: data.language || i18n.language,
         })
-        if (response.ok) {
-          const data = await response.json()
-          setUser(data)
-          setFormData((prev) => ({
-            ...prev,
-            firstName: data.firstName || '',
-            lastName: data.lastName || '',
-          }))
-          setOriginalFormData({
-            firstName: data.firstName || '',
-            lastName: data.lastName || '',
-            language: data.language || i18n.language,
-          })
 
-          if (data.language && data.language !== i18n.language) {
-            i18n.changeLanguage(data.language)
-          }
+        if (data.language && data.language !== i18n.language) {
+          i18n.changeLanguage(data.language)
         }
       } catch (e) {
         console.error('Failed to fetch profile', e)
@@ -84,34 +77,21 @@ export default function SettingsPage() {
   const handleSaveProfile = async () => {
     setProfileLoading(true)
     try {
-      const token = localStorage.getItem('token')
-      const response = await fetch('http://localhost:3000/api/users/profile', {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          language: formData.language,
-        }),
+      const updatedUser = await usersApi.updateProfile({
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        language: formData.language,
       })
 
-      if (response.ok) {
-        const updatedUser = await response.json()
-        setUser(updatedUser)
-        const saved = {
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          language: formData.language,
-        }
-        setOriginalFormData(saved)
-        if (formData.language !== i18n.language) {
-          i18n.changeLanguage(formData.language)
-        }
-      } else {
-        console.error('Failed to update profile')
+      setUser(updatedUser)
+      const saved = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        language: formData.language,
+      }
+      setOriginalFormData(saved)
+      if (formData.language !== i18n.language) {
+        i18n.changeLanguage(formData.language)
       }
     } catch (error) {
       console.error('Failed to update profile', error)

@@ -2,4 +2,5 @@ export class UpdateProfileDto {
   firstName?: string;
   lastName?: string;
   language?: string;
+  lastProjectId?: string;
 }

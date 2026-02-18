@@ -1,3 +1,27 @@
+export interface Variation {
+  id: string
+  name: string
+  value: string
+  type?: string
+}
+
+export interface TargetingRule {
+  id: string
+  attribute: string
+  operator: string
+  value: string
+  variationId: string
+}
+
+export interface FlagRules {
+  targeting?: {
+    individual?: Array<{ userId: string; variationId: string }>
+    rules?: TargetingRule[]
+    defaultVariationId?: string
+    offVariationId?: string
+  }
+}
+
 export interface FeatureFlag {
   id: string
   name: string
@@ -7,19 +31,17 @@ export interface FeatureFlag {
   type?: string
   isArchived: boolean
   defaultValue: string
+  variations?: Variation[]
   flagStates?: Array<{
     id: string
     isEnabled: boolean
+    rules?: FlagRules
     environmentId: string
     environment: {
       id: string
       name: string
       key: string
     }
-  }>
-  environments: Array<{
-    environmentId: string
-    isEnabled: boolean
   }>
   project?: {
     id: string
@@ -30,5 +52,4 @@ export interface FeatureFlag {
       key: string
     }>
   }
-  variations?: any[]
 }

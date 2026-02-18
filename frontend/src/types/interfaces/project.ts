@@ -16,4 +16,5 @@ export interface Environment {
   key: string
   apiKey: string
   projectId: string
+  requireConfirmation: boolean
 }

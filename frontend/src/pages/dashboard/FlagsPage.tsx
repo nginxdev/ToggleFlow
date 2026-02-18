@@ -44,6 +44,7 @@ import {
 import { useFlagStore } from '@/store/flagStore'
 import { useProjectStore } from '@/store/projectStore'
 import { toCamelCase } from '@/lib/string-utils'
+import { cn } from '@/lib/utils'
 import type { FeatureFlag } from '@/types'
 
 export default function FlagsPage() {
@@ -54,7 +55,11 @@ export default function FlagsPage() {
   const [togglingFlags, setTogglingFlags] = useState<Set<string>>(new Set())
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [isCreating, setIsCreating] = useState(false)
-  const [newFlag, setNewFlag] = useState({ name: '', key: '', description: '' })
+  const [newFlag, setNewFlag] = useState({ 
+    name: '', 
+    key: '', 
+    description: ''
+  })
 
   const [flagToArchive, setFlagToArchive] = useState<FeatureFlag | null>(null)
 
@@ -246,7 +251,7 @@ export default function FlagsPage() {
                         <Badge variant="secondary">{flag.type}</Badge>
                       </TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2.5">
                           <Switch
                             checked={isEnabled}
                             disabled={togglingFlags.has(toggleKey)}
@@ -255,11 +260,16 @@ export default function FlagsPage() {
                               handleToggleFlag(flag.id, productionState.environmentId, isEnabled)
                             }
                           />
-                          <span className="text-muted-foreground text-sm">
+                          <span 
+                            className={cn(
+                              "text-sm font-medium transition-colors duration-200",
+                              isEnabled ? "text-primary" : "text-muted-foreground"
+                            )}
+                          >
                             {isEnabled ? t('flags.enabled') : t('flags.disabled')}
                           </span>
                           {togglingFlags.has(toggleKey) && (
-                            <Loader2 className="h-4 w-4 animate-spin" />
+                            <Loader2 className="text-muted-foreground h-3.5 w-3.5 animate-spin" />
                           )}
                         </div>
                       </TableCell>

@@ -6,6 +6,7 @@ export interface IUser {
   language?: string;
   password: string;
   email: string;
+  lastProjectId?: string | null;
 }
 
 export type IUserWithoutPassword = Omit<IUser, 'password'>;
