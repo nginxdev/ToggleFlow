@@ -30,6 +30,7 @@ model Project {
   updatedAt    DateTime      @updatedAt
   environments Environment[]
   flags        FeatureFlag[]
+  segments     Segment[]
   users        User[]        @relation("ProjectToUser")
 }
 
@@ -85,4 +86,18 @@ model FlagState {
   flag          FeatureFlag @relation(fields: [flagId], references: [id], onDelete: Cascade)
 
   @@unique([flagId, environmentId])
+}
+
+model Segment {
+  id          String   @id @default(uuid())
+  name        String
+  key         String
+  description String?
+  projectId   String
+  rules       Json     // Array of { attribute: string, operator: string, value: string }
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, key])
 }

@@ -131,7 +131,22 @@
     "newSegment": "Neues Segment",
     "comingSoon": "Benutzersegmente demnächst verfügbar",
     "comingSoonDesc": "Erstellen und verwalten Sie Benutzersegmente, um bestimmte Gruppen mit Ihren Feature-Flags anzusprechen. Definieren Sie Segmente basierend auf Benutzerattributen, Verhalten oder benutzerdefinierten Regeln.",
-    "underDevelopment": "Diese Funktion befindet sich derzeit in der Entwicklung."
+    "underDevelopment": "Diese Funktion befindet sich derzeit in der Entwicklung.",
+    "create": "Segment erstellen",
+    "edit": "Segment bearbeiten",
+    "descHelper": "Erstellen Sie wiederverwendbare Benutzersegmente für die Zielgruppenansprache.",
+    "searchPlaceholder": "Segmente suchen...",
+    "defineGroup": "Definieren Sie eine Benutzergruppe basierend auf ihren Attributen.",
+    "targetingRule": "Zielgruppenregel",
+    "attribute": "Attribut",
+    "attributePlaceholder": "z.B. E-Mail",
+    "operator": "Operator",
+    "isIn": "Ist in",
+    "isNotIn": "Ist nicht in",
+    "values": "Werte (durch Kommas getrennt)",
+    "valuesPlaceholder": "z.B. benutzer1@beispiel.de, benutzer2@beispiel.de",
+    "valuesCount": "{{count}} Werte",
+    "noSegments": "Keine Segmente gefunden. Erstellen Sie eines, um zu beginnen."
   },
   "auditLog": {
     "title": "Audit-Protokoll",
@@ -195,7 +210,13 @@
       "settings": "Einstellungen"
     },
     "targeting": {
-      "title": "Individuelle Benutzerzielsteuerung",
+      "title": "Zielgruppensteuerung",
+      "individualTitle": "Individuelle Zielgruppensteuerung",
+      "segmentTitle": "Segment-Zielgruppensteuerung",
+      "addSegment": "Segment hinzufügen",
+      "noSegmentsAvailable": "Keine Segmente gefunden",
+      "noSegmentsTargeted": "Keine Segmente gezielt. Fügen Sie ein Segment hinzu, um bestimmte Benutzergruppen anzusprechen.",
+      "unknownSegment": "Unbekanntes Segment",
       "addUsers": "Benutzer hinzufügen",
       "noUsers": "Für diesen Indikator sind keine Benutzer spezifisch Zielgruppen.",
       "defaultRule": "Standardregel",

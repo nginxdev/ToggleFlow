@@ -50,6 +50,10 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
     return this.prisma.auditLog;
   }
 
+  get segment() {
+    return this.prisma.segment;
+  }
+
   get $transaction() {
     return this.prisma.$transaction.bind(this.prisma);
   }

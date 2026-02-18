@@ -10,6 +10,8 @@ import { EnvironmentsModule } from './environments/environments.module';
 import { FlagsModule } from './flags/flags.module';
 import { AuditModule } from './audit/audit.module';
 
+import { SegmentsModule } from './segments/segments.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -20,6 +22,7 @@ import { AuditModule } from './audit/audit.module';
     EnvironmentsModule,
     FlagsModule,
     AuditModule,
+    SegmentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

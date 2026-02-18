@@ -26,6 +26,12 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import {
   ChevronRight,
   Settings as SettingsIcon,
   Users,
@@ -42,6 +48,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useFlagStore } from '@/store/flagStore'
+import { useSegmentStore } from '@/store/segmentStore'
 import { DEFAULT_BOOLEAN_VARIATIONS } from '@/lib/constants'
 
 export default function FlagDetailsPage() {
@@ -50,6 +57,7 @@ export default function FlagDetailsPage() {
   const navigate = useNavigate()
   const { selectedFlag: flag, loading, audits, fetchFlag, toggleFlag, updateFlag, updateFlagState, archiveFlag, unarchiveFlag, deleteFlag, fetchAudits } =
     useFlagStore()
+  const { segments, fetchSegments } = useSegmentStore()
   const [activeTab, setActiveTab] = useState('targeting')
   const [selectedEnvId, setSelectedEnvId] = useState<string>('')
   const [isToggling, setIsToggling] = useState(false)
@@ -81,6 +89,48 @@ export default function FlagDetailsPage() {
       fetchFlag(id)
     }
   }, [id, fetchFlag])
+
+  useEffect(() => {
+    if (flag?.project?.id) {
+      fetchSegments(flag.project.id)
+    }
+  }, [flag?.project?.id, fetchSegments])
+
+  const handleAddSegmentTargeting = async (segmentId: string, variationId: string) => {
+    if (!flag || !selectedEnvId) return
+    
+    let currentRules = { ...(draftRules || {}) }
+    if (!currentRules.targeting) currentRules.targeting = {}
+    if (!currentRules.targeting.segments) currentRules.targeting.segments = []
+    
+    // Check if already exists
+    if (currentRules.targeting.segments.some((s: any) => s.segmentId === segmentId)) return
+    
+    currentRules.targeting.segments.push({ segmentId, variationId })
+    setDraftRules(currentRules)
+  }
+
+  const handleRemoveSegmentTargeting = async (segmentId: string) => {
+    if (!flag || !selectedEnvId) return
+    
+    let currentRules = { ...(draftRules || {}) }
+    if (!currentRules.targeting?.segments) return
+    
+    currentRules.targeting.segments = currentRules.targeting.segments.filter((s: any) => s.segmentId !== segmentId)
+    setDraftRules(currentRules)
+  }
+
+  const handleUpdateSegmentVariation = async (segmentId: string, variationId: string) => {
+    if (!flag || !selectedEnvId) return
+    
+    let currentRules = { ...(draftRules || {}) }
+    if (!currentRules.targeting?.segments) return
+    
+    currentRules.targeting.segments = currentRules.targeting.segments.map((s: any) => 
+      s.segmentId === segmentId ? { ...s, variationId } : s
+    )
+    setDraftRules(currentRules)
+  }
 
   useEffect(() => {
     if (activeTab === 'history' && id) {
@@ -571,9 +621,85 @@ export default function FlagDetailsPage() {
                   </div>
                 </div>
                 
+
                 <section className="border-border bg-card border rounded-lg overflow-hidden">
                 <div className="border-border flex items-center justify-between border-b p-4 bg-muted/10">
-                  <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wider">Individual Targeting</h4>
+                  <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wider">{t('flagDetails.targeting.segmentTitle')}</h4>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size="sm" className="gap-2 bg-background">
+                        <Plus className="h-4 w-4" />
+                        {t('flagDetails.targeting.addSegment')}
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      {segments.map((segment) => (
+                        <DropdownMenuItem 
+                          key={segment.id}
+                          onClick={() => handleAddSegmentTargeting(segment.id, flag.variations?.[0]?.id || '')}
+                          disabled={draftRules?.targeting?.segments?.some((s: any) => s.segmentId === segment.id)}
+                        >
+                          {segment.name}
+                        </DropdownMenuItem>
+                      ))}
+                      {segments.length === 0 && <DropdownMenuItem disabled>{t('flagDetails.targeting.noSegmentsAvailable')}</DropdownMenuItem>}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+                <div>
+                  <div className="divide-border divide-y">
+                    {(draftRules?.targeting?.segments || []).map((segRule: any) => {
+                      const segment = segments.find(s => s.id === segRule.segmentId)
+                      return (
+                        <div key={segRule.segmentId} className="flex items-center justify-between p-4">
+                          <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-2">
+                              <Users className="h-4 w-4 text-muted-foreground" />
+                              <span className="font-medium">{segment?.name || t('flagDetails.targeting.unknownSegment')}</span>
+                            </div>
+                            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                            <div className="flex items-center gap-2">
+                                <span className="text-sm text-muted-foreground">serve</span>
+                                <Select 
+                                  value={segRule.variationId} 
+                                  onValueChange={(val) => handleUpdateSegmentVariation(segRule.segmentId, val)}
+                                >
+                                  <SelectTrigger className="w-[180px] h-8">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {(flag.variations || []).map((v: any) => (
+                                      <SelectItem key={v.id} value={v.id}>{v.name}</SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                            </div>
+                          </div>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-8 w-8 text-destructive"
+                            onClick={() => handleRemoveSegmentTargeting(segRule.segmentId)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      )
+                    })}
+                    {(!draftRules?.targeting?.segments || draftRules?.targeting?.segments.length === 0) && (
+                      <div className="bg-muted/10 p-8 text-center">
+                        <p className="text-muted-foreground text-sm">
+                          {t('flagDetails.targeting.noSegmentsTargeted')}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </section>
+                
+                <section className="border-border bg-card border rounded-lg overflow-hidden">
+                <div className="border-border flex items-center justify-between border-b p-4 bg-muted/10">
+                  <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wider">{t('flagDetails.targeting.individualTitle')}</h4>
                     <Button 
                       variant="outline" 
                       size="sm" 
@@ -724,7 +850,7 @@ export default function FlagDetailsPage() {
               </div>
               <section className="border-border bg-card border rounded-lg overflow-hidden">
                 <div className="border-border flex items-center justify-between border-b p-4 bg-muted/10">
-                   <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wider">Variations List</h4>
+                   <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wider">{t('flagDetails.variations.listTitle')}</h4>
                     <Button 
                       variant="outline" 
                       size="sm" 
@@ -813,7 +939,7 @@ export default function FlagDetailsPage() {
                       {editingVariation?.id ? t('flagDetails.variations.editVariation') : t('flagDetails.variations.addVariation')}
                     </AlertDialogTitle>
                     <AlertDialogDescription>
-                      Define a name and the value for this variation.
+                      {t('flagDetails.variations.defineNameAndValue')}
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <div className="grid gap-4 py-4">
@@ -823,7 +949,7 @@ export default function FlagDetailsPage() {
                         id="var-name"
                         value={editingVariation?.name || ''}
                         onChange={(e) => setEditingVariation(prev => prev ? ({ ...prev, name: e.target.value }) : null)}
-                        placeholder="Variation Name"
+                        placeholder={t('flagDetails.variations.namePlaceholder')}
                       />
                     </div>
                     {!(flag.type === 'boolean' && (editingVariation?.value === 'true' || editingVariation?.value === 'false')) && (
@@ -834,13 +960,13 @@ export default function FlagDetailsPage() {
                           onValueChange={(val) => setEditingVariation(prev => prev ? ({ ...prev, type: val }) : null)}
                         >
                           <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select type" />
+                            <SelectValue placeholder={t('flagDetails.variations.typePlaceholder')} />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="boolean">Boolean</SelectItem>
-                            <SelectItem value="string">String</SelectItem>
-                            <SelectItem value="number">Number</SelectItem>
-                            <SelectItem value="json">JSON</SelectItem>
+                            <SelectItem value="boolean">{t('flags.types.boolean')}</SelectItem>
+                            <SelectItem value="string">{t('flags.types.string')}</SelectItem>
+                            <SelectItem value="number">{t('flags.types.number')}</SelectItem>
+                            <SelectItem value="json">{t('flags.types.json')}</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -853,7 +979,7 @@ export default function FlagDetailsPage() {
                             id="var-value"
                             value={editingVariation?.value || ''}
                             onChange={(e) => setEditingVariation(prev => prev ? ({ ...prev, value: e.target.value }) : null)}
-                            placeholder='{"key": "value"}'
+                            placeholder={t('flagDetails.variations.jsonPlaceholder')}
                             className="flex min-h-[100px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
                           />
                         ) : (
@@ -861,7 +987,7 @@ export default function FlagDetailsPage() {
                             id="var-value"
                             value={editingVariation?.value || ''}
                             onChange={(e) => setEditingVariation(prev => prev ? ({ ...prev, value: e.target.value }) : null)}
-                            placeholder={(editingVariation?.type || flag.type) === 'boolean' ? 'true or false' : 'Variation Value'}
+                            placeholder={(editingVariation?.type || flag.type) === 'boolean' ? t('flagDetails.variations.booleanPlaceholder') : t('flagDetails.variations.valuePlaceholder')}
                           />
                         )}
                         {editingVariation?.value && !validateVariationValue(editingVariation.value, editingVariation?.type || flag.type) && (
@@ -925,7 +1051,7 @@ export default function FlagDetailsPage() {
 
               <section className="border-border bg-card border rounded-lg overflow-hidden">
                 <div className="border-border flex items-center justify-between border-b p-4 bg-muted/10">
-                   <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wider">Custom Rules</h4>
+                   <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wider">{t('flagDetails.targeting.customRulesTitle')}</h4>
                     <Button 
                       variant="outline" 
                       size="sm" 
@@ -933,7 +1059,7 @@ export default function FlagDetailsPage() {
                       onClick={handleAddRule}
                     >
                       <Plus className="h-4 w-4" />
-                      Add Rule
+                      {t('flagDetails.targeting.addRule')}
                     </Button>
                 </div>
                 <div>
@@ -941,7 +1067,7 @@ export default function FlagDetailsPage() {
                     {(draftRules?.targeting?.rules || []).map((rule: any, idx: number) => (
                       <div key={rule.id} className="p-6 space-y-4">
                         <div className="flex items-center justify-between">
-                          <h4 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Rule #{idx + 1}</h4>
+                          <h4 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">{t('flagDetails.targeting.ruleNumber', { number: idx + 1 })}</h4>
                           <Button 
                             variant="ghost" 
                             size="icon" 
@@ -970,12 +1096,12 @@ export default function FlagDetailsPage() {
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="equals">equals</SelectItem>
-                                <SelectItem value="notEquals">not equals</SelectItem>
-                                <SelectItem value="contains">contains</SelectItem>
-                                <SelectItem value="notContains">not contains</SelectItem>
-                                <SelectItem value="startsWith">starts with</SelectItem>
-                                <SelectItem value="endsWith">ends with</SelectItem>
+                                <SelectItem value="equals">{t('flagDetails.targeting.operators.equals')}</SelectItem>
+                                <SelectItem value="notEquals">{t('flagDetails.targeting.operators.notEquals')}</SelectItem>
+                                <SelectItem value="contains">{t('flagDetails.targeting.operators.contains')}</SelectItem>
+                                <SelectItem value="notContains">{t('flagDetails.targeting.operators.notContains')}</SelectItem>
+                                <SelectItem value="startsWith">{t('flagDetails.targeting.operators.startsWith')}</SelectItem>
+                                <SelectItem value="endsWith">{t('flagDetails.targeting.operators.endsWith')}</SelectItem>
                               </SelectContent>
                             </Select>
                           </div>
@@ -997,7 +1123,7 @@ export default function FlagDetailsPage() {
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
-                                {(flag.variations || []).map(v => (
+                                {(flag.variations || []).map((v: any) => (
                                   <SelectItem key={v.id} value={v.id}>{v.name}</SelectItem>
                                 ))}
                               </SelectContent>
@@ -1009,11 +1135,11 @@ export default function FlagDetailsPage() {
                     {(draftRules?.targeting?.rules?.length === 0 || !draftRules?.targeting?.rules) && (
                       <div className="bg-muted/10 p-12 text-center">
                         <Terminal className="h-12 w-12 mx-auto mb-4 opacity-10" />
-                        <h4 className="font-medium text-muted-foreground mb-1">No custom rules</h4>
-                        <p className="text-muted-foreground text-sm">Target users by email, group, or any custom attribute.</p>
+                        <h4 className="font-medium text-muted-foreground mb-1">{t('flagDetails.targeting.noCustomRules')}</h4>
+                        <p className="text-muted-foreground text-sm">{t('flagDetails.targeting.customRulesDesc')}</p>
                         <Button variant="outline" className="mt-4 gap-2" onClick={handleAddRule}>
                           <Plus className="h-4 w-4" />
-                          Add your first rule
+                          {t('flagDetails.targeting.addFirstRule')}
                         </Button>
                       </div>
                     )}
@@ -1028,14 +1154,14 @@ export default function FlagDetailsPage() {
               <div>
                 <h3 className="text-lg font-medium">{t('flagDetails.tabs.history')}</h3>
                 <p className="text-muted-foreground text-sm">
-                  Activity and changes for this feature flag.
+                  {t('flagDetails.history.description')}
                 </p>
               </div>
               
               <div className="space-y-4">
                 {audits.length === 0 ? (
                   <div className="text-muted-foreground py-12 text-center">
-                    No history found for this flag.
+                    {t('flagDetails.history.noHistory')}
                   </div>
                 ) : (
                   audits.map((audit) => (
@@ -1055,11 +1181,11 @@ export default function FlagDetailsPage() {
                         <div className="text-muted-foreground text-sm">
                           {audit.action === 'FLAG_STATE_UPDATED' || audit.action === 'FLAG_TOGGLED' ? (
                             <span>
-                              Updated state in 
+                              {t('flagDetails.history.updatedState')} 
                               <strong> {audit.payload.environment}</strong>
                             </span>
                           ) : (
-                            <span>Action performed by user {audit.userId}</span>
+                            <span>{t('flagDetails.history.actionBy')} {audit.userId}</span>
                           )}
                         </div>
                       </div>

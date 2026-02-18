@@ -259,3 +259,45 @@ export const usersApi = {
     return response.json()
   },
 }
+
+export const segmentsApi = {
+  create: async (projectId: string, data: any) => {
+    const response = await apiFetch(`${API_URL}/segments/${projectId}`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data),
+    })
+    return response.json()
+  },
+
+  getAll: async (projectId: string) => {
+    const response = await apiFetch(`${API_URL}/segments/project/${projectId}`, {
+      headers: getAuthHeaders(),
+    })
+    return response.json()
+  },
+
+  getOne: async (id: string) => {
+    const response = await apiFetch(`${API_URL}/segments/${id}`, {
+      headers: getAuthHeaders(),
+    })
+    return response.json()
+  },
+
+  update: async (id: string, data: any) => {
+    const response = await apiFetch(`${API_URL}/segments/${id}`, {
+      method: 'PATCH',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data),
+    })
+    return response.json()
+  },
+
+  delete: async (id: string) => {
+    const response = await apiFetch(`${API_URL}/segments/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    })
+    return response.json()
+  },
+}

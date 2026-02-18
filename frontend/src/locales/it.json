@@ -129,7 +129,22 @@
     "newSegment": "Nuovo Segmento",
     "comingSoon": "Segmenti Utente Prossimamente",
     "comingSoonDesc": "Crea e gestisci segmenti di utenti per indirizzare gruppi specifici con i tuoi flag di funzionalità. Definisci segmenti basati su attributi utente, comportamento o regole personalizzate.",
-    "underDevelopment": "Questa funzionalità è attualmente in sviluppo."
+    "underDevelopment": "Questa funzionalità è attualmente in sviluppo.",
+    "create": "Crea Segmento",
+    "edit": "Modifica Segmento",
+    "descHelper": "Crea segmenti utente riutilizzabili per il targeting.",
+    "searchPlaceholder": "Cerca segmenti...",
+    "defineGroup": "Definisci un gruppo di utenti in base ai loro attributi.",
+    "targetingRule": "Regola di Targeting",
+    "attribute": "Attributo",
+    "attributePlaceholder": "es. email",
+    "operator": "Operatore",
+    "isIn": "È in",
+    "isNotIn": "Non è in",
+    "values": "Valori (separati da virgola)",
+    "valuesPlaceholder": "es. utente1@esempio.it, utente2@esempio.it",
+    "valuesCount": "{{count}} valori",
+    "noSegments": "Nessun segmento trovato. Creane uno per iniziare."
   },
   "auditLog": {
     "title": "Registro di Controllo",
@@ -193,7 +208,13 @@
       "settings": "Impostazioni"
     },
     "targeting": {
-      "title": "Targeting Utente Individuale",
+      "title": "Targeting",
+      "individualTitle": "Targeting Individuale",
+      "segmentTitle": "Targeting per Segmento",
+      "addSegment": "Aggiungi Segmento",
+      "noSegmentsAvailable": "Nessun segmento trovato",
+      "noSegmentsTargeted": "Nessun segmento mirato. Aggiungi un segmento per indirizzare gruppi di utenti specifici.",
+      "unknownSegment": "Segmento Sconosciuto",
       "addUsers": "Aggiungi utenti",
       "noUsers": "Nessun utente specificamente mirato per questo flag.",
       "defaultRule": "Regola Predefinita",

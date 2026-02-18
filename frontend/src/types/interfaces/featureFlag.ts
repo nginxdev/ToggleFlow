@@ -16,6 +16,7 @@ export interface TargetingRule {
 export interface FlagRules {
   targeting?: {
     individual?: Array<{ userId: string; variationId: string }>
+    segments?: Array<{ segmentId: string; variationId: string }>
     rules?: TargetingRule[]
     defaultVariationId?: string
     offVariationId?: string

@@ -45,6 +45,12 @@
     "name": "xxx-flags.name-xxx",
     "key": "xxx-flags.key-xxx",
     "type": "xxx-flags.type-xxx",
+    "types": {
+      "boolean": "xxx-flags.types.boolean-xxx",
+      "string": "xxx-flags.types.string-xxx",
+      "number": "xxx-flags.types.number-xxx",
+      "json": "xxx-flags.types.json-xxx"
+    },
     "status": "xxx-flags.status-xxx",
     "actions": "xxx-flags.actions-xxx",
     "enabled": "xxx-flags.enabled-xxx",
@@ -61,8 +67,17 @@
     "description": "xxx-flags.description-xxx",
     "descriptionPlaceholder": "xxx-flags.descriptionPlaceholder-xxx",
     "createError": "xxx-flags.createError-xxx",
+    "archive": "xxx-flags.archive-xxx",
+    "unarchive": "xxx-flags.unarchive-xxx",
+    "archivedTitle": "xxx-flags.archivedTitle-xxx",
+    "viewArchived": "xxx-flags.viewArchived-xxx",
+    "archiveConfirm": "xxx-flags.archiveConfirm-xxx",
+    "archiveWarning": "xxx-flags.archiveWarning-xxx",
+    "archiveAction": "xxx-flags.archiveAction-xxx",
     "deleteTitle": "xxx-flags.deleteTitle-xxx",
     "deleteWarning": "xxx-flags.deleteWarning-xxx",
+    "deletePermanent": "xxx-flags.deletePermanent-xxx",
+    "deletePermanentWarning": "xxx-flags.deletePermanentWarning-xxx",
     "deleteInstruction": "xxx-flags.deleteInstruction-xxx",
     "deleteAction": "xxx-flags.deleteAction-xxx"
   },
@@ -121,7 +136,9 @@
     "deleteWarning": "xxx-environments.deleteWarning-xxx",
     "deleteProtected": "xxx-environments.deleteProtected-xxx",
     "deleteInstruction": "xxx-environments.deleteInstruction-xxx",
-    "deleteAction": "xxx-environments.deleteAction-xxx"
+    "deleteAction": "xxx-environments.deleteAction-xxx",
+    "requireConfirmation": "xxx-environments.requireConfirmation-xxx",
+    "requireConfirmationDesc": "xxx-environments.requireConfirmationDesc-xxx"
   },
   "segments": {
     "title": "xxx-segments.title-xxx",
@@ -129,7 +146,22 @@
     "newSegment": "xxx-segments.newSegment-xxx",
     "comingSoon": "xxx-segments.comingSoon-xxx",
     "comingSoonDesc": "xxx-segments.comingSoonDesc-xxx",
-    "underDevelopment": "xxx-segments.underDevelopment-xxx"
+    "underDevelopment": "xxx-segments.underDevelopment-xxx",
+    "create": "xxx-segments.create-xxx",
+    "edit": "xxx-segments.edit-xxx",
+    "descHelper": "xxx-segments.descHelper-xxx",
+    "searchPlaceholder": "xxx-segments.searchPlaceholder-xxx",
+    "defineGroup": "xxx-segments.defineGroup-xxx",
+    "targetingRule": "xxx-segments.targetingRule-xxx",
+    "attribute": "xxx-segments.attribute-xxx",
+    "attributePlaceholder": "xxx-segments.attributePlaceholder-xxx",
+    "operator": "xxx-segments.operator-xxx",
+    "isIn": "xxx-segments.isIn-xxx",
+    "isNotIn": "xxx-segments.isNotIn-xxx",
+    "values": "xxx-segments.values-xxx",
+    "valuesPlaceholder": "xxx-segments.valuesPlaceholder-xxx",
+    "valuesCount": "xxx-segments.valuesCount-xxx",
+    "noSegments": "xxx-segments.noSegments-xxx"
   },
   "auditLog": {
     "title": "xxx-auditLog.title-xxx",
@@ -194,19 +226,65 @@
     },
     "targeting": {
       "title": "xxx-flagDetails.targeting.title-xxx",
+      "individualTitle": "xxx-flagDetails.targeting.individualTitle-xxx",
+      "segmentTitle": "xxx-flagDetails.targeting.segmentTitle-xxx",
+      "addSegment": "xxx-flagDetails.targeting.addSegment-xxx",
+      "noSegmentsAvailable": "xxx-flagDetails.targeting.noSegmentsAvailable-xxx",
+      "noSegmentsTargeted": "xxx-flagDetails.targeting.noSegmentsTargeted-xxx",
+      "unknownSegment": "xxx-flagDetails.targeting.unknownSegment-xxx",
       "addUsers": "xxx-flagDetails.targeting.addUsers-xxx",
       "noUsers": "xxx-flagDetails.targeting.noUsers-xxx",
       "defaultRule": "xxx-flagDetails.targeting.defaultRule-xxx",
       "whenOn": "xxx-flagDetails.targeting.whenOn-xxx",
       "whenOff": "xxx-flagDetails.targeting.whenOff-xxx",
-      "serve": "xxx-flagDetails.targeting.serve-xxx"
+      "serve": "xxx-flagDetails.targeting.serve-xxx",
+      "serveVariation": "xxx-flagDetails.targeting.serveVariation-xxx",
+      "addUserOverride": "xxx-flagDetails.targeting.addUserOverride-xxx",
+      "value": "xxx-flagDetails.targeting.value-xxx",
+      "attribute": "xxx-flagDetails.targeting.attribute-xxx",
+      "operator": "xxx-flagDetails.targeting.operator-xxx",
+      "customRulesTitle": "xxx-flagDetails.targeting.customRulesTitle-xxx",
+      "addRule": "xxx-flagDetails.targeting.addRule-xxx",
+      "ruleNumber": "xxx-flagDetails.targeting.ruleNumber-xxx",
+      "operators": {
+        "equals": "xxx-flagDetails.targeting.operators.equals-xxx",
+        "notEquals": "xxx-flagDetails.targeting.operators.notEquals-xxx",
+        "contains": "xxx-flagDetails.targeting.operators.contains-xxx",
+        "notContains": "xxx-flagDetails.targeting.operators.notContains-xxx",
+        "startsWith": "xxx-flagDetails.targeting.operators.startsWith-xxx",
+        "endsWith": "xxx-flagDetails.targeting.operators.endsWith-xxx"
+      },
+      "noCustomRules": "xxx-flagDetails.targeting.noCustomRules-xxx",
+      "customRulesDesc": "xxx-flagDetails.targeting.customRulesDesc-xxx",
+      "addFirstRule": "xxx-flagDetails.targeting.addFirstRule-xxx"
     },
     "variations": {
       "title": "xxx-flagDetails.variations.title-xxx",
       "addVariation": "xxx-flagDetails.variations.addVariation-xxx",
+      "editVariation": "xxx-flagDetails.variations.editVariation-xxx",
+      "deleteVariation": "xxx-flagDetails.variations.deleteVariation-xxx",
       "variationColumn": "xxx-flagDetails.variations.variationColumn-xxx",
+      "valueColumn": "xxx-flagDetails.variations.valueColumn-xxx",
+      "nameColumn": "xxx-flagDetails.variations.nameColumn-xxx",
       "descriptionColumn": "xxx-flagDetails.variations.descriptionColumn-xxx",
-      "noVariations": "xxx-flagDetails.variations.noVariations-xxx"
+      "noVariations": "xxx-flagDetails.variations.noVariations-xxx",
+      "invalidValue": "xxx-flagDetails.variations.invalidValue-xxx",
+      "listTitle": "xxx-flagDetails.variations.listTitle-xxx",
+      "invalidValueAlert": "xxx-flagDetails.variations.invalidValueAlert-xxx",
+      "defaultBooleanDeletionAlert": "xxx-flagDetails.variations.defaultBooleanDeletionAlert-xxx",
+      "enterUserIdPrompt": "xxx-flagDetails.variations.enterUserIdPrompt-xxx",
+      "namePlaceholder": "xxx-flagDetails.variations.namePlaceholder-xxx",
+      "typePlaceholder": "xxx-flagDetails.variations.typePlaceholder-xxx",
+      "jsonPlaceholder": "xxx-flagDetails.variations.jsonPlaceholder-xxx",
+      "valuePlaceholder": "xxx-flagDetails.variations.valuePlaceholder-xxx",
+      "booleanPlaceholder": "xxx-flagDetails.variations.booleanPlaceholder-xxx",
+      "defineNameAndValue": "xxx-flagDetails.variations.defineNameAndValue-xxx"
+    },
+    "history": {
+      "description": "xxx-flagDetails.history.description-xxx",
+      "noHistory": "xxx-flagDetails.history.noHistory-xxx",
+      "updatedState": "xxx-flagDetails.history.updatedState-xxx",
+      "actionBy": "xxx-flagDetails.history.actionBy-xxx"
     },
     "saveChanges": "xxx-flagDetails.saveChanges-xxx",
     "discardChanges": "xxx-flagDetails.discardChanges-xxx",
@@ -217,8 +295,12 @@
       "general": "xxx-flagDetails.settings.general-xxx",
       "keyReadOnly": "xxx-flagDetails.settings.keyReadOnly-xxx",
       "dangerZone": "xxx-flagDetails.settings.dangerZone-xxx",
+      "archiveFlag": "xxx-flagDetails.settings.archiveFlag-xxx",
+      "archiveDesc": "xxx-flagDetails.settings.archiveDesc-xxx",
       "deleteFlag": "xxx-flagDetails.settings.deleteFlag-xxx",
-      "deleteDesc": "xxx-flagDetails.settings.deleteDesc-xxx"
+      "deleteDesc": "xxx-flagDetails.settings.deleteDesc-xxx",
+      "restoreFlag": "xxx-flagDetails.settings.restoreFlag-xxx",
+      "restoreDesc": "xxx-flagDetails.settings.restoreDesc-xxx"
     }
   },
   "settings": {

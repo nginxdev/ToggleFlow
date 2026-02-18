@@ -138,7 +138,22 @@
     "newSegment": "Nouveau Segment",
     "comingSoon": "Segments d'Utilisateurs Bientôt Disponibles",
     "comingSoonDesc": "Créez et gérez des segments d'utilisateurs pour cibler des groupes spécifiques avec vos indicateurs de fonctionnalité. Définissez des segments basés sur les attributs des utilisateurs, leur comportement ou des règles personnalisées.",
-    "underDevelopment": "Cette fonctionnalité est actuellement en développement."
+    "underDevelopment": "Cette fonctionnalité est actuellement en développement.",
+    "create": "Créer un Segment",
+    "edit": "Modifier le Segment",
+    "descHelper": "Créez des segments d'utilisateurs réutilisables pour le ciblage.",
+    "searchPlaceholder": "Rechercher des segments...",
+    "defineGroup": "Définissez un groupe d'utilisateurs basé sur leurs attributs.",
+    "targetingRule": "Règle de Ciblage",
+    "attribute": "Attribut",
+    "attributePlaceholder": "ex: email",
+    "operator": "Opérateur",
+    "isIn": "Est dans",
+    "isNotIn": "N'est pas dans",
+    "values": "Valeurs (séparées par des virgules)",
+    "valuesPlaceholder": "ex: user1@example.com, user2@example.com",
+    "valuesCount": "{{count}} valeurs",
+    "noSegments": "Aucun segment trouvé. Créez-en un pour commencer."
   },
   "auditLog": {
     "title": "Journal d'Audit",
@@ -202,13 +217,24 @@
       "settings": "Paramètres"
     },
     "targeting": {
-      "title": "Ciblage Individuel des Utilisateurs",
+      "title": "Ciblage",
+      "individualTitle": "Ciblage Individuel des Utilisateurs",
+      "segmentTitle": "Ciblage par Segment",
+      "addSegment": "Ajouter un Segment",
+      "noSegmentsAvailable": "Aucun segment trouvé",
+      "noSegmentsTargeted": "Aucun segment ciblé. Ajoutez un segment pour cibler des groupes d'utilisateurs spécifiques.",
+      "unknownSegment": "Segment Inconnu",
       "addUsers": "Ajouter des utilisateurs",
       "noUsers": "Aucun utilisateur spécifiquement ciblé pour cet indicateur.",
       "defaultRule": "Règle par Défaut",
       "whenOn": "Quand l'indicateur est ACTIVÉ",
       "whenOff": "Quand l'indicateur est DÉSACTIVÉ",
-      "serve": "Servir"
+      "serve": "Servir",
+      "serveVariation": "Servir la variation",
+      "addUserOverride": "Ajouter une dérogation utilisateur",
+      "value": "Valeur",
+      "attribute": "Attribut",
+      "operator": "Opérateur"
     },
     "variations": {
       "title": "Variations d'Indicateur",

@@ -45,6 +45,12 @@
     "name": "Name",
     "key": "Key",
     "type": "Type",
+    "types": {
+      "boolean": "Boolean",
+      "string": "String",
+      "number": "Number",
+      "json": "JSON"
+    },
     "status": "Serve",
     "actions": "Actions",
     "enabled": "ON",
@@ -140,7 +146,22 @@
     "newSegment": "New Segment",
     "comingSoon": "User Segments Coming Soon",
     "comingSoonDesc": "Create and manage user segments to target specific groups with your feature flags. Define segments based on user attributes, behavior, or custom rules.",
-    "underDevelopment": "This feature is currently under development."
+    "underDevelopment": "This feature is currently under development.",
+    "create": "Create Segment",
+    "edit": "Edit Segment",
+    "descHelper": "Create reusable user segments for targeting.",
+    "searchPlaceholder": "Search segments...",
+    "defineGroup": "Define a group of users based on their attributes.",
+    "targetingRule": "Targeting Rule",
+    "attribute": "Attribute",
+    "attributePlaceholder": "e.g. email",
+    "operator": "Operator",
+    "isIn": "Is In",
+    "isNotIn": "Is Not In",
+    "values": "Values (comma separated)",
+    "valuesPlaceholder": "e.g. user1@example.com, user2@example.com",
+    "valuesCount": "{{count}} values",
+    "noSegments": "No segments found. Create one to get started."
   },
   "auditLog": {
     "title": "Audit Log",
@@ -204,7 +225,13 @@
       "settings": "Settings"
     },
     "targeting": {
-      "title": "Individual User Targeting",
+      "title": "Targeting",
+      "individualTitle": "Individual Targeting",
+      "segmentTitle": "Segment Targeting",
+      "addSegment": "Add Segment",
+      "noSegmentsAvailable": "No segments found",
+      "noSegmentsTargeted": "No segments targeted. Add a segment to target specific user groups.",
+      "unknownSegment": "Unknown Segment",
       "addUsers": "Add users",
       "noUsers": "No users specifically targeted for this flag.",
       "defaultRule": "Default Rule",
@@ -215,7 +242,21 @@
       "addUserOverride": "Add user override",
       "value": "Value",
       "attribute": "Attribute",
-      "operator": "Operator"
+      "operator": "Operator",
+      "customRulesTitle": "Custom Rules",
+      "addRule": "Add Rule",
+      "ruleNumber": "Rule #{{number}}",
+      "operators": {
+        "equals": "equals",
+        "notEquals": "not equals",
+        "contains": "contains",
+        "notContains": "not contains",
+        "startsWith": "starts with",
+        "endsWith": "ends with"
+      },
+      "noCustomRules": "No custom rules",
+      "customRulesDesc": "Target users by email, group, or any custom attribute.",
+      "addFirstRule": "Add your first rule"
     },
     "variations": {
       "title": "Flag Variations",
@@ -227,7 +268,23 @@
       "nameColumn": "Name",
       "descriptionColumn": "Description",
       "noVariations": "No variations defined for boolean flag (Implicit true/false)",
-      "invalidValue": "Invalid value for type {{type}}"
+      "invalidValue": "Invalid value for type {{type}}",
+      "listTitle": "Variations List",
+      "invalidValueAlert": "Invalid value for type {{type}}",
+      "defaultBooleanDeletionAlert": "Default boolean variations cannot be deleted",
+      "enterUserIdPrompt": "Enter User ID:",
+      "namePlaceholder": "Variation Name",
+      "typePlaceholder": "Select type",
+      "jsonPlaceholder": "{\"key\": \"value\"}",
+      "valuePlaceholder": "Variation Value",
+      "booleanPlaceholder": "true or false",
+      "defineNameAndValue": "Define a name and the value for this variation."
+    },
+    "history": {
+      "description": "Activity and changes for this feature flag.",
+      "noHistory": "No history found for this flag.",
+      "updatedState": "Updated state in",
+      "actionBy": "Action performed by user"
     },
     "saveChanges": "Save changes",
     "discardChanges": "Discard changes",
