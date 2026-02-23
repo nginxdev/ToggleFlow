@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { useTranslation, Trans } from 'react-i18next'
-import DashboardLayout from '@/components/layout/DashboardLayout'
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useTranslation, Trans } from "react-i18next";
+import DashboardLayout from "@/components/layout/DashboardLayout";
 import {
   Table,
   TableBody,
@@ -9,18 +9,18 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { MoreVertical, Loader2, Flag, History, Trash2, ArrowLeft } from 'lucide-react'
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { MoreVertical, Loader2, Flag, History, Trash2, ArrowLeft } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+} from "@/components/ui/dropdown-menu";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,52 +30,52 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
-import { useFlagStore } from '@/store/flagStore'
-import { useProjectStore } from '@/store/projectStore'
-import type { FeatureFlag } from '@/types'
+} from "@/components/ui/alert-dialog";
+import { useFlagStore } from "@/store/flagStore";
+import { useProjectStore } from "@/store/projectStore";
+import type { FeatureFlag } from "@/types";
 
 export default function ArchivedFlagsPage() {
-  const { t } = useTranslation()
-  const { selectedProject } = useProjectStore()
-  const { archivedFlags, loading, fetchArchivedFlags, unarchiveFlag, deleteFlag } = useFlagStore()
-  const navigate = useNavigate()
+  const { t } = useTranslation();
+  const { selectedProject } = useProjectStore();
+  const { archivedFlags, loading, fetchArchivedFlags, unarchiveFlag, deleteFlag } = useFlagStore();
+  const navigate = useNavigate();
 
-  const [flagToDelete, setFlagToDelete] = useState<FeatureFlag | null>(null)
-  const [deleteConfirmation, setDeleteConfirmation] = useState('')
-  const [isRestoring, setIsRestoring] = useState<string | null>(null)
+  const [flagToDelete, setFlagToDelete] = useState<FeatureFlag | null>(null);
+  const [deleteConfirmation, setDeleteConfirmation] = useState("");
+  const [isRestoring, setIsRestoring] = useState<string | null>(null);
 
-  const currentUser = JSON.parse(localStorage.getItem('user') || '{}')
-  const isSuperUser = currentUser.isSuperUser || currentUser.email === 'john.doe@toggleflow.com'
+  const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
+  const isSuperUser = currentUser.isSuperUser || currentUser.email === "john.doe@toggleflow.com";
 
   useEffect(() => {
     if (selectedProject) {
-      fetchArchivedFlags(selectedProject.id)
+      fetchArchivedFlags(selectedProject.id);
     }
-  }, [selectedProject, fetchArchivedFlags])
+  }, [selectedProject, fetchArchivedFlags]);
 
   const handleRestore = async (id: string) => {
-    setIsRestoring(id)
+    setIsRestoring(id);
     try {
-      await unarchiveFlag(id)
+      await unarchiveFlag(id);
     } catch (error) {
-      console.error('Failed to restore flag:', error)
+      console.error("Failed to restore flag:", error);
     } finally {
-      setIsRestoring(null)
+      setIsRestoring(null);
     }
-  }
+  };
 
   const confirmDeleteFlag = async () => {
-    if (!flagToDelete) return
+    if (!flagToDelete) return;
 
     try {
-      await deleteFlag(flagToDelete.id)
-      setFlagToDelete(null)
-      setDeleteConfirmation('')
+      await deleteFlag(flagToDelete.id);
+      setFlagToDelete(null);
+      setDeleteConfirmation("");
     } catch (error) {
-      console.error('Failed to delete flag:', error)
+      console.error("Failed to delete flag:", error);
     }
-  }
+  };
 
   if (loading && !archivedFlags.length) {
     return (
@@ -84,7 +84,7 @@ export default function ArchivedFlagsPage() {
           <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
         </div>
       </DashboardLayout>
-    )
+    );
   }
 
   return (
@@ -92,11 +92,11 @@ export default function ArchivedFlagsPage() {
       <div className="flex flex-col gap-6 p-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" onClick={() => navigate('/dashboard/flags')}>
+            <Button variant="ghost" size="icon" onClick={() => navigate("/dashboard/flags")}>
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div>
-              <h1 className="text-3xl font-bold tracking-tight">{t('flags.archivedTitle')}</h1>
+              <h1 className="text-3xl font-bold tracking-tight">{t("flags.archivedTitle")}</h1>
               <p className="text-muted-foreground mt-1">
                 Flags that have been archived. Most functionality is disabled for these flags.
               </p>
@@ -109,7 +109,8 @@ export default function ArchivedFlagsPage() {
             <Flag className="text-muted-foreground mx-auto mb-4 h-16 w-16" />
             <h3 className="mb-2 text-lg font-semibold">No Archived Flags</h3>
             <p className="text-muted-foreground mx-auto max-w-md">
-              Flags you archive will appear here. You can restore them to the active list at any time.
+              Flags you archive will appear here. You can restore them to the active list at any
+              time.
             </p>
           </div>
         ) : (
@@ -117,10 +118,10 @@ export default function ArchivedFlagsPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{t('flags.name')}</TableHead>
-                  <TableHead>{t('flags.key')}</TableHead>
-                  <TableHead>{t('flags.type')}</TableHead>
-                  <TableHead className="text-right">{t('common.actions')}</TableHead>
+                  <TableHead>{t("flags.name")}</TableHead>
+                  <TableHead>{t("flags.key")}</TableHead>
+                  <TableHead>{t("flags.type")}</TableHead>
+                  <TableHead className="text-right">{t("common.actions")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -150,9 +151,9 @@ export default function ArchivedFlagsPage() {
                           ) : (
                             <History className="mr-2 h-4 w-4" />
                           )}
-                          {t('flagDetails.settings.restoreFlag')}
+                          {t("flagDetails.settings.restoreFlag")}
                         </Button>
-                        
+
                         {isSuperUser && (
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -166,7 +167,7 @@ export default function ArchivedFlagsPage() {
                                 onClick={() => setFlagToDelete(flag)}
                               >
                                 <Trash2 className="mr-2 h-4 w-4" />
-                                {t('common.delete')}
+                                {t("common.delete")}
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
@@ -185,15 +186,15 @@ export default function ArchivedFlagsPage() {
         open={!!flagToDelete}
         onOpenChange={(open) => {
           if (!open) {
-            setFlagToDelete(null)
-            setDeleteConfirmation('')
+            setFlagToDelete(null);
+            setDeleteConfirmation("");
           }
         }}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t('flags.deleteTitle')}</AlertDialogTitle>
-            <AlertDialogDescription>{t('flags.deletePermanentWarning')}</AlertDialogDescription>
+            <AlertDialogTitle>{t("flags.deleteTitle")}</AlertDialogTitle>
+            <AlertDialogDescription>{t("flags.deletePermanentWarning")}</AlertDialogDescription>
             {flagToDelete && (
               <div className="mt-4 w-full">
                 <Label htmlFor="confirm-archived-delete" className="mb-2 block">
@@ -214,19 +215,19 @@ export default function ArchivedFlagsPage() {
             )}
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
             {flagToDelete && (
               <AlertDialogAction
                 variant="destructive"
                 onClick={confirmDeleteFlag}
                 disabled={deleteConfirmation !== flagToDelete.key}
               >
-                {t('flags.deletePermanent')}
+                {t("flags.deletePermanent")}
               </AlertDialogAction>
             )}
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
     </DashboardLayout>
-  )
+  );
 }

@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
+import React, { useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   Zap,
   Flag,
@@ -14,12 +14,12 @@ import {
   User,
   LogOut,
   Folder,
-} from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { ModeToggle } from '@/components/mode-toggle'
-import { Separator } from '@/components/ui/separator'
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { ModeToggle } from "@/components/mode-toggle";
+import { Separator } from "@/components/ui/separator";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,15 +27,15 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { useProjectStore } from '@/store/projectStore'
-import { LanguageSelector } from '@/components/LanguageSelector'
+} from "@/components/ui/dropdown-menu";
+import { useProjectStore } from "@/store/projectStore";
+import { LanguageSelector } from "@/components/LanguageSelector";
 
 interface SidebarItemProps {
-  icon: React.ReactNode
-  label: string
-  href: string
-  active?: boolean
+  icon: React.ReactNode;
+  label: string;
+  href: string;
+  active?: boolean;
 }
 
 function SidebarItem({ icon, label, href, active }: SidebarItemProps) {
@@ -43,70 +43,65 @@ function SidebarItem({ icon, label, href, active }: SidebarItemProps) {
     <Link
       to={href}
       className={cn(
-        'group flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors',
+        "group flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors",
         active
-          ? 'bg-primary/10 text-primary'
-          : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+          ? "bg-primary/10 text-primary"
+          : "text-muted-foreground hover:bg-muted hover:text-foreground",
       )}
     >
       <span
         className={cn(
-          'flex h-5 w-5 items-center justify-center',
-          active ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground',
+          "flex h-5 w-5 items-center justify-center",
+          active ? "text-primary" : "text-muted-foreground group-hover:text-foreground",
         )}
       >
         {icon}
       </span>
       {label}
     </Link>
-  )
+  );
 }
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const location = useLocation()
-  const navigate = useNavigate()
-  const { t } = useTranslation()
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { t } = useTranslation();
 
-  const {
-    projects,
-    selectedProject,
-    loading,
-    fetchProjects,
-  } = useProjectStore()
+  const { projects, selectedProject, loading, fetchProjects } = useProjectStore();
 
   useEffect(() => {
-    fetchProjects()
-  }, [fetchProjects])
+    fetchProjects();
+  }, [fetchProjects]);
 
   const handleProjectChange = (project: any) => {
-    useProjectStore.getState().selectProject(project)
-  }
+    useProjectStore.getState().selectProject(project);
+  };
 
   const handleLogout = () => {
-    localStorage.removeItem('token')
-    navigate('/login')
-  }
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
 
   const navItems = [
-    { icon: <Flag className="h-4 w-4" />, label: t('nav.featureFlags'), href: '/dashboard/flags' },
-    { icon: <Folder className="h-4 w-4" />, label: t('nav.projects'), href: '/dashboard/projects' },
-    { icon: <Users className="h-4 w-4" />, label: t('nav.segments'), href: '/dashboard/segments' },
+    { icon: <Flag className="h-4 w-4" />, label: t("nav.featureFlags"), href: "/dashboard/flags" },
+    { icon: <Folder className="h-4 w-4" />, label: t("nav.projects"), href: "/dashboard/projects" },
+    { icon: <Users className="h-4 w-4" />, label: t("nav.segments"), href: "/dashboard/segments" },
     {
       icon: <Layers className="h-4 w-4" />,
-      label: t('nav.environments'),
-      href: '/dashboard/environments',
+      label: t("nav.environments"),
+      href: "/dashboard/environments",
     },
     {
       icon: <Activity className="h-4 w-4" />,
-      label: t('nav.auditLog'),
-      href: '/dashboard/audit-log',
+      label: t("nav.auditLog"),
+      href: "/dashboard/audit-log",
     },
     {
       icon: <Settings className="h-4 w-4" />,
-      label: t('nav.settings'),
-      href: '/dashboard/settings',
+      label: t("nav.settings"),
+      href: "/dashboard/settings",
     },
-  ]
+  ];
 
   return (
     <div className="bg-background text-foreground flex min-h-screen">
@@ -137,15 +132,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <div className="px-3 pb-4">
             <div className="bg-muted/50 rounded-none p-4">
               <p className="text-muted-foreground mb-2 text-xs font-semibold tracking-wider uppercase">
-                {t('common.usage')}
+                {t("common.usage")}
               </p>
               <div className="space-y-2">
                 <div className="flex justify-between text-xs">
-                  <span>{t('common.flags')}</span>
+                  <span>{t("common.flags")}</span>
                   <span>12 / 50</span>
                 </div>
                 <div className="bg-border h-1.5 w-full">
-                  <div className="bg-primary h-full" style={{ width: '24%' }} />
+                  <div className="bg-primary h-full" style={{ width: "24%" }} />
                 </div>
               </div>
             </div>
@@ -163,31 +158,30 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="flex items-center gap-2 font-semibold">
                   {loading
-                    ? t('common.loading')
-                    : selectedProject?.name || t('common.selectProject')}
+                    ? t("common.loading")
+                    : selectedProject?.name || t("common.selectProject")}
                   <ChevronDown className="h-4 w-4 opacity-50" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-56">
-                <DropdownMenuLabel>{t('common.switchProject')}</DropdownMenuLabel>
+                <DropdownMenuLabel>{t("common.switchProject")}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 {projects.map((project) => (
                   <DropdownMenuItem
                     key={project.id}
                     onClick={() => handleProjectChange(project)}
-                    className={selectedProject?.id === project.id ? 'bg-accent' : ''}
+                    className={selectedProject?.id === project.id ? "bg-accent" : ""}
                   >
                     {project.name}
                   </DropdownMenuItem>
                 ))}
                 {projects.length === 0 && !loading && (
-                  <DropdownMenuItem disabled>{t('common.noProjects')}</DropdownMenuItem>
+                  <DropdownMenuItem disabled>{t("common.noProjects")}</DropdownMenuItem>
                 )}
               </DropdownMenuContent>
             </DropdownMenu>
 
             <Separator orientation="vertical" className="h-6" />
-
           </div>
 
           <div className="flex items-center gap-4">
@@ -195,7 +189,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <Search className="text-muted-foreground absolute top-2.5 left-2.5 h-4 w-4" />
               <Input
                 type="search"
-                placeholder={t('common.search')}
+                placeholder={t("common.search")}
                 className="w-[200px] pl-8 lg:w-[300px]"
               />
             </div>
@@ -220,15 +214,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel>{t('auth.myAccount')}</DropdownMenuLabel>
+                <DropdownMenuLabel>{t("auth.myAccount")}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>{t('auth.profile')}</DropdownMenuItem>
-                <DropdownMenuItem>{t('auth.apiKeys')}</DropdownMenuItem>
-                <DropdownMenuItem>{t('auth.teams')}</DropdownMenuItem>
+                <DropdownMenuItem>{t("auth.profile")}</DropdownMenuItem>
+                <DropdownMenuItem>{t("auth.apiKeys")}</DropdownMenuItem>
+                <DropdownMenuItem>{t("auth.teams")}</DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout} className="text-destructive">
                   <LogOut className="mr-2 h-4 w-4" />
-                  {t('common.signOut')}
+                  {t("common.signOut")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -238,5 +232,5 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <main className="flex-1 p-4 sm:p-8">{children}</main>
       </div>
     </div>
-  )
+  );
 }

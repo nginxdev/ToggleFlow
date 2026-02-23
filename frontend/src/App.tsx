@@ -1,18 +1,18 @@
-import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom'
-import LandingPage from '@/pages/LandingPage'
-import LoginPage from '@/pages/auth/LoginPage'
-import SignUpPage from '@/pages/auth/SignUpPage'
-import ForgotPasswordPage from '@/pages/auth/ForgotPasswordPage'
-import FlagsPage from '@/pages/dashboard/FlagsPage'
-import FlagDetailsPage from '@/pages/dashboard/FlagDetailsPage'
-import ArchivedFlagsPage from '@/pages/dashboard/ArchivedFlagsPage'
-import ProjectsPage from '@/pages/dashboard/ProjectsPage'
-import SegmentsPage from '@/pages/dashboard/SegmentsPage'
-import EnvironmentsPage from '@/pages/dashboard/EnvironmentsPage'
-import AuditLogPage from '@/pages/dashboard/AuditLogPage'
-import SettingsPage from '@/pages/dashboard/SettingsPage'
-import ProtectedRoute from '@/components/ProtectedRoute'
-import { SessionTimeoutHandler } from '@/components/SessionTimeoutHandler'
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
+import LandingPage from "@/pages/LandingPage";
+import LoginPage from "@/pages/auth/LoginPage";
+import SignUpPage from "@/pages/auth/SignUpPage";
+import ForgotPasswordPage from "@/pages/auth/ForgotPasswordPage";
+import FlagsPage from "@/pages/dashboard/FlagsPage";
+import FlagDetailsPage from "@/pages/dashboard/FlagDetailsPage";
+import ArchivedFlagsPage from "@/pages/dashboard/ArchivedFlagsPage";
+import ProjectsPage from "@/pages/dashboard/ProjectsPage";
+import SegmentsPage from "@/pages/dashboard/SegmentsPage";
+import EnvironmentsPage from "@/pages/dashboard/EnvironmentsPage";
+import AuditLogPage from "@/pages/dashboard/AuditLogPage";
+import SettingsPage from "@/pages/dashboard/SettingsPage";
+import ProtectedRoute from "@/components/ProtectedRoute";
+import { SessionTimeoutHandler } from "@/components/SessionTimeoutHandler";
 
 export function App() {
   return (
@@ -98,7 +98,7 @@ export function App() {
         />
       </Routes>
     </BrowserRouter>
-  )
+  );
 }
 
-export default App
+export default App;

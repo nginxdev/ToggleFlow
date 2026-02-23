@@ -1,8 +1,8 @@
-import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
-import { PrismaPg } from '@prisma/adapter-pg';
-import { Pool } from 'pg';
-import { ConfigService } from '@nestjs/config';
+import { Injectable, OnModuleInit, OnModuleDestroy } from "@nestjs/common";
+import { PrismaClient } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { Pool } from "pg";
+import { ConfigService } from "@nestjs/config";
 
 @Injectable()
 export class PrismaService implements OnModuleInit, OnModuleDestroy {
@@ -12,7 +12,7 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
   constructor(private configService: ConfigService) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
     this.pool = new Pool({
-      connectionString: this.configService.get<string>('DATABASE_URL'),
+      connectionString: this.configService.get<string>("DATABASE_URL"),
     });
     const adapter = new PrismaPg(this.pool);
     this.prisma = new PrismaClient({ adapter });

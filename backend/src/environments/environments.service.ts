@@ -3,12 +3,12 @@ import {
   NotFoundException,
   ConflictException,
   ForbiddenException,
-} from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { CreateEnvironmentDto } from './dto/create-environment.dto';
-import { UpdateEnvironmentDto } from './dto/update-environment.dto';
-import { DEFAULT_ENVIRONMENT_KEYS } from '../types/consts/environments';
-import { AuditService } from '../audit/audit.service';
+} from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
+import { CreateEnvironmentDto } from "./dto/create-environment.dto";
+import { UpdateEnvironmentDto } from "./dto/update-environment.dto";
+import { DEFAULT_ENVIRONMENT_KEYS } from "../types/consts/environments";
+import { AuditService } from "../audit/audit.service";
 
 @Injectable()
 export class EnvironmentsService {
@@ -21,16 +21,12 @@ export class EnvironmentsService {
     return this.prisma.environment.findMany({
       where: { projectId },
       orderBy: {
-        createdAt: 'asc',
+        createdAt: "asc",
       },
     });
   }
 
-  async create(
-    createEnvironmentDto: CreateEnvironmentDto,
-    projectId: string,
-    userId: string,
-  ) {
+  async create(createEnvironmentDto: CreateEnvironmentDto, projectId: string, userId: string) {
     // Check if key already exists in this project
     const existing = await this.prisma.environment.findFirst({
       where: {
@@ -40,9 +36,7 @@ export class EnvironmentsService {
     });
 
     if (existing) {
-      throw new ConflictException(
-        'Environment key already exists in this project',
-      );
+      throw new ConflictException("Environment key already exists in this project");
     }
 
     const env = await this.prisma.environment.create({
@@ -55,8 +49,8 @@ export class EnvironmentsService {
     });
 
     await this.auditService.log({
-      action: 'ENVIRONMENT_CREATED',
-      entity: 'Environment',
+      action: "ENVIRONMENT_CREATED",
+      entity: "Environment",
       entityId: env.id,
       userId: userId,
       payload: { name: env.name, key: env.key },
@@ -65,11 +59,7 @@ export class EnvironmentsService {
     return env;
   }
 
-  async update(
-    id: string,
-    updateEnvironmentDto: UpdateEnvironmentDto,
-    userId: string,
-  ) {
+  async update(id: string, updateEnvironmentDto: UpdateEnvironmentDto, userId: string) {
     const environment = await this.prisma.environment.findUnique({
       where: { id },
     });
@@ -89,9 +79,7 @@ export class EnvironmentsService {
       });
 
       if (existing) {
-        throw new ConflictException(
-          'Environment key already exists in this project',
-        );
+        throw new ConflictException("Environment key already exists in this project");
       }
     }
 
@@ -104,8 +92,8 @@ export class EnvironmentsService {
     });
 
     await this.auditService.log({
-      action: 'ENVIRONMENT_UPDATED',
-      entity: 'Environment',
+      action: "ENVIRONMENT_UPDATED",
+      entity: "Environment",
       entityId: id,
       userId: userId,
       payload: updateEnvironmentDto,
@@ -129,7 +117,7 @@ export class EnvironmentsService {
       )
     ) {
       throw new ForbiddenException(
-        'Default environments (development, test, production) cannot be deleted',
+        "Default environments (development, test, production) cannot be deleted",
       );
     }
 
@@ -138,13 +126,13 @@ export class EnvironmentsService {
     });
 
     await this.auditService.log({
-      action: 'ENVIRONMENT_DELETED',
-      entity: 'Environment',
+      action: "ENVIRONMENT_DELETED",
+      entity: "Environment",
       entityId: id,
       userId: userId,
       payload: { name: environment.name, key: environment.key },
     });
 
-    return { message: 'Environment deleted successfully' };
+    return { message: "Environment deleted successfully" };
   }
 }

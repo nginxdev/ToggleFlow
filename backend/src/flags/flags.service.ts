@@ -3,13 +3,13 @@ import {
   NotFoundException,
   ConflictException,
   BadRequestException,
-} from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { CreateFlagDto } from './dto/create-flag.dto';
-import { UpdateFlagDto } from './dto/update-flag.dto';
-import { UpdateFlagStateDto } from './dto/update-flag-state.dto';
-import { AuditService } from '../audit/audit.service';
-import { DEFAULT_BOOLEAN_VARIATIONS } from './constants';
+} from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
+import { CreateFlagDto } from "./dto/create-flag.dto";
+import { UpdateFlagDto } from "./dto/update-flag.dto";
+import { UpdateFlagStateDto } from "./dto/update-flag-state.dto";
+import { AuditService } from "../audit/audit.service";
+import { DEFAULT_BOOLEAN_VARIATIONS } from "./constants";
 
 @Injectable()
 export class FlagsService {
@@ -29,7 +29,7 @@ export class FlagsService {
         },
       },
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
     });
   }
@@ -45,7 +45,7 @@ export class FlagsService {
         },
       },
       orderBy: {
-        updatedAt: 'desc',
+        updatedAt: "desc",
       },
     });
   }
@@ -74,11 +74,7 @@ export class FlagsService {
     return flag;
   }
 
-  async create(
-    createFlagDto: CreateFlagDto,
-    projectId: string,
-    userId: string,
-  ) {
+  async create(createFlagDto: CreateFlagDto, projectId: string, userId: string) {
     // Check if key already exists
     const existing = await this.prisma.featureFlag.findFirst({
       where: {
@@ -87,17 +83,17 @@ export class FlagsService {
     });
 
     if (existing) {
-      throw new ConflictException('Flag key already exists');
+      throw new ConflictException("Flag key already exists");
     }
 
     // Auto-generate variations for boolean flags if not provided
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     let variations = createFlagDto.variations || [];
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    if (createFlagDto.type === 'boolean' && variations.length === 0) {
+    if (createFlagDto.type === "boolean" && variations.length === 0) {
       variations = [
-        { id: crypto.randomUUID(), name: 'True', value: 'true' },
-        { id: crypto.randomUUID(), name: 'False', value: 'false' },
+        { id: crypto.randomUUID(), name: "True", value: "true" },
+        { id: crypto.randomUUID(), name: "False", value: "false" },
       ];
     }
 
@@ -107,7 +103,7 @@ export class FlagsService {
         name: createFlagDto.name,
         key: createFlagDto.key,
         description: createFlagDto.description,
-        type: createFlagDto.type || 'boolean',
+        type: createFlagDto.type || "boolean",
         defaultValue: createFlagDto.defaultValue,
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         variations: variations,
@@ -116,8 +112,8 @@ export class FlagsService {
     });
 
     await this.auditService.log({
-      action: 'FLAG_CREATED',
-      entity: 'FeatureFlag',
+      action: "FLAG_CREATED",
+      entity: "FeatureFlag",
       entityId: flag.id,
       userId,
       payload: { name: flag.name, key: flag.key },
@@ -161,14 +157,14 @@ export class FlagsService {
       });
 
       if (existing) {
-        throw new ConflictException('Flag key already exists');
+        throw new ConflictException("Flag key already exists");
       }
     }
 
     // ... (inside class)
 
     // Prevent deletion of default boolean variations
-    if (flag.type === 'boolean' && updateFlagDto.variations) {
+    if (flag.type === "boolean" && updateFlagDto.variations) {
       const newVariations = updateFlagDto.variations as Array<{
         name: string;
         value: string;
@@ -199,8 +195,8 @@ export class FlagsService {
     });
 
     await this.auditService.log({
-      action: 'FLAG_UPDATED',
-      entity: 'FeatureFlag',
+      action: "FLAG_UPDATED",
+      entity: "FeatureFlag",
       entityId: id,
       userId,
       payload: updateFlagDto,
@@ -215,7 +211,7 @@ export class FlagsService {
     });
 
     if (!user || !user.isSuperUser) {
-      throw new ConflictException('Only superusers can delete flags');
+      throw new ConflictException("Only superusers can delete flags");
     }
 
     const flag = await this.prisma.featureFlag.findUnique({
@@ -227,7 +223,7 @@ export class FlagsService {
     }
 
     if (flag.isArchived === false) {
-      throw new ConflictException('Flag must be archived before deletion');
+      throw new ConflictException("Flag must be archived before deletion");
     }
 
     await this.prisma.featureFlag.delete({
@@ -235,14 +231,14 @@ export class FlagsService {
     });
 
     await this.auditService.log({
-      action: 'FLAG_DELETED',
-      entity: 'FeatureFlag',
+      action: "FLAG_DELETED",
+      entity: "FeatureFlag",
       entityId: id,
       userId,
       payload: { name: flag.name, key: flag.key },
     });
 
-    return { message: 'Feature flag deleted successfully' };
+    return { message: "Feature flag deleted successfully" };
   }
 
   async archive(id: string, userId: string) {
@@ -260,8 +256,8 @@ export class FlagsService {
     });
 
     await this.auditService.log({
-      action: 'FLAG_ARCHIVED',
-      entity: 'FeatureFlag',
+      action: "FLAG_ARCHIVED",
+      entity: "FeatureFlag",
       entityId: id,
       userId,
     });
@@ -284,8 +280,8 @@ export class FlagsService {
     });
 
     await this.auditService.log({
-      action: 'FLAG_UNARCHIVED',
-      entity: 'FeatureFlag',
+      action: "FLAG_UNARCHIVED",
+      entity: "FeatureFlag",
       entityId: id,
       userId,
     });
@@ -311,7 +307,7 @@ export class FlagsService {
     });
 
     if (!flagState) {
-      throw new NotFoundException('Flag state not found');
+      throw new NotFoundException("Flag state not found");
     }
 
     const updated = await this.prisma.flagState.update({
@@ -329,8 +325,8 @@ export class FlagsService {
     });
 
     await this.auditService.log({
-      action: 'FLAG_STATE_UPDATED',
-      entity: 'FeatureFlag',
+      action: "FLAG_STATE_UPDATED",
+      entity: "FeatureFlag",
       entityId: flagId,
       userId,
       payload: {
@@ -345,6 +341,6 @@ export class FlagsService {
   }
 
   async getAudits(id: string) {
-    return this.auditService.findByEntity('FeatureFlag', id);
+    return this.auditService.findByEntity("FeatureFlag", id);
   }
 }

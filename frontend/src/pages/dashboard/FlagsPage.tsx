@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
-import DashboardLayout from '@/components/layout/DashboardLayout'
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import DashboardLayout from "@/components/layout/DashboardLayout";
 import {
   Table,
   TableBody,
@@ -9,19 +9,19 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Switch } from '@/components/ui/switch'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { MoreVertical, Plus, Loader2, Flag, Archive } from 'lucide-react'
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { MoreVertical, Plus, Loader2, Flag, Archive } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+} from "@/components/ui/dropdown-menu";
 import {
   Dialog,
   DialogContent,
@@ -30,7 +30,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog'
+} from "@/components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -40,85 +40,85 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
-import { useFlagStore } from '@/store/flagStore'
-import { useProjectStore } from '@/store/projectStore'
-import { toCamelCase } from '@/lib/string-utils'
-import { cn } from '@/lib/utils'
-import type { FeatureFlag } from '@/types'
+} from "@/components/ui/alert-dialog";
+import { useFlagStore } from "@/store/flagStore";
+import { useProjectStore } from "@/store/projectStore";
+import { toCamelCase } from "@/lib/string-utils";
+import { cn } from "@/lib/utils";
+import type { FeatureFlag } from "@/types";
 
 export default function FlagsPage() {
-  const { t } = useTranslation()
-  const { selectedProject } = useProjectStore()
-  const { flags, loading, fetchFlags, createFlag, toggleFlag, archiveFlag } = useFlagStore()
+  const { t } = useTranslation();
+  const { selectedProject } = useProjectStore();
+  const { flags, loading, fetchFlags, createFlag, toggleFlag, archiveFlag } = useFlagStore();
 
-  const [togglingFlags, setTogglingFlags] = useState<Set<string>>(new Set())
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
-  const [isCreating, setIsCreating] = useState(false)
-  const [newFlag, setNewFlag] = useState({ 
-    name: '', 
-    key: '', 
-    description: ''
-  })
+  const [togglingFlags, setTogglingFlags] = useState<Set<string>>(new Set());
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
+  const [newFlag, setNewFlag] = useState({
+    name: "",
+    key: "",
+    description: "",
+  });
 
-  const [flagToArchive, setFlagToArchive] = useState<FeatureFlag | null>(null)
+  const [flagToArchive, setFlagToArchive] = useState<FeatureFlag | null>(null);
 
   useEffect(() => {
     if (selectedProject) {
-      fetchFlags(selectedProject.id)
+      fetchFlags(selectedProject.id);
     }
-  }, [selectedProject, fetchFlags])
+  }, [selectedProject, fetchFlags]);
 
   const handleNameChange = (name: string) => {
-    setNewFlag({ ...newFlag, name, key: toCamelCase(name) })
-  }
+    setNewFlag({ ...newFlag, name, key: toCamelCase(name) });
+  };
 
   const handleCreateFlag = async () => {
-    if (!newFlag.name || !newFlag.key || !selectedProject) return
+    if (!newFlag.name || !newFlag.key || !selectedProject) return;
 
-    setIsCreating(true)
+    setIsCreating(true);
     try {
       await createFlag(selectedProject.id, {
         name: newFlag.name,
         key: newFlag.key,
         description: newFlag.description || undefined,
-        type: 'boolean',
-        defaultValue: 'false',
-      })
-      setIsCreateDialogOpen(false)
-      setNewFlag({ name: '', key: '', description: '' })
+        type: "boolean",
+        defaultValue: "false",
+      });
+      setIsCreateDialogOpen(false);
+      setNewFlag({ name: "", key: "", description: "" });
     } catch (error) {
-      console.error('Failed to create flag:', error)
-      alert(t('flags.createError'))
+      console.error("Failed to create flag:", error);
+      alert(t("flags.createError"));
     } finally {
-      setIsCreating(false)
+      setIsCreating(false);
     }
-  }
+  };
 
   const handleToggleFlag = async (flagId: string, environmentId: string, currentState: boolean) => {
-    const toggleKey = `${flagId}-${environmentId}`
-    setTogglingFlags((prev) => new Set(prev).add(toggleKey))
+    const toggleKey = `${flagId}-${environmentId}`;
+    setTogglingFlags((prev) => new Set(prev).add(toggleKey));
 
     try {
-      await toggleFlag(flagId, environmentId, currentState)
+      await toggleFlag(flagId, environmentId, currentState);
     } finally {
       setTogglingFlags((prev) => {
-        const newSet = new Set(prev)
-        newSet.delete(toggleKey)
-        return newSet
-      })
+        const newSet = new Set(prev);
+        newSet.delete(toggleKey);
+        return newSet;
+      });
     }
-  }
+  };
 
   const confirmArchiveFlag = async () => {
-    if (!flagToArchive) return
+    if (!flagToArchive) return;
     try {
-      await archiveFlag(flagToArchive.id)
-      setFlagToArchive(null)
+      await archiveFlag(flagToArchive.id);
+      setFlagToArchive(null);
     } catch (error) {
-      console.error('Failed to archive flag:', error)
+      console.error("Failed to archive flag:", error);
     }
-  }
+  };
 
   if (loading && !flags.length) {
     return (
@@ -127,7 +127,7 @@ export default function FlagsPage() {
           <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
         </div>
       </DashboardLayout>
-    )
+    );
   }
 
   return (
@@ -135,50 +135,48 @@ export default function FlagsPage() {
       <div className="flex flex-col gap-6 p-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">{t('flags.title')}</h1>
-            <p className="text-muted-foreground mt-1">{t('flags.subtitle')}</p>
+            <h1 className="text-3xl font-bold tracking-tight">{t("flags.title")}</h1>
+            <p className="text-muted-foreground mt-1">{t("flags.subtitle")}</p>
           </div>
           <div className="flex gap-2">
             <Link to="/dashboard/flags/archived">
               <Button variant="outline" size="sm">
                 <Archive className="mr-2 h-4 w-4" />
-                {t('flags.viewArchived')}
+                {t("flags.viewArchived")}
               </Button>
             </Link>
             <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
               <DialogTrigger asChild>
                 <Button size="sm">
                   <Plus className="mr-2 h-4 w-4" />
-                  {t('flags.newFlag')}
+                  {t("flags.newFlag")}
                 </Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>{t('flags.createFlag')}</DialogTitle>
-                  <DialogDescription>{t('flags.createDesc')}</DialogDescription>
+                  <DialogTitle>{t("flags.createFlag")}</DialogTitle>
+                  <DialogDescription>{t("flags.createDesc")}</DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
                   <div className="grid gap-2">
-                    <Label htmlFor="flag-name">{t('flags.flagName')}</Label>
+                    <Label htmlFor="flag-name">{t("flags.flagName")}</Label>
                     <Input
                       id="flag-name"
-                      placeholder={t('flags.namePlaceholder')}
+                      placeholder={t("flags.namePlaceholder")}
                       value={newFlag.name}
                       onChange={(e) => handleNameChange(e.target.value)}
                     />
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="flag-key">{t('flags.flagKey')}</Label>
+                    <Label htmlFor="flag-key">{t("flags.flagKey")}</Label>
                     <Input id="flag-key" value={newFlag.key} disabled />
-                    <p className="text-muted-foreground text-xs">
-                      {t('flags.keyAutoGenerated')}
-                    </p>
+                    <p className="text-muted-foreground text-xs">{t("flags.keyAutoGenerated")}</p>
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="flag-desc">{t('flags.description')}</Label>
+                    <Label htmlFor="flag-desc">{t("flags.description")}</Label>
                     <Input
                       id="flag-desc"
-                      placeholder={t('flags.descriptionPlaceholder')}
+                      placeholder={t("flags.descriptionPlaceholder")}
                       value={newFlag.description}
                       onChange={(e) => setNewFlag({ ...newFlag, description: e.target.value })}
                     />
@@ -186,7 +184,7 @@ export default function FlagsPage() {
                 </div>
                 <DialogFooter>
                   <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
-                    {t('common.cancel')}
+                    {t("common.cancel")}
                   </Button>
                   <Button
                     onClick={handleCreateFlag}
@@ -195,10 +193,10 @@ export default function FlagsPage() {
                     {isCreating ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        {t('common.creating')}
+                        {t("common.creating")}
                       </>
                     ) : (
-                      t('flags.createFlag')
+                      t("flags.createFlag")
                     )}
                   </Button>
                 </DialogFooter>
@@ -210,11 +208,11 @@ export default function FlagsPage() {
         {flags.length === 0 ? (
           <div className="rounded-lg border p-12 text-center">
             <Flag className="text-muted-foreground mx-auto mb-4 h-16 w-16" />
-            <h3 className="mb-2 text-lg font-semibold">{t('flags.noFlags')}</h3>
-            <p className="text-muted-foreground mx-auto mb-4 max-w-md">{t('flags.noFlagsDesc')}</p>
+            <h3 className="mb-2 text-lg font-semibold">{t("flags.noFlags")}</h3>
+            <p className="text-muted-foreground mx-auto mb-4 max-w-md">{t("flags.noFlagsDesc")}</p>
             <Button onClick={() => setIsCreateDialogOpen(true)}>
               <Plus className="mr-2 h-4 w-4" />
-              {t('flags.createFirst')}
+              {t("flags.createFirst")}
             </Button>
           </div>
         ) : (
@@ -222,20 +220,20 @@ export default function FlagsPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{t('flags.name')}</TableHead>
-                  <TableHead>{t('flags.key')}</TableHead>
-                  <TableHead>{t('flags.type')}</TableHead>
-                  <TableHead>{t('flags.status')}</TableHead>
-                  <TableHead className="text-right">{t('common.actions')}</TableHead>
+                  <TableHead>{t("flags.name")}</TableHead>
+                  <TableHead>{t("flags.key")}</TableHead>
+                  <TableHead>{t("flags.type")}</TableHead>
+                  <TableHead>{t("flags.status")}</TableHead>
+                  <TableHead className="text-right">{t("common.actions")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {flags.map((flag) => {
                   const productionState = flag.flagStates?.find(
-                    (state) => state.environment.key === 'production',
-                  )
-                  const isEnabled = productionState?.isEnabled || false
-                  const toggleKey = `${flag.id}-${productionState?.environmentId}`
+                    (state) => state.environment.key === "production",
+                  );
+                  const isEnabled = productionState?.isEnabled || false;
+                  const toggleKey = `${flag.id}-${productionState?.environmentId}`;
 
                   return (
                     <TableRow key={flag.id}>
@@ -260,13 +258,13 @@ export default function FlagsPage() {
                               handleToggleFlag(flag.id, productionState.environmentId, isEnabled)
                             }
                           />
-                          <span 
+                          <span
                             className={cn(
                               "text-sm font-medium transition-colors duration-200",
-                              isEnabled ? "text-primary" : "text-muted-foreground"
+                              isEnabled ? "text-primary" : "text-muted-foreground",
                             )}
                           >
-                            {isEnabled ? t('flags.enabled') : t('flags.disabled')}
+                            {isEnabled ? t("flags.enabled") : t("flags.disabled")}
                           </span>
                           {togglingFlags.has(toggleKey) && (
                             <Loader2 className="text-muted-foreground h-3.5 w-3.5 animate-spin" />
@@ -283,20 +281,20 @@ export default function FlagsPage() {
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem asChild>
                               <Link to={`/dashboard/flags/${flag.id}`}>
-                                {t('common.viewDetails')}
+                                {t("common.viewDetails")}
                               </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               className="text-destructive"
                               onClick={() => setFlagToArchive(flag)}
                             >
-                              {t('flags.archive')}
+                              {t("flags.archive")}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>
                     </TableRow>
-                  )
+                  );
                 })}
               </TableBody>
             </Table>
@@ -304,8 +302,8 @@ export default function FlagsPage() {
         )}
 
         <div className="bg-muted/50 rounded-lg border p-4">
-          <h3 className="mb-2 font-semibold">{t('flags.infoTitle')}</h3>
-          <p className="text-muted-foreground text-sm">{t('flags.infoDesc')}</p>
+          <h3 className="mb-2 font-semibold">{t("flags.infoTitle")}</h3>
+          <p className="text-muted-foreground text-sm">{t("flags.infoDesc")}</p>
         </div>
       </div>
 
@@ -313,28 +311,23 @@ export default function FlagsPage() {
         open={!!flagToArchive}
         onOpenChange={(open) => {
           if (!open) {
-            setFlagToArchive(null)
+            setFlagToArchive(null);
           }
         }}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t('flags.archiveConfirm')}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {t('flags.archiveWarning')}
-            </AlertDialogDescription>
+            <AlertDialogTitle>{t("flags.archiveConfirm")}</AlertDialogTitle>
+            <AlertDialogDescription>{t("flags.archiveWarning")}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
-            <AlertDialogAction
-              variant="destructive"
-              onClick={confirmArchiveFlag}
-            >
-              {t('flags.archiveAction')}
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction variant="destructive" onClick={confirmArchiveFlag}>
+              {t("flags.archiveAction")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
     </DashboardLayout>
-  )
+  );
 }

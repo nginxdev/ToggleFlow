@@ -7,14 +7,14 @@ import {
   Request as NestRequest,
   Get,
   NotFoundException,
-} from '@nestjs/common';
-import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateProfileDto } from './dto/update-profile.dto';
-import { AuthGuard } from '@nestjs/passport';
-import { Request } from 'express';
+} from "@nestjs/common";
+import { UsersService } from "./users.service";
+import { CreateUserDto } from "./dto/create-user.dto";
+import { UpdateProfileDto } from "./dto/update-profile.dto";
+import { AuthGuard } from "@nestjs/passport";
+import { Request } from "express";
 
-@Controller('users')
+@Controller("users")
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -29,23 +29,20 @@ export class UsersController {
     );
   }
 
-  @UseGuards(AuthGuard('jwt'))
-  @Patch('profile')
-  updateProfile(
-    @NestRequest() req: Request,
-    @Body() updateProfileDto: UpdateProfileDto,
-  ) {
+  @UseGuards(AuthGuard("jwt"))
+  @Patch("profile")
+  updateProfile(@NestRequest() req: Request, @Body() updateProfileDto: UpdateProfileDto) {
     const user = req.user as { userId: string };
     return this.usersService.updateProfile(user.userId, updateProfileDto);
   }
 
-  @UseGuards(AuthGuard('jwt'))
-  @Get('profile')
+  @UseGuards(AuthGuard("jwt"))
+  @Get("profile")
   async getProfile(@NestRequest() req: Request) {
     const userId = (req.user as { userId: string }).userId;
     const user = await this.usersService.findById(userId);
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException("User not found");
     }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...result } = user;

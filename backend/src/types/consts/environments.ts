@@ -1,5 +1,1 @@
-export const DEFAULT_ENVIRONMENT_KEYS = [
-  'development',
-  'test',
-  'production',
-] as const;
+export const DEFAULT_ENVIRONMENT_KEYS = ["development", "test", "production"] as const;

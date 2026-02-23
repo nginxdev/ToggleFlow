@@ -9,4 +9,4 @@ export interface IUser {
   lastProjectId?: string | null;
 }
 
-export type IUserWithoutPassword = Omit<IUser, 'password'>;
+export type IUserWithoutPassword = Omit<IUser, "password">;

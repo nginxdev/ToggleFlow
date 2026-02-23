@@ -1,5 +1,5 @@
-import { Globe } from 'lucide-react'
-import { useTranslation } from 'react-i18next'
+import { Globe } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,32 +7,32 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { Button } from '@/components/ui/button'
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
-import { SUPPORTED_LANGUAGES } from '@/types'
-import { usersApi } from '@/lib/api'
+import { SUPPORTED_LANGUAGES } from "@/types";
+import { usersApi } from "@/lib/api";
 
 export function LanguageSelector() {
-  const { i18n } = useTranslation()
+  const { i18n } = useTranslation();
   const currentLang =
-    SUPPORTED_LANGUAGES.find((lang) => lang.code === i18n.language) || SUPPORTED_LANGUAGES[0]
+    SUPPORTED_LANGUAGES.find((lang) => lang.code === i18n.language) || SUPPORTED_LANGUAGES[0];
 
   const changeLanguage = async (langCode: string) => {
-    if (langCode === i18n.language) return
+    if (langCode === i18n.language) return;
 
-    i18n.changeLanguage(langCode)
+    i18n.changeLanguage(langCode);
 
     // If user is logged in, save preference
-    const token = localStorage.getItem('token')
+    const token = localStorage.getItem("token");
     if (token) {
       try {
-        await usersApi.updateProfile({ language: langCode })
+        await usersApi.updateProfile({ language: langCode });
       } catch (error) {
-        console.error('Failed to save language preference:', error)
+        console.error("Failed to save language preference:", error);
       }
     }
-  }
+  };
 
   return (
     <DropdownMenu>
@@ -48,7 +48,7 @@ export function LanguageSelector() {
           <DropdownMenuItem
             key={language.code}
             onClick={() => changeLanguage(language.code)}
-            className={currentLang.code === language.code ? 'bg-accent' : ''}
+            className={currentLang.code === language.code ? "bg-accent" : ""}
           >
             <span className="mr-2">{language.flag}</span>
             {language.name}
@@ -56,5 +56,5 @@ export function LanguageSelector() {
         ))}
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }

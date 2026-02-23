@@ -1,8 +1,8 @@
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { ModeToggle } from '@/components/mode-toggle'
-import { ArrowRight, Zap } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { ModeToggle } from "@/components/mode-toggle";
+import { ArrowRight, Zap } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function LandingPage() {
   return (
@@ -83,5 +83,5 @@ export default function LandingPage() {
         </div>
       </footer>
     </div>
-  )
+  );
 }

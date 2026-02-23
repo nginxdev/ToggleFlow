@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button'
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -6,46 +6,46 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Link, useNavigate } from 'react-router-dom'
-import { Zap, Loader2 } from 'lucide-react'
-import { ModeToggle } from '@/components/mode-toggle'
-import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Link, useNavigate } from "react-router-dom";
+import { Zap, Loader2 } from "lucide-react";
+import { ModeToggle } from "@/components/mode-toggle";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export default function SignUpPage() {
-  const { t } = useTranslation()
-  const navigate = useNavigate()
+  const { t } = useTranslation();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: '',
-  })
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-    setError(null)
+    e.preventDefault();
+    setIsLoading(true);
+    setError(null);
 
     if (formData.password.length < 8) {
-      setError(t('auth.signup.passwordLengthError'))
-      setIsLoading(false)
-      return
+      setError(t("auth.signup.passwordLengthError"));
+      setIsLoading(false);
+      return;
     }
 
     try {
       // Generate username from first and last name
-      const username = `${formData.firstName}${formData.lastName}`.toLowerCase().replace(/\s/g, '')
+      const username = `${formData.firstName}${formData.lastName}`.toLowerCase().replace(/\s/g, "");
 
-      const response = await fetch('http://localhost:3000/api/auth/register', {
-        method: 'POST',
+      const response = await fetch("http://localhost:3000/api/auth/register", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           email: formData.email,
@@ -54,22 +54,22 @@ export default function SignUpPage() {
           firstName: formData.firstName,
           lastName: formData.lastName,
         }),
-      })
+      });
 
       if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.message || 'Registration failed')
+        const data = await response.json();
+        throw new Error(data.message || "Registration failed");
       }
 
-      const data = await response.json()
-      localStorage.setItem('token', data.access_token)
-      navigate('/dashboard')
+      const data = await response.json();
+      localStorage.setItem("token", data.access_token);
+      navigate("/dashboard");
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Registration failed')
+      setError(err instanceof Error ? err.message : "Registration failed");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div className="bg-muted/30 selection:bg-primary/10 flex min-h-screen flex-col">
@@ -89,9 +89,9 @@ export default function SignUpPage() {
           <Card className="border-border/40 shadow-primary/5 shadow-xl">
             <CardHeader className="space-y-1">
               <CardTitle className="text-2xl font-bold tracking-tight">
-                {t('auth.signup.title')}
+                {t("auth.signup.title")}
               </CardTitle>
-              <CardDescription>{t('auth.signup.subtitle')}</CardDescription>
+              <CardDescription>{t("auth.signup.subtitle")}</CardDescription>
             </CardHeader>
             <form onSubmit={handleSubmit}>
               <CardContent className="grid gap-4">
@@ -103,7 +103,7 @@ export default function SignUpPage() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
-                    <Label htmlFor="first-name">{t('auth.signup.firstName')}</Label>
+                    <Label htmlFor="first-name">{t("auth.signup.firstName")}</Label>
                     <Input
                       id="first-name"
                       placeholder="John"
@@ -113,7 +113,7 @@ export default function SignUpPage() {
                     />
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="last-name">{t('auth.signup.lastName')}</Label>
+                    <Label htmlFor="last-name">{t("auth.signup.lastName")}</Label>
                     <Input
                       id="last-name"
                       placeholder="Doe"
@@ -124,7 +124,7 @@ export default function SignUpPage() {
                   </div>
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="email">{t('auth.login.emailLabel')}</Label>
+                  <Label htmlFor="email">{t("auth.login.emailLabel")}</Label>
                   <Input
                     id="email"
                     type="email"
@@ -135,11 +135,11 @@ export default function SignUpPage() {
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="password">{t('auth.login.passwordLabel')}</Label>
+                  <Label htmlFor="password">{t("auth.login.passwordLabel")}</Label>
                   <Input
                     id="password"
                     type="password"
-                    placeholder={t('auth.signup.passwordPlaceholder')}
+                    placeholder={t("auth.signup.passwordPlaceholder")}
                     required
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
@@ -149,15 +149,15 @@ export default function SignUpPage() {
               <CardFooter className="mt-6 flex flex-col gap-4">
                 <Button type="submit" className="w-full" disabled={isLoading}>
                   {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  {t('auth.signup.submitButton')}
+                  {t("auth.signup.submitButton")}
                 </Button>
                 <div className="text-muted-foreground text-center text-sm">
-                  {t('auth.signup.hasAccount')}{' '}
+                  {t("auth.signup.hasAccount")}{" "}
                   <Link
                     to="/login"
                     className="text-primary font-medium underline-offset-4 hover:underline"
                   >
-                    {t('auth.signup.login')}
+                    {t("auth.signup.login")}
                   </Link>
                 </div>
               </CardFooter>
@@ -166,5 +166,5 @@ export default function SignUpPage() {
         </div>
       </main>
     </div>
-  )
+  );
 }

@@ -1,12 +1,8 @@
-import {
-  Injectable,
-  NotFoundException,
-  ConflictException,
-} from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { CreateSegmentDto } from './dto/create-segment.dto';
-import { UpdateSegmentDto } from './dto/update-segment.dto';
-import { AuditService } from '../audit/audit.service';
+import { Injectable, NotFoundException, ConflictException } from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
+import { CreateSegmentDto } from "./dto/create-segment.dto";
+import { UpdateSegmentDto } from "./dto/update-segment.dto";
+import { AuditService } from "../audit/audit.service";
 
 @Injectable()
 export class SegmentsService {
@@ -15,11 +11,7 @@ export class SegmentsService {
     private auditService: AuditService,
   ) {}
 
-  async create(
-    createSegmentDto: CreateSegmentDto,
-    projectId: string,
-    userId: string,
-  ) {
+  async create(createSegmentDto: CreateSegmentDto, projectId: string, userId: string) {
     const existing = await this.prisma.segment.findFirst({
       where: {
         projectId,
@@ -28,7 +20,7 @@ export class SegmentsService {
     });
 
     if (existing) {
-      throw new ConflictException('Segment key already exists in this project');
+      throw new ConflictException("Segment key already exists in this project");
     }
 
     const segment = await this.prisma.segment.create({
@@ -39,8 +31,8 @@ export class SegmentsService {
     });
 
     await this.auditService.log({
-      action: 'SEGMENT_CREATED',
-      entity: 'Segment',
+      action: "SEGMENT_CREATED",
+      entity: "Segment",
       entityId: segment.id,
       userId,
       payload: { name: segment.name, key: segment.key },
@@ -52,7 +44,7 @@ export class SegmentsService {
   async findAll(projectId: string) {
     return this.prisma.segment.findMany({
       where: { projectId },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
   }
 
@@ -80,9 +72,7 @@ export class SegmentsService {
       });
 
       if (existing) {
-        throw new ConflictException(
-          'Segment key already exists in this project',
-        );
+        throw new ConflictException("Segment key already exists in this project");
       }
     }
 
@@ -92,8 +82,8 @@ export class SegmentsService {
     });
 
     await this.auditService.log({
-      action: 'SEGMENT_UPDATED',
-      entity: 'Segment',
+      action: "SEGMENT_UPDATED",
+      entity: "Segment",
       entityId: id,
       userId,
       payload: updateSegmentDto,
@@ -110,13 +100,13 @@ export class SegmentsService {
     });
 
     await this.auditService.log({
-      action: 'SEGMENT_DELETED',
-      entity: 'Segment',
+      action: "SEGMENT_DELETED",
+      entity: "Segment",
       entityId: id,
       userId,
       payload: { name: segment.name, key: segment.key },
     });
 
-    return { message: 'Segment deleted successfully' };
+    return { message: "Segment deleted successfully" };
   }
 }

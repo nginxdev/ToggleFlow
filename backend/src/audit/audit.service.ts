@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { Injectable } from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
 
 @Injectable()
 export class AuditService {
@@ -27,7 +27,7 @@ export class AuditService {
   async findByEntity(entity: string, entityId: string) {
     return this.prisma.auditLog.findMany({
       where: { entity, entityId },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
   }
 
@@ -36,7 +36,7 @@ export class AuditService {
     // For now, we'll keep it simple or filter by userId/entityId if needed.
     // Given the current schema, we'd need to fetch logs for all flags/envs in a project.
     return this.prisma.auditLog.findMany({
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
       take: 100,
     });
   }
