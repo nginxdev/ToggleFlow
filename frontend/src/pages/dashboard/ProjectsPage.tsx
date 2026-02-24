@@ -257,6 +257,7 @@ export default function ProjectsPage() {
                       <Button
                         variant="ghost"
                         size="icon"
+                        className="text-destructive hover:text-destructive"
                         onClick={() => setProjectToDelete(project)}
                       >
                         <Trash2 className="h-4 w-4" />

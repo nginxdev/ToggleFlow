@@ -266,29 +266,8 @@ export default function EnvironmentsPage() {
                           )}
                         </div>
                       </div>
-                      <div className="flex shrink-0 items-center gap-1">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
-                          disabled={isDefaultEnvironment(env.key)}
-                          onClick={() => openEditDialog(env)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-destructive"
-                          disabled={isDefaultEnvironment(env.key)}
-                          onClick={() => setEnvToDelete(env)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
                     </div>
                   ))}
-                  <div className="pt-2">{CreateEnvDialog}</div>
                 </>
               )}
             </div>
@@ -368,6 +347,7 @@ export default function EnvironmentsPage() {
                               variant="ghost"
                               size="icon"
                               disabled={isDefaultEnvironment(env.key)}
+                              className="text-destructive hover:text-destructive"
                               onClick={() => setEnvToDelete(env)}
                             >
                               <Trash2 className="h-4 w-4" />

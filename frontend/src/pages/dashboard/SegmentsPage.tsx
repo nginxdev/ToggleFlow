@@ -30,14 +30,8 @@ import {
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, Users, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { Plus, Search, Users, Pencil, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { useSegmentStore } from "@/store/segmentStore";
 
 export default function SegmentsPage() {
@@ -320,28 +314,8 @@ export default function SegmentsPage() {
                       </p>
                     )}
                   </div>
-                  <div className="flex shrink-0 items-center gap-1">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8"
-                      onClick={() => handleEdit(segment)}
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 text-destructive"
-                      onClick={() => handleDelete(segment.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
                 </div>
               ))}
-              {/* Floating create at bottom of list */}
-              <div className="pt-2">{SegmentFormDialog}</div>
             </>
           )}
         </div>
@@ -408,26 +382,24 @@ export default function SegmentsPage() {
                       ))}
                     </TableCell>
                     <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => handleEdit(segment)}>
-                            <Pencil className="mr-2 h-4 w-4" />
-                            {t("common.edit")}
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            className="text-destructive"
-                            onClick={() => handleDelete(segment.id)}
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            {t("common.delete")}
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      <div className="flex items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() => handleEdit(segment)}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-destructive hover:text-destructive"
+                          onClick={() => handleDelete(segment.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))

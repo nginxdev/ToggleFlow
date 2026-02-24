@@ -579,16 +579,16 @@ export default function FlagDetailsPage() {
         <div className="pb-6 pt-2">
           {activeTab === "targeting" && (
             <div className="flex flex-col gap-4">
-              <div className="flex items-center justify-end gap-2">
+              <div className="flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-end">
                   {hasRuleChanges && (
-                    <Button variant="ghost" onClick={handleCancelRules} disabled={isSavingRules}>
+                    <Button variant="ghost" onClick={handleCancelRules} disabled={isSavingRules} className="w-full sm:w-auto">
                       {t("common.cancel")}
                     </Button>
                   )}
                   <Button
                     onClick={handleSaveRulesChanges}
                     disabled={!hasRuleChanges || isSavingRules}
-                    className="gap-2"
+                    className="w-full gap-2 sm:w-auto"
                   >
                     <span className="relative size-4 shrink-0">
                       <Check className={cn("h-4 w-4 transition-opacity", isSavingRules && "opacity-0")} />
@@ -769,12 +769,13 @@ export default function FlagDetailsPage() {
 
           {activeTab === "variations" && (
             <div className="flex flex-col gap-4">
-              <div className="flex items-center justify-end gap-2">
+              <div className="flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-end">
                   {hasVariationChanges && (
                     <Button
                       variant="ghost"
                       onClick={handleCancelVariations}
                       disabled={isSavingVariations}
+                      className="w-full sm:w-auto"
                     >
                       {t("common.cancel")}
                     </Button>
@@ -782,7 +783,7 @@ export default function FlagDetailsPage() {
                   <Button
                     onClick={handleSaveVariationsChanges}
                     disabled={!hasVariationChanges || isSavingVariations}
-                    className="gap-2"
+                    className="w-full gap-2 sm:w-auto"
                   >
                     <span className="relative size-4 shrink-0">
                       <Check className={cn("h-4 w-4 transition-opacity", isSavingVariations && "opacity-0")} />
@@ -1041,16 +1042,16 @@ export default function FlagDetailsPage() {
 
           {activeTab === "rules" && (
             <div className="flex flex-col gap-4">
-              <div className="flex items-center justify-end gap-2">
+              <div className="flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-end">
                   {hasRuleChanges && (
-                    <Button variant="ghost" onClick={handleCancelRules} disabled={isSavingRules}>
+                    <Button variant="ghost" onClick={handleCancelRules} disabled={isSavingRules} className="w-full sm:w-auto">
                       {t("common.cancel")}
                     </Button>
                   )}
                   <Button
                     onClick={handleSaveRulesChanges}
                     disabled={!hasRuleChanges || isSavingRules}
-                    className="gap-2"
+                    className="w-full gap-2 sm:w-auto"
                   >
                     <span className="relative size-4 shrink-0">
                       <Check className={cn("h-4 w-4 transition-opacity", isSavingRules && "opacity-0")} />
@@ -1280,7 +1281,7 @@ export default function FlagDetailsPage() {
                     />
                   </div>
                   <div className="flex justify-end">
-                    <Button onClick={handleSaveSettings} disabled={!hasChanges || isSaving}>
+                    <Button onClick={handleSaveSettings} disabled={!hasChanges || isSaving} className="w-full sm:w-auto">
                       <Loader2 className={cn("h-4 w-4 animate-spin", !isSaving && "invisible")} />
                       {isSaving ? t("common.saving") : t("common.save")}
                     </Button>

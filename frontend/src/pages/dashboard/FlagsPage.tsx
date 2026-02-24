@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import {
@@ -15,13 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { MoreVertical, Plus, Loader2, Flag, Archive } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Plus, Loader2, Flag, Archive } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -49,6 +43,7 @@ import type { FeatureFlag } from "@/types";
 
 export default function FlagsPage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { selectedProject } = useProjectStore();
   const { flags, loading, fetchFlags, createFlag, toggleFlag, archiveFlag } = useFlagStore();
 
@@ -213,7 +208,6 @@ export default function FlagsPage() {
             flags.map((flag) => {
               const ps = flag.flagStates?.find((s) => s.environment.key === "production");
               const isEnabled = ps?.isEnabled || false;
-              const toggleKey = `${flag.id}-${ps?.environmentId}`;
               return (
                 <Link
                   key={flag.id}
@@ -233,23 +227,15 @@ export default function FlagsPage() {
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-medium">{flag.name}</p>
                     <p className="text-muted-foreground truncate font-mono text-xs">{flag.key}</p>
-                  </div>
-                  <div className="flex shrink-0 items-center gap-2">
-                    <Switch
-                      checked={isEnabled}
-                      disabled={togglingFlags.has(toggleKey)}
-                      onCheckedChange={(checked) => {
-                        // prevent card click
-                        if (ps) handleToggleFlag(flag.id, ps.environmentId, !checked);
-                      }}
-                      onClick={(e) => e.stopPropagation()}
-                    />
-                    <Loader2
-                      className={cn(
-                        "text-muted-foreground h-3.5 w-3.5 animate-spin",
-                        !togglingFlags.has(toggleKey) && "invisible",
-                      )}
-                    />
+                    <div className="mt-1 flex flex-wrap gap-1.5">
+                      <Badge variant="secondary" className="text-xs">{flag.type}</Badge>
+                      <Badge
+                        variant={isEnabled ? "default" : "outline"}
+                        className={cn("text-xs", isEnabled && "bg-primary")}
+                      >
+                        {isEnabled ? t("flags.enabled") : t("flags.disabled")}
+                      </Badge>
+                    </div>
                   </div>
                 </Link>
               );
@@ -286,12 +272,12 @@ export default function FlagsPage() {
                   const isEnabled = ps?.isEnabled || false;
                   const toggleKey = `${flag.id}-${ps?.environmentId}`;
                   return (
-                    <TableRow key={flag.id}>
-                      <TableCell className="font-medium">
-                        <Link to={`/dashboard/flags/${flag.id}`} className="hover:underline">
-                          {flag.name}
-                        </Link>
-                      </TableCell>
+                    <TableRow
+                      key={flag.id}
+                      className="cursor-pointer"
+                      onClick={() => navigate(`/dashboard/flags/${flag.id}`)}
+                    >
+                      <TableCell className="font-medium">{flag.name}</TableCell>
                       <TableCell className="text-muted-foreground font-mono text-sm">
                         {flag.key}
                       </TableCell>
@@ -306,6 +292,7 @@ export default function FlagsPage() {
                             onCheckedChange={() =>
                               ps && handleToggleFlag(flag.id, ps.environmentId, isEnabled)
                             }
+                            onClick={(e) => e.stopPropagation()}
                           />
                           <span
                             className={cn(
@@ -323,27 +310,15 @@ export default function FlagsPage() {
                           />
                         </div>
                       </TableCell>
-                      <TableCell className="text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem asChild>
-                              <Link to={`/dashboard/flags/${flag.id}`}>
-                                {t("common.viewDetails")}
-                              </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              className="text-destructive"
-                              onClick={() => setFlagToArchive(flag)}
-                            >
-                              {t("flags.archive")}
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                      <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setFlagToArchive(flag)}
+                          title={t("flags.archive")}
+                        >
+                          <Archive className="h-4 w-4" />
+                        </Button>
                       </TableCell>
                     </TableRow>
                   );

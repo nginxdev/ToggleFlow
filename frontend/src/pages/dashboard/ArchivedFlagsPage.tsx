@@ -14,13 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, Flag, History, Trash2, ArrowLeft, MoreVertical } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Loader2, Flag, History, Trash2, ArrowLeft } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -127,31 +121,6 @@ export default function ArchivedFlagsPage() {
                   <p className="text-muted-foreground truncate font-mono text-xs">{flag.key}</p>
                   <Badge variant="secondary" className="mt-1 text-xs">{flag.type}</Badge>
                 </div>
-                <div className="flex shrink-0 items-center gap-1">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={isRestoring === flag.id}
-                    onClick={() => handleRestore(flag.id)}
-                    className="h-8 px-2 text-xs"
-                  >
-                    <span className="relative mr-1 size-3.5 shrink-0">
-                      <History className={cn("h-3.5 w-3.5 transition-opacity", isRestoring === flag.id && "opacity-0")} />
-                      <Loader2 className={cn("absolute inset-0 h-3.5 w-3.5 animate-spin transition-opacity", isRestoring !== flag.id && "opacity-0")} />
-                    </span>
-                    {t("flagDetails.settings.restoreFlag")}
-                  </Button>
-                  {isSuperUser && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 text-destructive"
-                      onClick={() => setFlagToDelete(flag)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
               </div>
             ))
           )}
@@ -206,22 +175,14 @@ export default function ArchivedFlagsPage() {
                           {t("flagDetails.settings.restoreFlag")}
                         </Button>
                         {isSuperUser && (
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon">
-                                <MoreVertical className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem
-                                className="text-destructive font-semibold"
-                                onClick={() => setFlagToDelete(flag)}
-                              >
-                                <Trash2 className="mr-2 h-4 w-4" />
-                                {t("common.delete")}
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-destructive hover:text-destructive"
+                            onClick={() => setFlagToDelete(flag)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
                         )}
                       </div>
                     </TableCell>

@@ -167,7 +167,7 @@ export default function SettingsPage() {
                   value={formData.language}
                   onValueChange={(value) => setFormData({ ...formData, language: value })}
                 >
-                  <SelectTrigger id="language">
+                  <SelectTrigger id="language" className="w-full">
                     <SelectValue placeholder="Select Language" />
                   </SelectTrigger>
                   <SelectContent>
