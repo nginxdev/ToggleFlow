@@ -207,6 +207,8 @@ export default function EnvironmentsPage() {
           <>
             {/* ── MOBILE: card list (hidden sm+) ── */}
             <div className="flex flex-col gap-3 sm:hidden">
+              {/* Mobile Add button – always at top */}
+              <div className="sm:hidden">{CreateEnvDialog}</div>
               {environments.length === 0 ? (
                 <div className="flex flex-col items-center gap-3 py-16 text-center">
                   <Layers className="text-muted-foreground h-14 w-14" />
@@ -214,7 +216,6 @@ export default function EnvironmentsPage() {
                   <p className="text-muted-foreground max-w-xs text-sm">
                     {t("environments.noEnvironmentsDesc")}
                   </p>
-                  {CreateEnvDialog}
                 </div>
               ) : (
                 <>
@@ -369,10 +370,6 @@ export default function EnvironmentsPage() {
           </>
         )}
 
-        <div className="bg-muted/50 rounded-lg border p-4">
-          <h3 className="mb-2 font-semibold">{t("environments.infoTitle")}</h3>
-          <p className="text-muted-foreground text-sm">{t("environments.infoDesc")}</p>
-        </div>
       </div>
 
       {/* Mobile env detail dialog */}

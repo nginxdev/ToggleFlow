@@ -169,6 +169,8 @@ export default function ProjectsPage() {
 
         {/* ── MOBILE: card list (hidden sm+) ── */}
         <div className="flex flex-col gap-3 sm:hidden">
+          {/* Mobile Add button – always at top */}
+          <div>{CreateProjectDialog}</div>
           {projects.length === 0 ? (
             <div className="flex flex-col items-center gap-3 py-16 text-center">
               <Folder className="text-muted-foreground h-14 w-14" />
@@ -176,7 +178,6 @@ export default function ProjectsPage() {
               <p className="text-muted-foreground max-w-xs text-sm">
                 {t("projects.noProjectsDesc")}
               </p>
-              {CreateProjectDialog}
             </div>
           ) : (
             <>
@@ -213,7 +214,6 @@ export default function ProjectsPage() {
                   <ChevronRight className="text-muted-foreground h-4 w-4 shrink-0" />
                 </button>
               ))}
-              <div className="pt-2">{CreateProjectDialog}</div>
             </>
           )}
         </div>
@@ -276,10 +276,6 @@ export default function ProjectsPage() {
           </div>
         )}
 
-        <div className="bg-muted/50 rounded-lg border p-4">
-          <h3 className="mb-2 font-semibold">{t("projects.infoTitle")}</h3>
-          <p className="text-muted-foreground text-sm">{t("projects.infoDesc")}</p>
-        </div>
       </div>
 
       {/* Delete confirm */}

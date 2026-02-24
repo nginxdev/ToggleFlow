@@ -194,14 +194,14 @@ export default function FlagsPage() {
         {/* ── MOBILE: card list (hidden sm+) ── */}
         <div className="flex flex-col gap-3 sm:hidden">
           {/* Mobile action bar */}
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" className="flex-1" asChild>
+          <div className="flex flex-col gap-2">
+            <div className="w-full">{CreateFlagDialog}</div>
+            <Button variant="outline" size="sm" className="w-full" asChild>
               <Link to="/dashboard/flags/archived">
                 <Archive className="mr-2 h-4 w-4" />
                 {t("flags.viewArchived")}
               </Link>
             </Button>
-            <div className="flex-1">{CreateFlagDialog}</div>
           </div>
 
           {flags.length === 0 ? (
@@ -359,10 +359,6 @@ export default function FlagsPage() {
           </div>
         )}
 
-        <div className="bg-muted/50 rounded-lg border p-4">
-          <h3 className="mb-2 font-semibold">{t("flags.infoTitle")}</h3>
-          <p className="text-muted-foreground text-sm">{t("flags.infoDesc")}</p>
-        </div>
       </div>
 
       {/* Archive confirm */}

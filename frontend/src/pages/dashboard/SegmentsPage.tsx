@@ -263,15 +263,18 @@ export default function SegmentsPage() {
           <div className="hidden sm:block">{SegmentFormDialog}</div>
         </div>
 
-        {/* Search */}
-        <div className="relative">
-          <Search className="text-muted-foreground absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
-          <Input
-            placeholder={t("segments.searchPlaceholder")}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9"
-          />
+        {/* Search + Add (mobile: Add on top, full-width; desktop: just search bar) */}
+        <div className="flex flex-col gap-2 sm:block">
+          <div className="sm:hidden">{SegmentFormDialog}</div>
+          <div className="relative">
+            <Search className="text-muted-foreground absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
+            <Input
+              placeholder={t("segments.searchPlaceholder")}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-9"
+            />
+          </div>
         </div>
 
         {/* ── MOBILE: card list (hidden sm+) ── */}
@@ -284,7 +287,6 @@ export default function SegmentsPage() {
             <div className="flex flex-col items-center gap-3 py-16 text-center">
               <Users className="text-muted-foreground h-12 w-12" />
               <p className="text-muted-foreground text-sm">{t("segments.noSegments")}</p>
-              {SegmentFormDialog}
             </div>
           ) : (
             <>
