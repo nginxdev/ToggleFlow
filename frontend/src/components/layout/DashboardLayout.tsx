@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
@@ -14,6 +14,8 @@ import {
   User,
   LogOut,
   Folder,
+  Menu,
+  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -36,12 +38,14 @@ interface SidebarItemProps {
   label: string;
   href: string;
   active?: boolean;
+  onNavigate?: () => void;
 }
 
-function SidebarItem({ icon, label, href, active }: SidebarItemProps) {
+function SidebarItem({ icon, label, href, active, onNavigate }: SidebarItemProps) {
   return (
     <Link
       to={href}
+      onClick={onNavigate}
       className={cn(
         "group flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors",
         active
@@ -66,6 +70,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const location = useLocation();
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const { projects, selectedProject, loading, fetchProjects } = useProjectStore();
 
@@ -105,9 +110,23 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="bg-background text-foreground flex min-h-screen">
+      {/* Mobile overlay backdrop */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 z-30 bg-black/40 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="border-border bg-card fixed top-0 left-0 z-40 h-screen w-64 border-r transition-transform lg:translate-x-0">
-        <div className="border-border flex h-16 items-center border-b px-6">
+      <aside
+        className={cn(
+          "border-border bg-card fixed top-0 left-0 z-40 h-screen w-64 border-r transition-transform duration-300",
+          sidebarOpen ? "translate-x-0" : "-translate-x-full",
+          "lg:translate-x-0",
+        )}
+      >
+        <div className="border-border flex h-16 items-center justify-between border-b px-6">
           <Link
             to="/"
             className="text-primary flex items-center gap-2 text-xl font-bold tracking-tighter"
@@ -115,6 +134,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <Zap className="fill-primary h-5 w-5" />
             <span>ToggleFlow</span>
           </Link>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            className="lg:hidden"
+            onClick={() => setSidebarOpen(false)}
+          >
+            <X className="h-4 w-4" />
+          </Button>
         </div>
         <div className="flex h-[calc(100vh-64px)] flex-col justify-between py-4">
           <nav className="space-y-1 px-3">
@@ -125,6 +152,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 label={item.label}
                 href={item.href}
                 active={location.pathname === item.href}
+                onNavigate={() => setSidebarOpen(false)}
               />
             ))}
           </nav>
@@ -151,16 +179,28 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* Main Content */}
       <div className="flex flex-1 flex-col lg:pl-64">
         {/* Top Header */}
-        <header className="border-border bg-background/80 sticky top-0 z-30 flex h-16 items-center justify-between border-b px-4 backdrop-blur-md sm:px-8">
-          <div className="flex items-center gap-4">
+        <header className="border-border bg-background/80 sticky top-0 z-30 flex h-16 items-center justify-between border-b px-4 backdrop-blur-md sm:px-6">
+          <div className="flex items-center gap-2 sm:gap-4">
+            {/* Mobile hamburger */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="lg:hidden"
+              onClick={() => setSidebarOpen(true)}
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
+
             {/* Project Selector */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="flex items-center gap-2 font-semibold">
-                  {loading
-                    ? t("common.loading")
-                    : selectedProject?.name || t("common.selectProject")}
-                  <ChevronDown className="h-4 w-4 opacity-50" />
+                <Button variant="ghost" className="flex items-center gap-2 font-semibold max-w-[140px] sm:max-w-none truncate">
+                  <span className="truncate">
+                    {loading
+                      ? t("common.loading")
+                      : selectedProject?.name || t("common.selectProject")}
+                  </span>
+                  <ChevronDown className="h-4 w-4 opacity-50 shrink-0" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-56">
@@ -181,24 +221,26 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <Separator orientation="vertical" className="h-6" />
+            <Separator orientation="vertical" className="h-6 hidden sm:block" />
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-3">
             <div className="relative hidden md:block">
               <Search className="text-muted-foreground absolute top-2.5 left-2.5 h-4 w-4" />
               <Input
                 type="search"
                 placeholder={t("common.search")}
-                className="w-[200px] pl-8 lg:w-[300px]"
+                className="w-[180px] pl-8 lg:w-[280px]"
               />
             </div>
 
             <ModeToggle />
 
-            <LanguageSelector />
+            <div className="hidden sm:block">
+              <LanguageSelector />
+            </div>
 
-            <Button variant="ghost" size="icon" className="relative">
+            <Button variant="ghost" size="icon" className="relative hidden sm:flex">
               <Bell className="h-5 w-5" />
               <span className="bg-primary absolute top-2 right-2 h-2 w-2 rounded-full" />
             </Button>
@@ -219,6 +261,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <DropdownMenuItem>{t("auth.profile")}</DropdownMenuItem>
                 <DropdownMenuItem>{t("auth.apiKeys")}</DropdownMenuItem>
                 <DropdownMenuItem>{t("auth.teams")}</DropdownMenuItem>
+                {/* Bell + Lang accessible on mobile via user menu on very small screens */}
+                <DropdownMenuSeparator className="sm:hidden" />
+                <DropdownMenuItem className="sm:hidden">
+                  <Bell className="mr-2 h-4 w-4" />
+                  {t("nav.notifications") || "Notifications"}
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout} className="text-destructive">
                   <LogOut className="mr-2 h-4 w-4" />
@@ -229,7 +277,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
         </header>
 
-        <main className="flex-1 p-4 sm:p-8">{children}</main>
+        <main className="flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
       </div>
     </div>
   );

@@ -29,7 +29,9 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, Search, Users, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Plus, Search, Users, MoreHorizontal, Pencil, Trash2, ChevronRight } from "lucide-react";
+import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -45,6 +47,7 @@ export default function SegmentsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingSegment, setEditingSegment] = useState<any>(null);
+  const [selectedSegment, setSelectedSegment] = useState<any>(null);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -55,7 +58,6 @@ export default function SegmentsPage() {
     value: "",
   });
 
-  // Mock project ID for now - should come from context/store
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const projectId = user.lastProjectId;
 
@@ -65,14 +67,13 @@ export default function SegmentsPage() {
     }
   }, [projectId, fetchSegments]);
 
-  const generateKey = (name: string) => {
-    return name
+  const generateKey = (name: string) =>
+    name
       .replace(/(?:^\w|[A-Z]|\b\w)/g, (word, index) =>
         index === 0 ? word.toLowerCase() : word.toUpperCase(),
       )
       .replace(/\s+/g, "")
       .replace(/[^a-zA-Z0-9]+/g, "");
-  };
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name = e.target.value;
@@ -85,19 +86,12 @@ export default function SegmentsPage() {
 
   const handleSubmit = async () => {
     if (!projectId) return;
-
     try {
       const values = formData.value
         .split(",")
         .map((v) => v.trim())
         .filter((v) => v);
-      const rules = [
-        {
-          attribute: formData.attribute,
-          operator: formData.operator,
-          value: values,
-        },
-      ];
+      const rules = [{ attribute: formData.attribute, operator: formData.operator, value: values }];
 
       if (editingSegment) {
         await updateSegment(editingSegment.id, {
@@ -122,10 +116,8 @@ export default function SegmentsPage() {
 
   const handleEdit = (segment: any) => {
     setEditingSegment(segment);
-    // Extract first rule for simple edit form
     const rule = segment.rules?.[0] || { attribute: "", operator: "IS_IN", value: [] };
     const valueStr = Array.isArray(rule.value) ? rule.value.join(", ") : rule.value;
-
     setFormData({
       name: segment.name,
       key: segment.key,
@@ -144,14 +136,7 @@ export default function SegmentsPage() {
   };
 
   const resetForm = () => {
-    setFormData({
-      name: "",
-      key: "",
-      description: "",
-      attribute: "",
-      operator: "IS_IN",
-      value: "",
-    });
+    setFormData({ name: "", key: "", description: "", attribute: "", operator: "IS_IN", value: "" });
     setEditingSegment(null);
   };
 
@@ -161,150 +146,216 @@ export default function SegmentsPage() {
       s.key.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
-  return (
-    <DashboardLayout>
-      <div className="flex flex-col gap-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">{t("segments.title")}</h1>
-            <p className="text-muted-foreground mt-2">{t("segments.descHelper")}</p>
-          </div>
-          <Dialog
-            open={isDialogOpen}
-            onOpenChange={(open) => {
-              setIsDialogOpen(open);
-              if (!open) resetForm();
-            }}
-          >
-            <DialogTrigger asChild>
-              <Button className="gap-2">
-                <Plus className="h-4 w-4" />
-                {t("segments.create")}
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>
-                  {editingSegment ? t("segments.edit") : t("segments.create")}
-                </DialogTitle>
-                <DialogDescription>{t("segments.defineGroup")}</DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="name">{t("flags.name")}</Label>
-                  <Input
-                    id="name"
-                    value={formData.name}
-                    onChange={handleNameChange}
-                    placeholder="e.g. Beta Users"
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="key">{t("flags.key")}</Label>
-                  <Input
-                    id="key"
-                    value={formData.key}
-                    disabled={!!editingSegment}
-                    onChange={(e) => setFormData({ ...formData, key: e.target.value })}
-                    className="font-mono bg-muted"
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="description">{t("flags.description")}</Label>
-                  <Textarea
-                    id="description"
-                    value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  />
-                </div>
-
-                <div className="border-t pt-4 mt-2">
-                  <h4 className="font-medium mb-3 text-sm">{t("segments.targetingRule")}</h4>
-                  <div className="grid gap-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="grid gap-2">
-                        <Label htmlFor="attribute">{t("segments.attribute")}</Label>
-                        <Input
-                          id="attribute"
-                          value={formData.attribute}
-                          onChange={(e) => setFormData({ ...formData, attribute: e.target.value })}
-                          placeholder={t("segments.attributePlaceholder")}
-                        />
-                      </div>
-                      <div className="grid gap-2">
-                        <Label htmlFor="operator">{t("segments.operator")}</Label>
-                        <Select
-                          value={formData.operator}
-                          onValueChange={(val) => setFormData({ ...formData, operator: val })}
-                        >
-                          <SelectTrigger className="w-full">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="IS_IN">{t("segments.isIn")}</SelectItem>
-                            <SelectItem value="IS_NOT_IN">{t("segments.isNotIn")}</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                    <div className="grid gap-2">
-                      <Label htmlFor="value">{t("segments.values")}</Label>
-                      <Textarea
-                        id="value"
-                        value={formData.value}
-                        onChange={(e) => setFormData({ ...formData, value: e.target.value })}
-                        placeholder={t("segments.valuesPlaceholder")}
-                        className="min-h-[80px]"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-                  {t("common.cancel")}
-                </Button>
-                <Button onClick={handleSubmit}>
-                  {editingSegment ? t("common.save") : t("segments.create")}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        </div>
-
-        <div className="flex items-center gap-4">
-          <div className="bg-background relative flex-1">
-            <Search className="text-muted-foreground absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
+  /** Shared create/edit dialog form */
+  const SegmentFormDialog = (
+    <Dialog
+      open={isDialogOpen}
+      onOpenChange={(open) => {
+        setIsDialogOpen(open);
+        if (!open) resetForm();
+      }}
+    >
+      <DialogTrigger asChild>
+        <Button className="w-full gap-2 sm:w-auto">
+          <Plus className="h-4 w-4" />
+          {t("segments.create")}
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="max-h-[90dvh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>{editingSegment ? t("segments.edit") : t("segments.create")}</DialogTitle>
+          <DialogDescription>{t("segments.defineGroup")}</DialogDescription>
+        </DialogHeader>
+        <div className="grid gap-4 py-2">
+          <div className="grid gap-2">
+            <Label htmlFor="seg-name">{t("flags.name")}</Label>
             <Input
-              placeholder={t("segments.searchPlaceholder")}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9"
+              id="seg-name"
+              value={formData.name}
+              onChange={handleNameChange}
+              placeholder="e.g. Beta Users"
             />
           </div>
+          <div className="grid gap-2">
+            <Label htmlFor="seg-key">{t("flags.key")}</Label>
+            <Input
+              id="seg-key"
+              value={formData.key}
+              disabled={!!editingSegment}
+              onChange={(e) => setFormData({ ...formData, key: e.target.value })}
+              className="bg-muted font-mono"
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="seg-desc">{t("flags.description")}</Label>
+            <Textarea
+              id="seg-desc"
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              rows={2}
+            />
+          </div>
+          <div className="mt-2 border-t pt-4">
+            <h4 className="mb-3 text-sm font-medium">{t("segments.targetingRule")}</h4>
+            <div className="grid gap-4">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="grid gap-2">
+                  <Label htmlFor="seg-attr">{t("segments.attribute")}</Label>
+                  <Input
+                    id="seg-attr"
+                    value={formData.attribute}
+                    onChange={(e) => setFormData({ ...formData, attribute: e.target.value })}
+                    placeholder={t("segments.attributePlaceholder")}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="seg-op">{t("segments.operator")}</Label>
+                  <Select
+                    value={formData.operator}
+                    onValueChange={(val) => setFormData({ ...formData, operator: val })}
+                  >
+                    <SelectTrigger id="seg-op" className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="IS_IN">{t("segments.isIn")}</SelectItem>
+                      <SelectItem value="IS_NOT_IN">{t("segments.isNotIn")}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="seg-val">{t("segments.values")}</Label>
+                <Textarea
+                  id="seg-val"
+                  value={formData.value}
+                  onChange={(e) => setFormData({ ...formData, value: e.target.value })}
+                  placeholder={t("segments.valuesPlaceholder")}
+                  rows={3}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <DialogFooter className="gap-2 sm:gap-0">
+          <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+            {t("common.cancel")}
+          </Button>
+          <Button onClick={handleSubmit}>
+            {editingSegment ? t("common.save") : t("segments.create")}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+
+  return (
+    <DashboardLayout>
+      <div className="flex flex-col gap-4 p-4 sm:gap-6 sm:p-6">
+        {/* Header */}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+              {t("segments.title")}
+            </h1>
+            <p className="text-muted-foreground mt-1 text-sm">{t("segments.descHelper")}</p>
+          </div>
+          <div className="hidden sm:block">{SegmentFormDialog}</div>
         </div>
 
-        <div className="border-border bg-card rounded-lg border shadow-sm">
+        {/* Search */}
+        <div className="relative">
+          <Search className="text-muted-foreground absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
+          <Input
+            placeholder={t("segments.searchPlaceholder")}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-9"
+          />
+        </div>
+
+        {/* ── MOBILE: card list (hidden sm+) ── */}
+        <div className="flex flex-col gap-3 sm:hidden">
+          {loading ? (
+            <div className="text-muted-foreground py-12 text-center text-sm">
+              {t("common.loading")}
+            </div>
+          ) : filteredSegments.length === 0 ? (
+            <div className="flex flex-col items-center gap-3 py-16 text-center">
+              <Users className="text-muted-foreground h-12 w-12" />
+              <p className="text-muted-foreground text-sm">{t("segments.noSegments")}</p>
+              {SegmentFormDialog}
+            </div>
+          ) : (
+            <>
+              {filteredSegments.map((segment) => (
+                <button
+                  key={segment.id}
+                  type="button"
+                  onClick={() => setSelectedSegment(segment)}
+                  className={cn(
+                    "bg-card border-border flex w-full items-center gap-3 rounded-lg border p-4 text-left shadow-sm",
+                    "active:bg-muted transition-colors",
+                  )}
+                >
+                  <div className="bg-muted flex h-9 w-9 shrink-0 items-center justify-center rounded-full">
+                    <Users className="text-muted-foreground h-4 w-4" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-medium">{segment.name}</p>
+                    <p className="text-muted-foreground truncate font-mono text-xs">
+                      {segment.key}
+                    </p>
+                    {segment.rules?.[0] && (
+                      <p className="text-muted-foreground mt-0.5 truncate text-xs">
+                        <span className="text-primary font-mono">
+                          {segment.rules[0].attribute}
+                        </span>
+                        {" "}
+                        {segment.rules[0].operator === "IS_NOT_IN"
+                          ? t("segments.isNotIn")
+                          : t("segments.isIn")}
+                        {" "}
+                        {t("segments.valuesCount", {
+                          count: Array.isArray(segment.rules[0].value)
+                            ? segment.rules[0].value.length
+                            : 1,
+                        })}
+                      </p>
+                    )}
+                  </div>
+                  <ChevronRight className="text-muted-foreground h-4 w-4 shrink-0" />
+                </button>
+              ))}
+              {/* Floating create at bottom of list */}
+              <div className="pt-2">{SegmentFormDialog}</div>
+            </>
+          )}
+        </div>
+
+        {/* ── DESKTOP: table (hidden below sm) ── */}
+        <div className="border-border bg-card hidden rounded-lg border shadow-sm sm:block">
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>{t("flags.name")}</TableHead>
                 <TableHead>{t("flags.key")}</TableHead>
                 <TableHead>{t("segments.targetingRule")}</TableHead>
-                <TableHead className="w-[100px]"></TableHead>
+                <TableHead className="w-[56px]" />
               </TableRow>
             </TableHeader>
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={4} className="text-muted-foreground py-10 text-center">
                     {t("common.loading")}
                   </TableCell>
                 </TableRow>
               ) : filteredSegments.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
-                    {t("segments.noSegments")}
+                  <TableCell colSpan={4} className="py-16 text-center">
+                    <Users className="text-muted-foreground mx-auto mb-3 h-10 w-10" />
+                    <p className="text-muted-foreground text-sm">{t("segments.noSegments")}</p>
                   </TableCell>
                 </TableRow>
               ) : (
@@ -312,32 +363,34 @@ export default function SegmentsPage() {
                   <TableRow key={segment.id}>
                     <TableCell className="font-medium">
                       <div className="flex items-center gap-2">
-                        <Users className="h-4 w-4 text-muted-foreground" />
-                        {segment.name}
-                      </div>
-                      {segment.description && (
-                        <div className="text-muted-foreground text-xs mt-0.5 max-w-[300px] truncate">
-                          {segment.description}
+                        <Users className="text-muted-foreground h-4 w-4 shrink-0" />
+                        <div>
+                          <p>{segment.name}</p>
+                          {segment.description && (
+                            <p className="text-muted-foreground max-w-xs truncate text-xs">
+                              {segment.description}
+                            </p>
+                          )}
                         </div>
-                      )}
+                      </div>
                     </TableCell>
                     <TableCell>
-                      <code className="bg-muted px-2 py-1 rounded text-sm">{segment.key}</code>
+                      <code className="bg-muted rounded px-2 py-1 text-sm">{segment.key}</code>
                     </TableCell>
                     <TableCell>
                       {segment.rules?.map((rule: any, i: number) => (
                         <div key={i} className="text-sm">
                           <code className="text-primary">{rule.attribute}</code>
-                          <span className="mx-1 text-muted-foreground">
+                          <span className="text-muted-foreground mx-1">
                             {rule.operator === "IS_NOT_IN"
                               ? t("segments.isNotIn")
                               : t("segments.isIn")}
                           </span>
-                          <span className="font-medium">
+                          <Badge variant="secondary" className="text-xs">
                             {t("segments.valuesCount", {
                               count: Array.isArray(rule.value) ? rule.value.length : 1,
                             })}
-                          </span>
+                          </Badge>
                         </div>
                       ))}
                     </TableCell>
@@ -370,6 +423,80 @@ export default function SegmentsPage() {
           </Table>
         </div>
       </div>
+
+      {/* Mobile segment detail sheet */}
+      <Dialog open={!!selectedSegment} onOpenChange={(open) => !open && setSelectedSegment(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              <span className="flex items-center gap-2">
+                <Users className="text-muted-foreground h-5 w-5" />
+                {selectedSegment?.name}
+              </span>
+            </DialogTitle>
+            <DialogDescription>
+              <code className="bg-muted rounded px-1.5 py-0.5 font-mono text-xs">
+                {selectedSegment?.key}
+              </code>
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-1">
+            {selectedSegment?.description && (
+              <p className="text-muted-foreground border-b pb-4 text-sm">
+                {selectedSegment.description}
+              </p>
+            )}
+            {selectedSegment?.rules?.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
+                  {t("segments.targetingRule")}
+                </p>
+                {selectedSegment.rules.map((rule: any, i: number) => (
+                  <div
+                    key={i}
+                    className="bg-muted/50 flex flex-wrap items-center gap-1.5 rounded-md p-3 text-sm"
+                  >
+                    <code className="text-primary font-mono font-semibold">{rule.attribute}</code>
+                    <Badge variant="outline" className="text-xs">
+                      {rule.operator === "IS_NOT_IN" ? t("segments.isNotIn") : t("segments.isIn")}
+                    </Badge>
+                    <Badge variant="secondary" className="text-xs">
+                      {t("segments.valuesCount", {
+                        count: Array.isArray(rule.value) ? rule.value.length : 1,
+                      })}
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <DialogFooter className="flex-col gap-2">
+            <Button
+              className="w-full"
+              onClick={() => {
+                handleEdit(selectedSegment);
+                setSelectedSegment(null);
+              }}
+            >
+              <Pencil className="mr-2 h-4 w-4" />
+              {t("common.edit")}
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full text-destructive hover:text-destructive"
+              onClick={() => {
+                handleDelete(selectedSegment.id);
+                setSelectedSegment(null);
+              }}
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              {t("common.delete")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 }

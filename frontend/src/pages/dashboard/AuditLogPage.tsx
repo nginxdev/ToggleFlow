@@ -6,11 +6,11 @@ export default function AuditLogPage() {
   const { t } = useTranslation();
   return (
     <DashboardLayout>
-      <div className="flex flex-col gap-6 p-6">
+      <div className="flex flex-col gap-6 p-4 sm:p-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">{t("auditLog.title")}</h1>
+            <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{t("auditLog.title")}</h1>
             <p className="text-muted-foreground mt-1">{t("auditLog.subtitle")}</p>
           </div>
         </div>

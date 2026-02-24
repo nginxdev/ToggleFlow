@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useTranslation, Trans } from "react-i18next";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
-import { Plus, Folder, Trash2, Loader2 } from "lucide-react";
+import { Plus, Folder, Trash2, Loader2, ChevronRight } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -44,22 +44,15 @@ export default function ProjectsPage() {
   const { projects, loading, fetchProjects, createProject, deleteProject } = useProjectStore();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
-  const [newProject, setNewProject] = useState({
-    name: "",
-    key: "",
-    description: "",
-  });
-
+  const [newProject, setNewProject] = useState({ name: "", key: "", description: "" });
   const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
+  const [detailProject, setDetailProject] = useState<Project | null>(null);
   const [deleteConfirmation, setDeleteConfirmation] = useState("");
 
-  useEffect(() => {
-    fetchProjects();
-  }, [fetchProjects]);
+  useEffect(() => { fetchProjects(); }, [fetchProjects]);
 
   const handleCreateProject = async () => {
     if (!newProject.name || !newProject.key) return;
-
     setIsCreating(true);
     try {
       await createProject({
@@ -67,11 +60,10 @@ export default function ProjectsPage() {
         key: newProject.key,
         description: newProject.description || undefined,
       });
-
       setIsCreateDialogOpen(false);
       setNewProject({ name: "", key: "", description: "" });
     } catch (error) {
-      console.error("Failed to create project:", error);
+      console.error(error);
       alert("Failed to create project. Key might already exist.");
     } finally {
       setIsCreating(false);
@@ -80,23 +72,17 @@ export default function ProjectsPage() {
 
   const confirmDeleteProject = async () => {
     if (!projectToDelete) return;
-
     try {
       await deleteProject(projectToDelete.id);
       setProjectToDelete(null);
     } catch (error) {
-      console.error("Failed to delete project:", error);
+      console.error(error);
       alert("Failed to delete project.");
     }
   };
 
-  const handleNameChange = (name: string) => {
-    setNewProject({
-      ...newProject,
-      name,
-      key: toCamelCase(name),
-    });
-  };
+  const handleNameChange = (name: string) =>
+    setNewProject({ ...newProject, name, key: toCamelCase(name) });
 
   if (loading) {
     return (
@@ -108,76 +94,133 @@ export default function ProjectsPage() {
     );
   }
 
+  const CreateProjectDialog = (
+    <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+      <DialogTrigger asChild>
+        <Button size="sm" className="w-full sm:w-auto">
+          <Plus className="mr-2 h-4 w-4" />
+          {t("projects.newProject")}
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{t("projects.createNew")}</DialogTitle>
+          <DialogDescription>{t("projects.createDesc")}</DialogDescription>
+        </DialogHeader>
+        <div className="grid gap-4 py-4">
+          <div className="grid gap-2">
+            <Label htmlFor="proj-name">{t("projects.projectName")}</Label>
+            <Input
+              id="proj-name"
+              placeholder={t("projects.namePlaceholder")}
+              value={newProject.name}
+              onChange={(e) => handleNameChange(e.target.value)}
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="proj-key">{t("projects.projectKey")}</Label>
+            <Input
+              id="proj-key"
+              placeholder={t("projects.keyPlaceholder")}
+              value={newProject.key}
+              onChange={(e) => setNewProject({ ...newProject, key: e.target.value })}
+              className="bg-muted font-mono"
+            />
+            <p className="text-muted-foreground text-xs">{t("projects.keyHint")}</p>
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="proj-desc">{t("projects.description")}</Label>
+            <Textarea
+              id="proj-desc"
+              placeholder={t("projects.descPlaceholder")}
+              value={newProject.description}
+              onChange={(e) => setNewProject({ ...newProject, description: e.target.value })}
+              rows={3}
+            />
+          </div>
+        </div>
+        <DialogFooter className="gap-2 sm:gap-0">
+          <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
+            {t("common.cancel")}
+          </Button>
+          <Button
+            onClick={handleCreateProject}
+            disabled={!newProject.name || !newProject.key || isCreating}
+          >
+            <Loader2 className={cn("h-4 w-4 animate-spin", !isCreating && "invisible")} />
+            {isCreating ? t("common.creating") : t("projects.createNew")}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+
   return (
     <DashboardLayout>
-      <div className="flex flex-col gap-6 p-6">
+      <div className="flex flex-col gap-4 p-4 sm:gap-6 sm:p-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">{t("projects.title")}</h1>
-            <p className="text-muted-foreground mt-1">{t("projects.subtitle")}</p>
+            <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{t("projects.title")}</h1>
+            <p className="text-muted-foreground mt-1 text-sm">{t("projects.subtitle")}</p>
           </div>
-          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-            <DialogTrigger asChild>
-              <Button size="sm">
-                <Plus className="mr-2 h-4 w-4" />
-                {t("projects.newProject")}
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>{t("projects.createNew")}</DialogTitle>
-                <DialogDescription>{t("projects.createDesc")}</DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="name">{t("projects.projectName")}</Label>
-                  <Input
-                    id="name"
-                    placeholder={t("projects.namePlaceholder")}
-                    value={newProject.name}
-                    onChange={(e) => handleNameChange(e.target.value)}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="key">{t("projects.projectKey")}</Label>
-                  <Input
-                    id="key"
-                    placeholder={t("projects.keyPlaceholder")}
-                    value={newProject.key}
-                    onChange={(e) => setNewProject({ ...newProject, key: e.target.value })}
-                  />
-                  <p className="text-muted-foreground text-xs">{t("projects.keyHint")}</p>
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="description">{t("projects.description")}</Label>
-                  <Textarea
-                    id="description"
-                    placeholder={t("projects.descPlaceholder")}
-                    value={newProject.description}
-                    onChange={(e) => setNewProject({ ...newProject, description: e.target.value })}
-                  />
-                </div>
-              </div>
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
-                  {t("common.cancel")}
-                </Button>
-                <Button
-                  onClick={handleCreateProject}
-                  disabled={!newProject.name || !newProject.key || isCreating}
-                >
-                  <Loader2 className={cn("h-4 w-4 animate-spin", !isCreating && "invisible")} />
-                  {isCreating ? t("common.creating") : t("projects.createNew")}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+          <div className="hidden sm:block">{CreateProjectDialog}</div>
         </div>
 
-        {/* Projects Table */}
+        {/* ── MOBILE: card list (hidden sm+) ── */}
+        <div className="flex flex-col gap-3 sm:hidden">
+          {projects.length === 0 ? (
+            <div className="flex flex-col items-center gap-3 py-16 text-center">
+              <Folder className="text-muted-foreground h-14 w-14" />
+              <h3 className="font-semibold">{t("projects.noProjects")}</h3>
+              <p className="text-muted-foreground max-w-xs text-sm">
+                {t("projects.noProjectsDesc")}
+              </p>
+              {CreateProjectDialog}
+            </div>
+          ) : (
+            <>
+              {projects.map((project) => (
+                <button
+                  key={project.id}
+                  type="button"
+                  onClick={() => setDetailProject(project)}
+                  className={cn(
+                    "bg-card border-border flex w-full items-center gap-3 rounded-lg border p-4 text-left shadow-sm",
+                    "active:bg-muted transition-colors",
+                  )}
+                >
+                  <div className="bg-primary/10 flex h-9 w-9 shrink-0 items-center justify-center rounded-full">
+                    <Folder className="text-primary h-4 w-4" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-medium">{project.name}</p>
+                    <p className="text-muted-foreground truncate font-mono text-xs">{project.key}</p>
+                    {project.description && (
+                      <p className="text-muted-foreground mt-0.5 truncate text-xs">
+                        {project.description}
+                      </p>
+                    )}
+                    <div className="mt-1.5 flex gap-2">
+                      <Badge variant="secondary" className="text-xs">
+                        {project._count?.environments || 0} envs
+                      </Badge>
+                      <Badge variant="secondary" className="text-xs">
+                        {project._count?.flags || 0} flags
+                      </Badge>
+                    </div>
+                  </div>
+                  <ChevronRight className="text-muted-foreground h-4 w-4 shrink-0" />
+                </button>
+              ))}
+              <div className="pt-2">{CreateProjectDialog}</div>
+            </>
+          )}
+        </div>
+
+        {/* ── DESKTOP: table (hidden below sm) ── */}
         {projects.length === 0 ? (
-          <div className="rounded-lg border p-12 text-center">
+          <div className="hidden rounded-lg border p-12 text-center sm:block">
             <Folder className="text-muted-foreground mx-auto mb-4 h-16 w-16" />
             <h3 className="mb-2 text-lg font-semibold">{t("projects.noProjects")}</h3>
             <p className="text-muted-foreground mx-auto mb-4 max-w-md">
@@ -189,7 +232,7 @@ export default function ProjectsPage() {
             </Button>
           </div>
         ) : (
-          <div className="rounded-lg border">
+          <div className="border-border bg-card hidden rounded-lg border shadow-sm sm:block">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -209,7 +252,7 @@ export default function ProjectsPage() {
                       {project.key}
                     </TableCell>
                     <TableCell className="text-muted-foreground max-w-xs truncate text-sm">
-                      {project.description || "-"}
+                      {project.description || "—"}
                     </TableCell>
                     <TableCell>
                       <Badge variant="secondary">{project._count?.environments || 0}</Badge>
@@ -218,15 +261,13 @@ export default function ProjectsPage() {
                       <Badge variant="secondary">{project._count?.flags || 0}</Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => setProjectToDelete(project)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setProjectToDelete(project)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -235,20 +276,17 @@ export default function ProjectsPage() {
           </div>
         )}
 
-        {/* Info Card */}
         <div className="bg-muted/50 rounded-lg border p-4">
           <h3 className="mb-2 font-semibold">{t("projects.infoTitle")}</h3>
           <p className="text-muted-foreground text-sm">{t("projects.infoDesc")}</p>
         </div>
       </div>
 
+      {/* Delete confirm */}
       <AlertDialog
         open={!!projectToDelete}
         onOpenChange={(open) => {
-          if (!open) {
-            setProjectToDelete(null);
-            setDeleteConfirmation("");
-          }
+          if (!open) { setProjectToDelete(null); setDeleteConfirmation(""); }
         }}
       >
         <AlertDialogContent>
@@ -284,6 +322,48 @@ export default function ProjectsPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Mobile project detail dialog */}
+      <Dialog open={!!detailProject} onOpenChange={(open) => !open && setDetailProject(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Folder className="text-primary h-5 w-5" />
+              {detailProject?.name}
+            </DialogTitle>
+            <DialogDescription>
+              <code className="bg-muted rounded px-1.5 py-0.5 font-mono text-xs">
+                {detailProject?.key}
+              </code>
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 py-1">
+            {detailProject?.description && (
+              <p className="text-muted-foreground border-b pb-3 text-sm">
+                {detailProject.description}
+              </p>
+            )}
+            <div className="flex items-center justify-between border-b pb-3">
+              <span className="text-muted-foreground text-sm">{t("projects.environmentCount")}</span>
+              <Badge variant="secondary">{detailProject?._count?.environments || 0}</Badge>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-muted-foreground text-sm">{t("projects.flagCount")}</span>
+              <Badge variant="secondary">{detailProject?._count?.flags || 0}</Badge>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              className="w-full text-destructive hover:text-destructive"
+              onClick={() => { setProjectToDelete(detailProject); setDetailProject(null); }}
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              {t("common.delete")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 }

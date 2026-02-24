@@ -113,10 +113,10 @@ export default function SettingsPage() {
 
   return (
     <DashboardLayout>
-      <div className="flex max-w-4xl flex-col gap-6 p-6">
+      <div className="flex max-w-4xl flex-col gap-6 p-4 sm:p-6">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">{t("settings.title")}</h1>
+          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{t("settings.title")}</h1>
           <p className="text-muted-foreground mt-1">{t("settings.subtitle")}</p>
         </div>
 
@@ -130,7 +130,7 @@ export default function SettingsPage() {
             <CardDescription>{t("settings.profileDesc")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="grid gap-2">
                 <Label htmlFor="firstName">{t("settings.firstName")}</Label>
                 <Input
@@ -150,7 +150,7 @@ export default function SettingsPage() {
                 />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="grid gap-2">
                 <Label htmlFor="email">{t("settings.email")}</Label>
                 <Input

@@ -480,7 +480,7 @@ export default function FlagDetailsPage() {
 
   return (
     <DashboardLayout>
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-6 p-4 sm:p-6">
         <nav className="text-muted-foreground flex items-center gap-2 text-sm">
           <Link to="/dashboard/flags" className="hover:text-foreground transition-colors">
             {t("nav.featureFlags")}
@@ -500,7 +500,7 @@ export default function FlagDetailsPage() {
               <GitBranch className="h-6 w-6" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold tracking-tight">{flag.name}</h1>
+              <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{flag.name}</h1>
               <div className="mt-1 flex items-center gap-2">
                 <code className="text-muted-foreground bg-muted px-1.5 py-0.5 font-mono text-sm">
                   {flag.key}
@@ -522,9 +522,9 @@ export default function FlagDetailsPage() {
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <Select value={selectedEnvId} onValueChange={setSelectedEnvId}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-full sm:w-[180px]">
                 <SelectValue placeholder={t("flagDetails.selectEnvironment")} />
               </SelectTrigger>
               <SelectContent>
@@ -558,20 +558,20 @@ export default function FlagDetailsPage() {
           </div>
         </div>
 
-        <div className="border-border no-scrollbar flex items-center gap-1 overflow-x-auto border-b">
+        <div className="border-border no-scrollbar flex items-center overflow-x-auto border-b">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={cn(
-                "-mb-px flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-medium transition-colors",
+                "-mb-px flex flex-1 sm:flex-none items-center justify-center gap-2 border-b-2 px-3 py-3 text-sm font-medium transition-colors sm:px-4",
                 activeTab === tab.id
                   ? "border-primary text-primary bg-primary/5"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted border-transparent",
               )}
             >
               {tab.icon}
-              {tab.label}
+              <span className="hidden sm:inline">{tab.label}</span>
             </button>
           ))}
         </div>
@@ -579,7 +579,7 @@ export default function FlagDetailsPage() {
         <div className="py-2">
           {activeTab === "targeting" && (
             <div className="flex flex-col gap-4">
-              <div className="flex items-center justify-between px-1">
+              <div className="flex flex-wrap items-center justify-between gap-2 px-1">
                 <div className="flex items-center gap-3">
                   <Users className="text-primary h-5 w-5" />
                   <h3 className="font-bold text-lg">{t("flagDetails.targeting.title")}</h3>
@@ -645,17 +645,17 @@ export default function FlagDetailsPage() {
                       return (
                         <div
                           key={segRule.segmentId}
-                          className="flex items-center justify-between p-4"
+                          className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between"
                         >
-                          <div className="flex items-center gap-4">
+                          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
                             <div className="flex items-center gap-2">
                               <Users className="h-4 w-4 text-muted-foreground" />
                               <span className="font-medium">
                                 {segment?.name || t("flagDetails.targeting.unknownSegment")}
                               </span>
                             </div>
-                            <ChevronRight className="h-4 w-4 text-muted-foreground" />
                             <div className="flex items-center gap-2">
+                              <ChevronRight className="hidden h-4 w-4 text-muted-foreground sm:block" />
                               <span className="text-sm text-muted-foreground">serve</span>
                               <Select
                                 value={segRule.variationId}
@@ -663,7 +663,7 @@ export default function FlagDetailsPage() {
                                   handleUpdateSegmentVariation(segRule.segmentId, val)
                                 }
                               >
-                                <SelectTrigger className="w-[180px] h-8">
+                                <SelectTrigger className="h-8 w-full sm:w-[180px]">
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -679,7 +679,7 @@ export default function FlagDetailsPage() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8 text-destructive"
+                            className="h-8 w-8 self-end text-destructive sm:self-auto"
                             onClick={() => handleRemoveSegmentTargeting(segRule.segmentId)}
                           >
                             <Trash2 className="h-4 w-4" />
@@ -708,9 +708,9 @@ export default function FlagDetailsPage() {
                     </h3>
                   </div>
                 </div>
-                <div className="space-y-4 p-6">
-                  <div className="flex items-center gap-4">
-                    <span className="w-48 text-sm font-medium">
+                <div className="space-y-4 p-4 sm:p-6">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+                    <span className="text-sm font-medium sm:w-48">
                       {t("flagDetails.targeting.whenOn")}
                     </span>
                     <div className="flex flex-1 items-center gap-3">
@@ -738,8 +738,8 @@ export default function FlagDetailsPage() {
                       </Select>
                     </div>
                   </div>
-                  <div className="flex items-center gap-4">
-                    <span className="w-48 text-sm font-medium">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+                    <span className="text-sm font-medium sm:w-48">
                       {t("flagDetails.targeting.whenOff")}
                     </span>
                     <div className="flex flex-1 items-center gap-3">
@@ -775,7 +775,7 @@ export default function FlagDetailsPage() {
 
           {activeTab === "variations" && (
             <div className="flex flex-col gap-4">
-              <div className="flex items-center justify-between px-1">
+              <div className="flex flex-wrap items-center justify-between gap-2 px-1">
                 <div className="flex items-center gap-3">
                   <GitBranch className="text-primary h-5 w-5" />
                   <h3 className="font-bold text-lg">{t("flagDetails.variations.title")}</h3>
@@ -822,7 +822,7 @@ export default function FlagDetailsPage() {
                   </Button>
                 </div>
                 <div>
-                  <div className="text-muted-foreground border-border bg-muted/30 grid grid-cols-12 gap-4 border-b p-4 text-xs font-semibold tracking-widest uppercase">
+                  <div className="text-muted-foreground border-border bg-muted/30 hidden border-b p-4 text-xs font-semibold tracking-widest uppercase sm:grid sm:grid-cols-12 sm:gap-4">
                     <div className="col-span-3">{t("flagDetails.variations.nameColumn")}</div>
                     <div className="col-span-3">{t("flagDetails.variations.valueColumn")}</div>
                     <div className="col-span-5">
@@ -834,18 +834,53 @@ export default function FlagDetailsPage() {
                     {(draftVariations || []).map((variation: any) => (
                       <div
                         key={variation.id}
-                        className="grid grid-cols-12 items-center gap-4 p-4 hover:bg-muted/30 transition-colors"
+                        className="flex flex-col gap-2 p-4 transition-colors hover:bg-muted/30 sm:grid sm:grid-cols-12 sm:items-center sm:gap-4"
                       >
-                        <div className="col-span-3 font-medium">{variation.name}</div>
-                        <div className="col-span-3">
-                          <code className="text-primary font-mono text-[13px] font-bold bg-primary/5 px-2 py-1 rounded">
+                        <div className="flex items-center justify-between sm:col-span-3 sm:block">
+                          <span className="font-medium">{variation.name}</span>
+                          <div className="flex gap-1 sm:hidden">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={() => {
+                                setEditingVariation({
+                                  id: variation.id,
+                                  name: variation.name,
+                                  value: variation.value,
+                                  type: variation.type || flag.type,
+                                });
+                                setShowVariationDialog(true);
+                              }}
+                            >
+                              <SettingsIcon className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-destructive"
+                              disabled={
+                                flag.type === "boolean" &&
+                                DEFAULT_BOOLEAN_VARIATIONS.some(
+                                  (dv: { name: string; value: string }) =>
+                                    dv.name === variation.name && dv.value === variation.value,
+                                )
+                              }
+                              onClick={() => handleDeleteVariation(variation.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                        <div className="sm:col-span-3">
+                          <code className="bg-primary/5 text-primary rounded px-2 py-1 font-mono text-[13px] font-bold">
                             {variation.value}
                           </code>
                         </div>
-                        <div className="col-span-5 text-muted-foreground text-sm italic">
+                        <div className="text-muted-foreground text-sm italic sm:col-span-5">
                           {variation.description || "-"}
                         </div>
-                        <div className="flex gap-1">
+                        <div className="hidden gap-1 sm:flex">
                           <Button
                             variant="ghost"
                             size="icon"
@@ -1018,7 +1053,7 @@ export default function FlagDetailsPage() {
 
           {activeTab === "rules" && (
             <div className="flex flex-col gap-4">
-              <div className="flex items-center justify-between px-1">
+              <div className="flex flex-wrap items-center justify-between gap-2 px-1">
                 <div className="flex items-center gap-3">
                   <Terminal className="text-primary h-5 w-5" />
                   <h3 className="font-bold text-lg">{t("flagDetails.tabs.rules")}</h3>
@@ -1075,8 +1110,8 @@ export default function FlagDetailsPage() {
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
-                        <div className="grid grid-cols-12 gap-4 items-end">
-                          <div className="col-span-3 space-y-1.5">
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 lg:items-end">
+                          <div className="space-y-1.5">
                             <Label className="text-[10px] uppercase font-bold tracking-widest">
                               {t("flagDetails.targeting.attribute")}
                             </Label>
@@ -1088,7 +1123,7 @@ export default function FlagDetailsPage() {
                               className="h-9"
                             />
                           </div>
-                          <div className="col-span-3 space-y-1.5">
+                          <div className="space-y-1.5">
                             <Label className="text-[10px] uppercase font-bold tracking-widest">
                               {t("flagDetails.targeting.operator")}
                             </Label>
@@ -1121,7 +1156,7 @@ export default function FlagDetailsPage() {
                               </SelectContent>
                             </Select>
                           </div>
-                          <div className="col-span-3 space-y-1.5">
+                          <div className="space-y-1.5">
                             <Label className="text-[10px] uppercase font-bold tracking-widest">
                               {t("flagDetails.targeting.value")}
                             </Label>
@@ -1131,7 +1166,7 @@ export default function FlagDetailsPage() {
                               className="h-9"
                             />
                           </div>
-                          <div className="col-span-3 space-y-1.5">
+                          <div className="space-y-1.5">
                             <Label className="text-[10px] uppercase font-bold tracking-widest">
                               {t("flagDetails.targeting.serveVariation")}
                             </Label>
@@ -1282,35 +1317,35 @@ export default function FlagDetailsPage() {
                 </div>
 
                 {!flag.isArchived ? (
-                  <div className="flex items-center justify-between p-6">
+                  <div className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-6">
                     <div>
                       <p className="font-medium">{t("flagDetails.settings.archiveFlag")}</p>
                       <p className="text-muted-foreground text-sm">
                         {t("flagDetails.settings.archiveDesc")}
                       </p>
                     </div>
-                    <Button variant="destructive" onClick={() => setShowArchiveDialog(true)}>
+                    <Button className="w-full sm:w-auto" variant="destructive" onClick={() => setShowArchiveDialog(true)}>
                       <Archive className="mr-2 h-4 w-4" />
                       {t("flags.archiveAction")}
                     </Button>
                   </div>
                 ) : (
                   <>
-                    <div className="flex items-center justify-between p-6 border-b border-destructive/10">
+                    <div className="flex flex-col gap-3 border-b border-destructive/10 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-6">
                       <div>
                         <p className="font-medium">{t("flagDetails.settings.restoreFlag")}</p>
                         <p className="text-muted-foreground text-sm">
                           {t("flagDetails.settings.restoreDesc")}
                         </p>
                       </div>
-                      <Button variant="outline" onClick={() => setShowRestoreDialog(true)}>
+                      <Button className="w-full sm:w-auto" variant="outline" onClick={() => setShowRestoreDialog(true)}>
                         <History className="mr-2 h-4 w-4" />
                         {t("flagDetails.settings.restoreFlag")}
                       </Button>
                     </div>
 
                     {isSuperUser && (
-                      <div className="flex items-center justify-between p-6">
+                      <div className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-6">
                         <div>
                           <p className="font-medium text-destructive">
                             {t("flagDetails.settings.deleteFlag")}
@@ -1319,7 +1354,7 @@ export default function FlagDetailsPage() {
                             {t("flagDetails.settings.deleteDesc")}
                           </p>
                         </div>
-                        <Button variant="destructive" onClick={() => setShowDeleteDialog(true)}>
+                        <Button className="w-full sm:w-auto" variant="destructive" onClick={() => setShowDeleteDialog(true)}>
                           <Trash2 className="mr-2 h-4 w-4" />
                           {t("common.delete")}
                         </Button>

@@ -14,7 +14,15 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { MoreVertical, Loader2, Flag, History, Trash2, ArrowLeft } from "lucide-react";
+import { Loader2, Flag, History, Trash2, ArrowLeft, ChevronRight, MoreVertical } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -43,6 +51,7 @@ export default function ArchivedFlagsPage() {
   const navigate = useNavigate();
 
   const [flagToDelete, setFlagToDelete] = useState<FeatureFlag | null>(null);
+  const [selectedFlag, setSelectedFlag] = useState<FeatureFlag | null>(null);
   const [deleteConfirmation, setDeleteConfirmation] = useState("");
   const [isRestoring, setIsRestoring] = useState<string | null>(null);
 
@@ -50,17 +59,15 @@ export default function ArchivedFlagsPage() {
   const isSuperUser = currentUser.isSuperUser || currentUser.email === "john.doe@toggleflow.com";
 
   useEffect(() => {
-    if (selectedProject) {
-      fetchArchivedFlags(selectedProject.id);
-    }
+    if (selectedProject) fetchArchivedFlags(selectedProject.id);
   }, [selectedProject, fetchArchivedFlags]);
 
   const handleRestore = async (id: string) => {
     setIsRestoring(id);
     try {
       await unarchiveFlag(id);
-    } catch (error) {
-      console.error("Failed to restore flag:", error);
+    } catch (e) {
+      console.error(e);
     } finally {
       setIsRestoring(null);
     }
@@ -68,13 +75,12 @@ export default function ArchivedFlagsPage() {
 
   const confirmDeleteFlag = async () => {
     if (!flagToDelete) return;
-
     try {
       await deleteFlag(flagToDelete.id);
       setFlagToDelete(null);
       setDeleteConfirmation("");
-    } catch (error) {
-      console.error("Failed to delete flag:", error);
+    } catch (e) {
+      console.error(e);
     }
   };
 
@@ -90,32 +96,83 @@ export default function ArchivedFlagsPage() {
 
   return (
     <DashboardLayout>
-      <div className="flex flex-col gap-6 p-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" onClick={() => navigate("/dashboard/flags")}>
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight">{t("flags.archivedTitle")}</h1>
-              <p className="text-muted-foreground mt-1">
-                Flags that have been archived. Most functionality is disabled for these flags.
-              </p>
-            </div>
+      <div className="flex flex-col gap-4 p-4 sm:gap-6 sm:p-6">
+        {/* Header */}
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" onClick={() => navigate("/dashboard/flags")}>
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+              {t("flags.archivedTitle")}
+            </h1>
+            <p className="text-muted-foreground mt-0.5 text-sm">
+              Flags that have been archived. Most functionality is disabled for these flags.
+            </p>
           </div>
         </div>
 
+        {/* ── MOBILE: card list (hidden sm+) ── */}
+        <div className="flex flex-col gap-3 sm:hidden">
+          {archivedFlags.length === 0 ? (
+            <div className="flex flex-col items-center gap-3 py-16 text-center">
+              <Flag className="text-muted-foreground h-14 w-14" />
+              <h3 className="font-semibold">No Archived Flags</h3>
+              <p className="text-muted-foreground max-w-xs text-sm">
+                Flags you archive will appear here. You can restore them at any time.
+              </p>
+            </div>
+          ) : (
+            archivedFlags.map((flag) => (
+              <button
+                key={flag.id}
+                type="button"
+                onClick={() => setSelectedFlag(flag)}
+                className={cn(
+                  "bg-card border-border flex w-full items-center gap-3 rounded-lg border p-4 text-left shadow-sm",
+                  "active:bg-muted transition-colors",
+                )}
+              >
+                <div className="bg-muted flex h-9 w-9 shrink-0 items-center justify-center rounded-full">
+                  <Flag className="text-muted-foreground h-4 w-4" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-medium">{flag.name}</p>
+                  <p className="text-muted-foreground truncate font-mono text-xs">{flag.key}</p>
+                  <Badge variant="secondary" className="mt-1 text-xs">{flag.type}</Badge>
+                </div>
+                <div className="flex shrink-0 items-center gap-1">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={isRestoring === flag.id}
+                    onClick={(e) => { e.stopPropagation(); handleRestore(flag.id); }}
+                    className="h-8 px-2 text-xs"
+                  >
+                    <span className="relative mr-1 size-3.5 shrink-0">
+                      <History className={cn("h-3.5 w-3.5 transition-opacity", isRestoring === flag.id && "opacity-0")} />
+                      <Loader2 className={cn("absolute inset-0 h-3.5 w-3.5 animate-spin transition-opacity", isRestoring !== flag.id && "opacity-0")} />
+                    </span>
+                    {t("flagDetails.settings.restoreFlag")}
+                  </Button>
+                  <ChevronRight className="text-muted-foreground h-4 w-4" />
+                </div>
+              </button>
+            ))
+          )}
+        </div>
+
+        {/* ── DESKTOP: table (hidden below sm) ── */}
         {archivedFlags.length === 0 ? (
-          <div className="rounded-lg border p-12 text-center">
+          <div className="hidden rounded-lg border p-12 text-center sm:block">
             <Flag className="text-muted-foreground mx-auto mb-4 h-16 w-16" />
             <h3 className="mb-2 text-lg font-semibold">No Archived Flags</h3>
             <p className="text-muted-foreground mx-auto max-w-md">
-              Flags you archive will appear here. You can restore them to the active list at any
-              time.
+              Flags you archive will appear here. You can restore them to the active list at any time.
             </p>
           </div>
         ) : (
-          <div className="rounded-lg border">
+          <div className="border-border bg-card hidden rounded-lg border shadow-sm sm:block">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -147,13 +204,12 @@ export default function ArchivedFlagsPage() {
                           onClick={() => handleRestore(flag.id)}
                           disabled={isRestoring === flag.id}
                         >
-                          <span className="relative size-4 shrink-0">
+                          <span className="relative mr-1.5 size-4 shrink-0">
                             <History className={cn("h-4 w-4 transition-opacity", isRestoring === flag.id && "opacity-0")} />
                             <Loader2 className={cn("absolute inset-0 h-4 w-4 animate-spin transition-opacity", isRestoring !== flag.id && "opacity-0")} />
                           </span>
                           {t("flagDetails.settings.restoreFlag")}
                         </Button>
-
                         {isSuperUser && (
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -182,14 +238,10 @@ export default function ArchivedFlagsPage() {
         )}
       </div>
 
+      {/* Permanent delete confirm */}
       <AlertDialog
         open={!!flagToDelete}
-        onOpenChange={(open) => {
-          if (!open) {
-            setFlagToDelete(null);
-            setDeleteConfirmation("");
-          }
-        }}
+        onOpenChange={(open) => { if (!open) { setFlagToDelete(null); setDeleteConfirmation(""); } }}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -228,6 +280,59 @@ export default function ArchivedFlagsPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Mobile flag detail dialog */}
+      <Dialog open={!!selectedFlag} onOpenChange={(open) => !open && setSelectedFlag(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Flag className="text-muted-foreground h-5 w-5" />
+              {selectedFlag?.name}
+            </DialogTitle>
+            <DialogDescription>
+              <code className="bg-muted rounded px-1.5 py-0.5 font-mono text-xs">
+                {selectedFlag?.key}
+              </code>
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 py-1">
+            <div className="flex items-center justify-between">
+              <span className="text-muted-foreground text-sm">{t("flags.type")}</span>
+              <Badge variant="secondary">{selectedFlag?.type}</Badge>
+            </div>
+          </div>
+          <DialogFooter className="flex-col gap-2">
+            <Button className="w-full" asChild onClick={() => setSelectedFlag(null)}>
+              <Link to={`/dashboard/flags/${selectedFlag?.id}`}>{t("common.viewDetails")}</Link>
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full"
+              disabled={isRestoring === selectedFlag?.id}
+              onClick={() => {
+                if (selectedFlag) handleRestore(selectedFlag.id);
+                setSelectedFlag(null);
+              }}
+            >
+              <span className="relative mr-2 size-4 shrink-0">
+                <History className={cn("h-4 w-4 transition-opacity", isRestoring === selectedFlag?.id && "opacity-0")} />
+                <Loader2 className={cn("absolute inset-0 h-4 w-4 animate-spin transition-opacity", isRestoring !== selectedFlag?.id && "opacity-0")} />
+              </span>
+              {t("flagDetails.settings.restoreFlag")}
+            </Button>
+            {isSuperUser && (
+              <Button
+                variant="outline"
+                className="w-full text-destructive hover:text-destructive"
+                onClick={() => { setFlagToDelete(selectedFlag); setSelectedFlag(null); }}
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                {t("common.delete")}
+              </Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 }
