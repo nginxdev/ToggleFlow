@@ -14,15 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, Flag, History, Trash2, ArrowLeft, ChevronRight, MoreVertical } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Loader2, Flag, History, Trash2, ArrowLeft, MoreVertical } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -51,7 +43,6 @@ export default function ArchivedFlagsPage() {
   const navigate = useNavigate();
 
   const [flagToDelete, setFlagToDelete] = useState<FeatureFlag | null>(null);
-  const [selectedFlag, setSelectedFlag] = useState<FeatureFlag | null>(null);
   const [deleteConfirmation, setDeleteConfirmation] = useState("");
   const [isRestoring, setIsRestoring] = useState<string | null>(null);
 
@@ -124,14 +115,9 @@ export default function ArchivedFlagsPage() {
             </div>
           ) : (
             archivedFlags.map((flag) => (
-              <button
+              <div
                 key={flag.id}
-                type="button"
-                onClick={() => setSelectedFlag(flag)}
-                className={cn(
-                  "bg-card border-border flex w-full items-center gap-3 rounded-lg border p-4 text-left shadow-sm",
-                  "active:bg-muted transition-colors",
-                )}
+                className="bg-card border-border flex w-full items-center gap-3 rounded-lg border p-4 shadow-sm"
               >
                 <div className="bg-muted flex h-9 w-9 shrink-0 items-center justify-center rounded-full">
                   <Flag className="text-muted-foreground h-4 w-4" />
@@ -146,7 +132,7 @@ export default function ArchivedFlagsPage() {
                     variant="outline"
                     size="sm"
                     disabled={isRestoring === flag.id}
-                    onClick={(e) => { e.stopPropagation(); handleRestore(flag.id); }}
+                    onClick={() => handleRestore(flag.id)}
                     className="h-8 px-2 text-xs"
                   >
                     <span className="relative mr-1 size-3.5 shrink-0">
@@ -155,9 +141,18 @@ export default function ArchivedFlagsPage() {
                     </span>
                     {t("flagDetails.settings.restoreFlag")}
                   </Button>
-                  <ChevronRight className="text-muted-foreground h-4 w-4" />
+                  {isSuperUser && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-destructive"
+                      onClick={() => setFlagToDelete(flag)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  )}
                 </div>
-              </button>
+              </div>
             ))
           )}
         </div>
@@ -281,58 +276,6 @@ export default function ArchivedFlagsPage() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Mobile flag detail dialog */}
-      <Dialog open={!!selectedFlag} onOpenChange={(open) => !open && setSelectedFlag(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Flag className="text-muted-foreground h-5 w-5" />
-              {selectedFlag?.name}
-            </DialogTitle>
-            <DialogDescription>
-              <code className="bg-muted rounded px-1.5 py-0.5 font-mono text-xs">
-                {selectedFlag?.key}
-              </code>
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-3 py-1">
-            <div className="flex items-center justify-between">
-              <span className="text-muted-foreground text-sm">{t("flags.type")}</span>
-              <Badge variant="secondary">{selectedFlag?.type}</Badge>
-            </div>
-          </div>
-          <DialogFooter className="flex-col gap-2">
-            <Button className="w-full" asChild onClick={() => setSelectedFlag(null)}>
-              <Link to={`/dashboard/flags/${selectedFlag?.id}`}>{t("common.viewDetails")}</Link>
-            </Button>
-            <Button
-              variant="outline"
-              className="w-full"
-              disabled={isRestoring === selectedFlag?.id}
-              onClick={() => {
-                if (selectedFlag) handleRestore(selectedFlag.id);
-                setSelectedFlag(null);
-              }}
-            >
-              <span className="relative mr-2 size-4 shrink-0">
-                <History className={cn("h-4 w-4 transition-opacity", isRestoring === selectedFlag?.id && "opacity-0")} />
-                <Loader2 className={cn("absolute inset-0 h-4 w-4 animate-spin transition-opacity", isRestoring !== selectedFlag?.id && "opacity-0")} />
-              </span>
-              {t("flagDetails.settings.restoreFlag")}
-            </Button>
-            {isSuperUser && (
-              <Button
-                variant="outline"
-                className="w-full text-destructive hover:text-destructive"
-                onClick={() => { setFlagToDelete(selectedFlag); setSelectedFlag(null); }}
-              >
-                <Trash2 className="mr-2 h-4 w-4" />
-                {t("common.delete")}
-              </Button>
-            )}
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </DashboardLayout>
   );
 }

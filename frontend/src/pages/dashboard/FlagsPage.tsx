@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { MoreVertical, Plus, Loader2, Flag, Archive, ChevronRight } from "lucide-react";
+import { MoreVertical, Plus, Loader2, Flag, Archive } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -53,7 +53,6 @@ export default function FlagsPage() {
   const { flags, loading, fetchFlags, createFlag, toggleFlag, archiveFlag } = useFlagStore();
 
   const [togglingFlags, setTogglingFlags] = useState<Set<string>>(new Set());
-  const [selectedFlag, setSelectedFlag] = useState<FeatureFlag | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [newFlag, setNewFlag] = useState({ name: "", key: "", description: "" });
@@ -216,14 +215,10 @@ export default function FlagsPage() {
               const isEnabled = ps?.isEnabled || false;
               const toggleKey = `${flag.id}-${ps?.environmentId}`;
               return (
-                <button
+                <Link
                   key={flag.id}
-                  type="button"
-                  onClick={() => setSelectedFlag(flag)}
-                  className={cn(
-                    "bg-card border-border flex w-full items-center gap-3 rounded-lg border p-4 text-left shadow-sm",
-                    "active:bg-muted transition-colors",
-                  )}
+                  to={`/dashboard/flags/${flag.id}`}
+                  className="bg-card border-border flex w-full items-center gap-3 rounded-lg border p-4 text-left shadow-sm active:bg-muted transition-colors"
                 >
                   <div
                     className={cn(
@@ -255,9 +250,8 @@ export default function FlagsPage() {
                         !togglingFlags.has(toggleKey) && "invisible",
                       )}
                     />
-                    <ChevronRight className="text-muted-foreground h-4 w-4" />
                   </div>
-                </button>
+                </Link>
               );
             })
           )}
@@ -380,74 +374,6 @@ export default function FlagsPage() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Mobile flag detail dialog */}
-      <Dialog open={!!selectedFlag} onOpenChange={(open) => !open && setSelectedFlag(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Flag className="text-muted-foreground h-5 w-5" />
-              {selectedFlag?.name}
-            </DialogTitle>
-            <DialogDescription>
-              <code className="bg-muted rounded px-1.5 py-0.5 font-mono text-xs">
-                {selectedFlag?.key}
-              </code>
-            </DialogDescription>
-          </DialogHeader>
-          {selectedFlag && (() => {
-            const ps = selectedFlag.flagStates?.find((s) => s.environment.key === "production");
-            const enabled = ps?.isEnabled || false;
-            const tKey = `${selectedFlag.id}-${ps?.environmentId}`;
-            return (
-              <div className="space-y-4 py-1">
-                <div className="flex items-center justify-between border-b pb-4">
-                  <span className="text-muted-foreground text-sm">{t("flags.type")}</span>
-                  <Badge variant="secondary">{selectedFlag.type}</Badge>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">
-                    {t("flags.status")} — Production
-                  </span>
-                  <div className="flex items-center gap-2">
-                    <Switch
-                      checked={enabled}
-                      disabled={togglingFlags.has(tKey)}
-                      onCheckedChange={() =>
-                        ps && handleToggleFlag(selectedFlag.id, ps.environmentId, enabled)
-                      }
-                    />
-                    <span className={cn("text-sm font-medium", enabled ? "text-primary" : "text-muted-foreground")}>
-                      {enabled ? t("flags.enabled") : t("flags.disabled")}
-                    </span>
-                    <Loader2
-                      className={cn(
-                        "text-muted-foreground h-3.5 w-3.5 animate-spin",
-                        !togglingFlags.has(tKey) && "invisible",
-                      )}
-                    />
-                  </div>
-                </div>
-              </div>
-            );
-          })()}
-          <DialogFooter className="flex-col gap-2">
-            <Button className="w-full" asChild onClick={() => setSelectedFlag(null)}>
-              <Link to={`/dashboard/flags/${selectedFlag?.id}`}>{t("common.viewDetails")}</Link>
-            </Button>
-            <Button
-              variant="outline"
-              className="w-full text-destructive hover:text-destructive"
-              onClick={() => {
-                setFlagToArchive(selectedFlag);
-                setSelectedFlag(null);
-              }}
-            >
-              <Archive className="mr-2 h-4 w-4" />
-              {t("flags.archive")}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </DashboardLayout>
   );
 }

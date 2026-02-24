@@ -30,7 +30,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, Users, MoreHorizontal, Pencil, Trash2, ChevronRight } from "lucide-react";
+import { Plus, Search, Users, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
@@ -47,7 +47,6 @@ export default function SegmentsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingSegment, setEditingSegment] = useState<any>(null);
-  const [selectedSegment, setSelectedSegment] = useState<any>(null);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -291,14 +290,9 @@ export default function SegmentsPage() {
           ) : (
             <>
               {filteredSegments.map((segment) => (
-                <button
+                <div
                   key={segment.id}
-                  type="button"
-                  onClick={() => setSelectedSegment(segment)}
-                  className={cn(
-                    "bg-card border-border flex w-full items-center gap-3 rounded-lg border p-4 text-left shadow-sm",
-                    "active:bg-muted transition-colors",
-                  )}
+                  className="bg-card border-border flex w-full items-center gap-3 rounded-lg border p-4 shadow-sm"
                 >
                   <div className="bg-muted flex h-9 w-9 shrink-0 items-center justify-center rounded-full">
                     <Users className="text-muted-foreground h-4 w-4" />
@@ -326,8 +320,25 @@ export default function SegmentsPage() {
                       </p>
                     )}
                   </div>
-                  <ChevronRight className="text-muted-foreground h-4 w-4 shrink-0" />
-                </button>
+                  <div className="flex shrink-0 items-center gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={() => handleEdit(segment)}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-destructive"
+                      onClick={() => handleDelete(segment.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
               ))}
               {/* Floating create at bottom of list */}
               <div className="pt-2">{SegmentFormDialog}</div>
@@ -426,79 +437,6 @@ export default function SegmentsPage() {
         </div>
       </div>
 
-      {/* Mobile segment detail sheet */}
-      <Dialog open={!!selectedSegment} onOpenChange={(open) => !open && setSelectedSegment(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              <span className="flex items-center gap-2">
-                <Users className="text-muted-foreground h-5 w-5" />
-                {selectedSegment?.name}
-              </span>
-            </DialogTitle>
-            <DialogDescription>
-              <code className="bg-muted rounded px-1.5 py-0.5 font-mono text-xs">
-                {selectedSegment?.key}
-              </code>
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-4 py-1">
-            {selectedSegment?.description && (
-              <p className="text-muted-foreground border-b pb-4 text-sm">
-                {selectedSegment.description}
-              </p>
-            )}
-            {selectedSegment?.rules?.length > 0 && (
-              <div className="space-y-2">
-                <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
-                  {t("segments.targetingRule")}
-                </p>
-                {selectedSegment.rules.map((rule: any, i: number) => (
-                  <div
-                    key={i}
-                    className="bg-muted/50 flex flex-wrap items-center gap-1.5 rounded-md p-3 text-sm"
-                  >
-                    <code className="text-primary font-mono font-semibold">{rule.attribute}</code>
-                    <Badge variant="outline" className="text-xs">
-                      {rule.operator === "IS_NOT_IN" ? t("segments.isNotIn") : t("segments.isIn")}
-                    </Badge>
-                    <Badge variant="secondary" className="text-xs">
-                      {t("segments.valuesCount", {
-                        count: Array.isArray(rule.value) ? rule.value.length : 1,
-                      })}
-                    </Badge>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <DialogFooter className="flex-col gap-2">
-            <Button
-              className="w-full"
-              onClick={() => {
-                handleEdit(selectedSegment);
-                setSelectedSegment(null);
-              }}
-            >
-              <Pencil className="mr-2 h-4 w-4" />
-              {t("common.edit")}
-            </Button>
-            <Button
-              variant="outline"
-              className="w-full text-destructive hover:text-destructive"
-              onClick={() => {
-                handleDelete(selectedSegment.id);
-                setSelectedSegment(null);
-              }}
-            >
-              <Trash2 className="mr-2 h-4 w-4" />
-              {t("common.delete")}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </DashboardLayout>
   );
 }

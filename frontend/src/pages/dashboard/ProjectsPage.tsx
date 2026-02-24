@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useTranslation, Trans } from "react-i18next";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
-import { Plus, Folder, Trash2, Loader2, ChevronRight } from "lucide-react";
+import { Plus, Folder, Trash2, Loader2 } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -46,7 +46,6 @@ export default function ProjectsPage() {
   const [isCreating, setIsCreating] = useState(false);
   const [newProject, setNewProject] = useState({ name: "", key: "", description: "" });
   const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
-  const [detailProject, setDetailProject] = useState<Project | null>(null);
   const [deleteConfirmation, setDeleteConfirmation] = useState("");
 
   useEffect(() => { fetchProjects(); }, [fetchProjects]);
@@ -182,14 +181,9 @@ export default function ProjectsPage() {
           ) : (
             <>
               {projects.map((project) => (
-                <button
+                <div
                   key={project.id}
-                  type="button"
-                  onClick={() => setDetailProject(project)}
-                  className={cn(
-                    "bg-card border-border flex w-full items-center gap-3 rounded-lg border p-4 text-left shadow-sm",
-                    "active:bg-muted transition-colors",
-                  )}
+                  className="bg-card border-border flex w-full items-center gap-3 rounded-lg border p-4 text-left shadow-sm"
                 >
                   <div className="bg-primary/10 flex h-9 w-9 shrink-0 items-center justify-center rounded-full">
                     <Folder className="text-primary h-4 w-4" />
@@ -211,8 +205,7 @@ export default function ProjectsPage() {
                       </Badge>
                     </div>
                   </div>
-                  <ChevronRight className="text-muted-foreground h-4 w-4 shrink-0" />
-                </button>
+                </div>
               ))}
             </>
           )}
@@ -319,47 +312,6 @@ export default function ProjectsPage() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Mobile project detail dialog */}
-      <Dialog open={!!detailProject} onOpenChange={(open) => !open && setDetailProject(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Folder className="text-primary h-5 w-5" />
-              {detailProject?.name}
-            </DialogTitle>
-            <DialogDescription>
-              <code className="bg-muted rounded px-1.5 py-0.5 font-mono text-xs">
-                {detailProject?.key}
-              </code>
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-3 py-1">
-            {detailProject?.description && (
-              <p className="text-muted-foreground border-b pb-3 text-sm">
-                {detailProject.description}
-              </p>
-            )}
-            <div className="flex items-center justify-between border-b pb-3">
-              <span className="text-muted-foreground text-sm">{t("projects.environmentCount")}</span>
-              <Badge variant="secondary">{detailProject?._count?.environments || 0}</Badge>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-muted-foreground text-sm">{t("projects.flagCount")}</span>
-              <Badge variant="secondary">{detailProject?._count?.flags || 0}</Badge>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              className="w-full text-destructive hover:text-destructive"
-              onClick={() => { setProjectToDelete(detailProject); setDetailProject(null); }}
-            >
-              <Trash2 className="mr-2 h-4 w-4" />
-              {t("common.delete")}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </DashboardLayout>
   );
 }

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useTranslation, Trans } from "react-i18next";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
-import { Plus, Layers, Trash2, Edit, Loader2, ShieldAlert, ChevronRight } from "lucide-react";
+import { Plus, Layers, Trash2, Edit, Loader2, ShieldAlert } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -63,7 +63,6 @@ export default function EnvironmentsPage() {
   const [envToDelete, setEnvToDelete] = useState<Environment | null>(null);
   const [deleteConfirmation, setDeleteConfirmation] = useState("");
   const [envToEdit, setEnvToEdit] = useState<Environment | null>(null);
-  const [selectedEnv, setSelectedEnv] = useState<Environment | null>(null);
   const [editForm, setEditForm] = useState({ name: "", key: "", requireConfirmation: false });
   const [isEditing, setIsEditing] = useState(false);
 
@@ -220,14 +219,9 @@ export default function EnvironmentsPage() {
               ) : (
                 <>
                   {environments.map((env) => (
-                    <button
+                    <div
                       key={env.id}
-                      type="button"
-                      onClick={() => setSelectedEnv(env)}
-                      className={cn(
-                        "bg-card border-border flex w-full items-center gap-3 rounded-lg border p-4 text-left shadow-sm",
-                        "active:bg-muted transition-colors",
-                      )}
+                      className="bg-card border-border flex w-full items-center gap-3 rounded-lg border p-4 shadow-sm"
                     >
                       <div
                         className={cn(
@@ -272,8 +266,27 @@ export default function EnvironmentsPage() {
                           )}
                         </div>
                       </div>
-                      <ChevronRight className="text-muted-foreground h-4 w-4 shrink-0" />
-                    </button>
+                      <div className="flex shrink-0 items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          disabled={isDefaultEnvironment(env.key)}
+                          onClick={() => openEditDialog(env)}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-destructive"
+                          disabled={isDefaultEnvironment(env.key)}
+                          onClick={() => setEnvToDelete(env)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
                   ))}
                   <div className="pt-2">{CreateEnvDialog}</div>
                 </>
@@ -371,82 +384,6 @@ export default function EnvironmentsPage() {
         )}
 
       </div>
-
-      {/* Mobile env detail dialog */}
-      <Dialog open={!!selectedEnv} onOpenChange={(open) => !open && setSelectedEnv(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              <span className="flex items-center gap-2">
-                {selectedEnv?.name}
-                {selectedEnv && isDefaultEnvironment(selectedEnv.key) && (
-                  <Badge variant="outline" className="text-xs">
-                    {t("environments.default")}
-                  </Badge>
-                )}
-              </span>
-            </DialogTitle>
-            <DialogDescription>
-              <code className="bg-muted rounded px-1.5 py-0.5 font-mono text-xs">
-                {selectedEnv?.key}
-              </code>
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-3 py-1">
-            <div className="flex items-center justify-between border-b pb-3">
-              <span className="text-muted-foreground text-sm">{t("environments.status")}</span>
-              {selectedEnv && (
-                <Badge
-                  variant={selectedEnv.key === "production" ? "default" : "secondary"}
-                  className={selectedEnv.key === "production" ? "bg-green-500 hover:bg-green-600" : ""}
-                >
-                  {selectedEnv.key === "production" ? t("common.live") : t("common.active")}
-                </Badge>
-              )}
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-muted-foreground text-sm">
-                {t("environments.requireConfirmation")}
-              </span>
-              {selectedEnv?.requireConfirmation ? (
-                <Badge
-                  variant="outline"
-                  className="border-amber-500/50 bg-amber-500/10 text-amber-500"
-                >
-                  {t("common.active")}
-                </Badge>
-              ) : (
-                <span className="text-muted-foreground text-sm">—</span>
-              )}
-            </div>
-          </div>
-          <DialogFooter className="flex-col gap-2">
-            <Button
-              className="w-full"
-              disabled={selectedEnv ? isDefaultEnvironment(selectedEnv.key) : true}
-              onClick={() => {
-                if (selectedEnv) openEditDialog(selectedEnv);
-                setSelectedEnv(null);
-              }}
-            >
-              <Edit className="mr-2 h-4 w-4" />
-              {t("common.edit")}
-            </Button>
-            <Button
-              variant="outline"
-              className="w-full text-destructive hover:text-destructive"
-              disabled={selectedEnv ? isDefaultEnvironment(selectedEnv.key) : true}
-              onClick={() => {
-                setEnvToDelete(selectedEnv);
-                setSelectedEnv(null);
-              }}
-            >
-              <Trash2 className="mr-2 h-4 w-4" />
-              {t("common.delete")}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       {/* Edit dialog */}
       <Dialog
