@@ -49,8 +49,8 @@ function SidebarItem({ icon, label, href, active, onNavigate }: SidebarItemProps
       className={cn(
         "group flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors",
         active
-          ? "bg-primary/10 text-primary"
-          : "text-muted-foreground hover:bg-muted hover:text-foreground",
+          ? "bg-primary/10 text-primary rounded-md"
+          : "text-muted-foreground hover:bg-muted hover:text-foreground rounded-md",
       )}
     >
       <span
@@ -158,7 +158,36 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </nav>
 
           <div className="px-3 pb-4">
-            <div className="bg-muted/50 rounded-none p-4">
+            {/* User menu – bottom of sidebar, mobile only */}
+            <div className="mb-3 lg:hidden">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="flex w-full items-center justify-start gap-3 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
+                  >
+                    <span className="flex h-5 w-5 items-center justify-center">
+                      <User className="h-4 w-4" />
+                    </span>
+                    {t("auth.myAccount")}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent side="top" align="start" className="w-56">
+                  <DropdownMenuLabel>{t("auth.myAccount")}</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem>{t("auth.profile")}</DropdownMenuItem>
+                  <DropdownMenuItem>{t("auth.apiKeys")}</DropdownMenuItem>
+                  <DropdownMenuItem>{t("auth.teams")}</DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout} className="text-destructive">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    {t("common.signOut")}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+
+            <div className="bg-muted/50 rounded-lg p-4">
               <p className="text-muted-foreground mb-2 text-xs font-semibold tracking-wider uppercase">
                 {t("common.usage")}
               </p>
@@ -240,44 +269,40 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <LanguageSelector />
             </div>
 
-            <Button variant="ghost" size="icon" className="relative hidden sm:flex">
+            <Button variant="ghost" size="icon" className="relative flex">
               <Bell className="h-5 w-5" />
               <span className="bg-primary absolute top-2 right-2 h-2 w-2 rounded-full" />
             </Button>
 
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="border-border h-8 w-8 rounded-full border"
-                >
-                  <User className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel>{t("auth.myAccount")}</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>{t("auth.profile")}</DropdownMenuItem>
-                <DropdownMenuItem>{t("auth.apiKeys")}</DropdownMenuItem>
-                <DropdownMenuItem>{t("auth.teams")}</DropdownMenuItem>
-                {/* Bell + Lang accessible on mobile via user menu on very small screens */}
-                <DropdownMenuSeparator className="sm:hidden" />
-                <DropdownMenuItem className="sm:hidden">
-                  <Bell className="mr-2 h-4 w-4" />
-                  {t("nav.notifications") || "Notifications"}
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout} className="text-destructive">
-                  <LogOut className="mr-2 h-4 w-4" />
-                  {t("common.signOut")}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <div className="hidden sm:block">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="border-border h-8 w-8 rounded-full border"
+                  >
+                    <User className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>{t("auth.myAccount")}</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem>{t("auth.profile")}</DropdownMenuItem>
+                  <DropdownMenuItem>{t("auth.apiKeys")}</DropdownMenuItem>
+                  <DropdownMenuItem>{t("auth.teams")}</DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout} className="text-destructive">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    {t("common.signOut")}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         </header>
 
-        <main className="flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
+        <main className="flex-1">{children}</main>
       </div>
     </div>
   );

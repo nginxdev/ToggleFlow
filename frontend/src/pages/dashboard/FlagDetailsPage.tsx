@@ -496,7 +496,7 @@ export default function FlagDetailsPage() {
 
         <div className="border-border flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
-            <div className="bg-primary/10 text-primary hidden h-12 w-12 items-center justify-center sm:flex">
+            <div className="bg-primary/10 text-primary hidden h-12 w-12 items-center justify-center rounded-xl sm:flex">
               <GitBranch className="h-6 w-6" />
             </div>
             <div>
@@ -535,7 +535,7 @@ export default function FlagDetailsPage() {
                 ))}
               </SelectContent>
             </Select>
-            <div className="bg-muted/30 border-border inline-flex items-center gap-3 rounded-none border px-4 py-1.5 transition-all hover:bg-muted/50">
+            <div className="bg-muted/30 border-border inline-flex items-center gap-3 rounded-lg border px-4 py-1.5 transition-all hover:bg-muted/50">
               <span className="text-muted-foreground text-[10px] font-bold whitespace-nowrap tracking-widest uppercase">
                 {t("flagDetails.status")}
               </span>
@@ -576,15 +576,10 @@ export default function FlagDetailsPage() {
           ))}
         </div>
 
-        <div className="py-2">
+        <div className="pb-6 pt-2">
           {activeTab === "targeting" && (
             <div className="flex flex-col gap-4">
-              <div className="flex flex-wrap items-center justify-between gap-2 px-1">
-                <div className="flex items-center gap-3">
-                  <Users className="text-primary h-5 w-5" />
-                  <h3 className="font-bold text-lg">{t("flagDetails.targeting.title")}</h3>
-                </div>
-                <div className="flex gap-2">
+              <div className="flex items-center justify-end gap-2">
                   {hasRuleChanges && (
                     <Button variant="ghost" onClick={handleCancelRules} disabled={isSavingRules}>
                       {t("common.cancel")}
@@ -601,7 +596,6 @@ export default function FlagDetailsPage() {
                     </span>
                     {isSavingRules ? t("common.saving") : t("flagDetails.saveChanges")}
                   </Button>
-                </div>
               </div>
 
               <section className="border-border bg-card border rounded-lg overflow-hidden">
@@ -775,12 +769,7 @@ export default function FlagDetailsPage() {
 
           {activeTab === "variations" && (
             <div className="flex flex-col gap-4">
-              <div className="flex flex-wrap items-center justify-between gap-2 px-1">
-                <div className="flex items-center gap-3">
-                  <GitBranch className="text-primary h-5 w-5" />
-                  <h3 className="font-bold text-lg">{t("flagDetails.variations.title")}</h3>
-                </div>
-                <div className="flex gap-2">
+              <div className="flex items-center justify-end gap-2">
                   {hasVariationChanges && (
                     <Button
                       variant="ghost"
@@ -801,7 +790,6 @@ export default function FlagDetailsPage() {
                     </span>
                     {isSavingVariations ? t("common.saving") : t("flagDetails.saveChanges")}
                   </Button>
-                </div>
               </div>
               <section className="border-border bg-card border rounded-lg overflow-hidden">
                 <div className="border-border flex items-center justify-between border-b p-4 bg-muted/10">
@@ -1053,12 +1041,7 @@ export default function FlagDetailsPage() {
 
           {activeTab === "rules" && (
             <div className="flex flex-col gap-4">
-              <div className="flex flex-wrap items-center justify-between gap-2 px-1">
-                <div className="flex items-center gap-3">
-                  <Terminal className="text-primary h-5 w-5" />
-                  <h3 className="font-bold text-lg">{t("flagDetails.tabs.rules")}</h3>
-                </div>
-                <div className="flex gap-2">
+              <div className="flex items-center justify-end gap-2">
                   {hasRuleChanges && (
                     <Button variant="ghost" onClick={handleCancelRules} disabled={isSavingRules}>
                       {t("common.cancel")}
@@ -1075,7 +1058,6 @@ export default function FlagDetailsPage() {
                     </span>
                     {isSavingRules ? t("common.saving") : t("flagDetails.saveChanges")}
                   </Button>
-                </div>
               </div>
 
               <section className="border-border bg-card border rounded-lg overflow-hidden">
@@ -1265,7 +1247,7 @@ export default function FlagDetailsPage() {
 
           {activeTab === "settings" && (
             <div className="grid gap-6">
-              <section className="border-border bg-card border">
+              <section className="border-border bg-card rounded-lg overflow-hidden border">
                 <div className="border-border flex items-center justify-between border-b p-4">
                   <div className="flex items-center gap-3">
                     <SettingsIcon className="text-primary h-5 w-5" />
@@ -1306,7 +1288,7 @@ export default function FlagDetailsPage() {
                 </div>
               </section>
 
-              <section className="border-destructive/20 bg-card border">
+              <section className="border-destructive/20 bg-card rounded-lg overflow-hidden border">
                 <div className="border-destructive/20 flex items-center justify-between border-b p-4">
                   <div className="flex items-center gap-3">
                     <Archive className="text-destructive h-5 w-5" />
