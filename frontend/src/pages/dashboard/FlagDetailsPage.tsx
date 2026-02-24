@@ -595,17 +595,11 @@ export default function FlagDetailsPage() {
                     disabled={!hasRuleChanges || isSavingRules}
                     className="gap-2"
                   >
-                    {isSavingRules ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        {t("common.saving")}
-                      </>
-                    ) : (
-                      <>
-                        <Check className="h-4 w-4" />
-                        {t("flagDetails.saveChanges")}
-                      </>
-                    )}
+                    <span className="relative size-4 shrink-0">
+                      <Check className={cn("h-4 w-4 transition-opacity", isSavingRules && "opacity-0")} />
+                      <Loader2 className={cn("absolute inset-0 h-4 w-4 animate-spin transition-opacity", !isSavingRules && "opacity-0")} />
+                    </span>
+                    {isSavingRules ? t("common.saving") : t("flagDetails.saveChanges")}
                   </Button>
                 </div>
               </div>
@@ -801,17 +795,11 @@ export default function FlagDetailsPage() {
                     disabled={!hasVariationChanges || isSavingVariations}
                     className="gap-2"
                   >
-                    {isSavingVariations ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        {t("common.saving")}
-                      </>
-                    ) : (
-                      <>
-                        <Check className="h-4 w-4" />
-                        {t("flagDetails.saveChanges")}
-                      </>
-                    )}
+                    <span className="relative size-4 shrink-0">
+                      <Check className={cn("h-4 w-4 transition-opacity", isSavingVariations && "opacity-0")} />
+                      <Loader2 className={cn("absolute inset-0 h-4 w-4 animate-spin transition-opacity", !isSavingVariations && "opacity-0")} />
+                    </span>
+                    {isSavingVariations ? t("common.saving") : t("flagDetails.saveChanges")}
                   </Button>
                 </div>
               </div>
@@ -1046,17 +1034,11 @@ export default function FlagDetailsPage() {
                     disabled={!hasRuleChanges || isSavingRules}
                     className="gap-2"
                   >
-                    {isSavingRules ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        {t("common.saving")}
-                      </>
-                    ) : (
-                      <>
-                        <Check className="h-4 w-4" />
-                        {t("flagDetails.saveChanges")}
-                      </>
-                    )}
+                    <span className="relative size-4 shrink-0">
+                      <Check className={cn("h-4 w-4 transition-opacity", isSavingRules && "opacity-0")} />
+                      <Loader2 className={cn("absolute inset-0 h-4 w-4 animate-spin transition-opacity", !isSavingRules && "opacity-0")} />
+                    </span>
+                    {isSavingRules ? t("common.saving") : t("flagDetails.saveChanges")}
                   </Button>
                 </div>
               </div>
@@ -1282,14 +1264,8 @@ export default function FlagDetailsPage() {
                   </div>
                   <div className="flex justify-end">
                     <Button onClick={handleSaveSettings} disabled={!hasChanges || isSaving}>
-                      {isSaving ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          {t("common.saving")}
-                        </>
-                      ) : (
-                        t("common.save")
-                      )}
+                      <Loader2 className={cn("h-4 w-4 animate-spin", !isSaving && "invisible")} />
+                      {isSaving ? t("common.saving") : t("common.save")}
                     </Button>
                   </div>
                 </div>

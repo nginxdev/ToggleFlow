@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/select";
 import { SUPPORTED_LANGUAGES } from "@/types";
 import { usersApi } from "@/lib/api";
+import { cn } from "@/lib/utils";
 
 export default function SettingsPage() {
   const { t, i18n } = useTranslation();
@@ -190,7 +191,7 @@ export default function SettingsPage() {
                   formData.language === originalFormData.language)
               }
             >
-              {profileLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              <Loader2 className={cn("h-4 w-4 animate-spin", !profileLoading && "invisible")} />
               {t("common.save")}
             </Button>
           </CardFooter>

@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useFlagStore } from "@/store/flagStore";
 import { useProjectStore } from "@/store/projectStore";
+import { cn } from "@/lib/utils";
 import type { FeatureFlag } from "@/types";
 
 export default function ArchivedFlagsPage() {
@@ -146,11 +147,10 @@ export default function ArchivedFlagsPage() {
                           onClick={() => handleRestore(flag.id)}
                           disabled={isRestoring === flag.id}
                         >
-                          {isRestoring === flag.id ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          ) : (
-                            <History className="mr-2 h-4 w-4" />
-                          )}
+                          <span className="relative size-4 shrink-0">
+                            <History className={cn("h-4 w-4 transition-opacity", isRestoring === flag.id && "opacity-0")} />
+                            <Loader2 className={cn("absolute inset-0 h-4 w-4 animate-spin transition-opacity", isRestoring !== flag.id && "opacity-0")} />
+                          </span>
                           {t("flagDetails.settings.restoreFlag")}
                         </Button>
 

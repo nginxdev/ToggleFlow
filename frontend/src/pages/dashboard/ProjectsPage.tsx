@@ -37,6 +37,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { cn } from "@/lib/utils";
 
 export default function ProjectsPage() {
   const { t } = useTranslation();
@@ -166,14 +167,8 @@ export default function ProjectsPage() {
                   onClick={handleCreateProject}
                   disabled={!newProject.name || !newProject.key || isCreating}
                 >
-                  {isCreating ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      {t("common.creating")}
-                    </>
-                  ) : (
-                    t("projects.createNew")
-                  )}
+                  <Loader2 className={cn("h-4 w-4 animate-spin", !isCreating && "invisible")} />
+                  {isCreating ? t("common.creating") : t("projects.createNew")}
                 </Button>
               </DialogFooter>
             </DialogContent>

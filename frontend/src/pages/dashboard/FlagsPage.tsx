@@ -190,14 +190,8 @@ export default function FlagsPage() {
                     onClick={handleCreateFlag}
                     disabled={!newFlag.name || !newFlag.key || isCreating}
                   >
-                    {isCreating ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        {t("common.creating")}
-                      </>
-                    ) : (
-                      t("flags.createFlag")
-                    )}
+                    <Loader2 className={cn("h-4 w-4 animate-spin", !isCreating && "invisible")} />
+                    {isCreating ? t("common.creating") : t("flags.createFlag")}
                   </Button>
                 </DialogFooter>
               </DialogContent>
@@ -223,7 +217,7 @@ export default function FlagsPage() {
                   <TableHead>{t("flags.name")}</TableHead>
                   <TableHead>{t("flags.key")}</TableHead>
                   <TableHead>{t("flags.type")}</TableHead>
-                  <TableHead>{t("flags.status")}</TableHead>
+                  <TableHead className="w-[160px]">{t("flags.status")}</TableHead>
                   <TableHead className="text-right">{t("common.actions")}</TableHead>
                 </TableRow>
               </TableHeader>
@@ -248,7 +242,7 @@ export default function FlagsPage() {
                       <TableCell>
                         <Badge variant="secondary">{flag.type}</Badge>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="w-[160px]">
                         <div className="flex items-center gap-2.5">
                           <Switch
                             checked={isEnabled}
@@ -260,15 +254,13 @@ export default function FlagsPage() {
                           />
                           <span
                             className={cn(
-                              "text-sm font-medium transition-colors duration-200",
+                              "inline-block min-w-[2.5rem] text-sm font-medium transition-colors duration-200",
                               isEnabled ? "text-primary" : "text-muted-foreground",
                             )}
                           >
                             {isEnabled ? t("flags.enabled") : t("flags.disabled")}
                           </span>
-                          {togglingFlags.has(toggleKey) && (
-                            <Loader2 className="text-muted-foreground h-3.5 w-3.5 animate-spin" />
-                          )}
+                          <Loader2 className={cn("text-muted-foreground h-3.5 w-3.5 animate-spin", !togglingFlags.has(toggleKey) && "invisible")} />
                         </div>
                       </TableCell>
                       <TableCell className="text-right">

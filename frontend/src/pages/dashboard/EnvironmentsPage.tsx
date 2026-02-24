@@ -38,6 +38,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { cn } from "@/lib/utils";
 
 const isDefaultEnvironment = (key: string) =>
   DEFAULT_ENVIRONMENT_KEYS.includes(key as (typeof DEFAULT_ENVIRONMENT_KEYS)[number]);
@@ -199,14 +200,8 @@ export default function EnvironmentsPage() {
                   onClick={handleCreateEnvironment}
                   disabled={!newEnvironment.name || !newEnvironment.key || isCreating}
                 >
-                  {isCreating ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      {t("common.creating")}
-                    </>
-                  ) : (
-                    t("environments.createEnvironment")
-                  )}
+                  <Loader2 className={cn("h-4 w-4 animate-spin", !isCreating && "invisible")} />
+                  {isCreating ? t("common.creating") : t("environments.createEnvironment")}
                 </Button>
               </DialogFooter>
             </DialogContent>
@@ -373,14 +368,8 @@ export default function EnvironmentsPage() {
               onClick={handleEditEnvironment}
               disabled={!editForm.name || !editForm.key || isEditing}
             >
-              {isEditing ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {t("common.saving")}
-                </>
-              ) : (
-                t("common.save")
-              )}
+              <Loader2 className={cn("h-4 w-4 animate-spin", !isEditing && "invisible")} />
+              {isEditing ? t("common.saving") : t("common.save")}
             </Button>
           </DialogFooter>
         </DialogContent>
